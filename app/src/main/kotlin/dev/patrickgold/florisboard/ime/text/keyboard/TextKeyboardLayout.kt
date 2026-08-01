@@ -100,6 +100,13 @@ import org.florisboard.lib.snygg.ui.rememberSnyggThemeQuery
 import kotlin.math.abs
 import kotlin.math.sqrt
 
+/**
+ * How far (in swipe units, i.e. quarters of the configured swipe distance threshold) a finger must
+ * travel sideways on the space bar before a discrete space-bar action such as the language switch
+ * fires. Deliberately small so a calm swipe works, but large enough to not fight a normal tap.
+ */
+private const val SPACE_BAR_ACTION_UNIT_THRESHOLD = 2
+
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -849,8 +856,14 @@ private class TextKeyboardLayoutController(
                             }
                         }
                         true
+                    } else if (action != SwipeAction.NO_ACTION) {
+                        // Discrete actions (language switch and friends) must not depend on swipe
+                        // VELOCITY: SwipeGesture only emits TOUCH_UP above ~1900 dp/s, so a slow
+                        // deliberate swipe would never fire. Trigger once the gesture is clearly
+                        // horizontal, then latch until the finger lifts.
+                        triggerSpaceBarActionOnce(pointer, action, event.absUnitCountX)
                     } else {
-                        action != SwipeAction.NO_ACTION
+                        false
                     }
                 }
                 SwipeGesture.Direction.RIGHT -> {
@@ -868,13 +881,15 @@ private class TextKeyboardLayoutController(
                             }
                         }
                         true
+                    } else if (action != SwipeAction.NO_ACTION) {
+                        triggerSpaceBarActionOnce(pointer, action, event.absUnitCountX)
                     } else {
-                        action != SwipeAction.NO_ACTION
+                        false
                     }
                 }
                 else -> false
             }
-            SwipeGesture.Type.TOUCH_UP -> when (event.direction) {
+            SwipeGesture.Type.TOUCH_UP -> if (pointer.hasTriggeredSpaceBarAction) true else when (event.direction) {
                 SwipeGesture.Direction.LEFT -> {
                     prefs.gestures.spaceBarSwipeLeft.get().let {
                         when {
@@ -917,6 +932,19 @@ private class TextKeyboardLayoutController(
                 }
             }
         }
+    }
+
+    /**
+     * Runs a discrete space-bar swipe [action] exactly once per gesture, as soon as the finger has
+     * travelled far enough horizontally (2 swipe units ~= half the configured threshold).
+     */
+    private fun triggerSpaceBarActionOnce(pointer: TouchPointer, action: SwipeAction, absUnitCountX: Int): Boolean {
+        if (pointer.hasTriggeredSpaceBarAction) return true
+        if (abs(absUnitCountX) < SPACE_BAR_ACTION_UNIT_THRESHOLD) return true
+        pointer.hasTriggeredSpaceBarAction = true
+        inputFeedbackController?.gestureSwipe(TextKeyData.SPACE)
+        keyboardManager.executeSwipeAction(action)
+        return true
     }
 
     override fun onGlideAddPoint(point: GlideTypingGesture.Detector.Position) {
@@ -989,6 +1017,8 @@ private class TextKeyboardLayoutController(
         var hasTriggeredGestureMove: Boolean = false
         var hasTriggeredLongPress: Boolean = false
         var hasTriggeredMassSelection: Boolean = false
+        /** Guards the once-per-gesture space-bar action (e.g. language switch), see handleSpaceSwipe. */
+        var hasTriggeredSpaceBarAction: Boolean = false
         var pressedKeyInfo: InputEventDispatcher.PressedKeyInfo? = null
 
         override fun reset() {
@@ -998,6 +1028,7 @@ private class TextKeyboardLayoutController(
             hasTriggeredGestureMove = false
             hasTriggeredLongPress = false
             hasTriggeredMassSelection = false
+            hasTriggeredSpaceBarAction = false
             pressedKeyInfo = null
         }
 

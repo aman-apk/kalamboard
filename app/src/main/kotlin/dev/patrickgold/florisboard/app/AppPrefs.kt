@@ -271,7 +271,8 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
         )
         val suggestionType = enum(
             key = "emoji__suggestion_type",
-            default = EmojiSuggestionType.LEADING_COLON,
+            // Fork: emoji appear right after typing a word (SwiftKey-style), no ":" prefix needed.
+            default = EmojiSuggestionType.INLINE_TEXT,
         )
         val suggestionUpdateHistory = boolean(
             key = "emoji__suggestion_update_history",
@@ -313,13 +314,17 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
             key = "gestures__space_bar_swipe_up",
             default = SwipeAction.NO_ACTION,
         )
+        // Offline-Arabic fork: swiping the space bar switches keyboard language, the way most
+        // Arabic users expect (upstream default was cursor movement, which duplicates the
+        // dedicated cursor row). Users who prefer the old behavior can set it back in Settings >
+        // Gestures; jetpref only persists explicitly-set values, so this only affects fresh installs.
         val spaceBarSwipeLeft = enum(
             key = "gestures__space_bar_swipe_left",
-            default = SwipeAction.MOVE_CURSOR_LEFT,
+            default = SwipeAction.SWITCH_TO_NEXT_SUBTYPE,
         )
         val spaceBarSwipeRight = enum(
             key = "gestures__space_bar_swipe_right",
-            default = SwipeAction.MOVE_CURSOR_RIGHT,
+            default = SwipeAction.SWITCH_TO_PREV_SUBTYPE,
         )
         val spaceBarLongPress = enum(
             key = "gestures__space_bar_long_press",

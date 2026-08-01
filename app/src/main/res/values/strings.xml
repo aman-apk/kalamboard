@@ -1190,4 +1190,21 @@
         <item quantity="other">{v} candidates</item>
     </plurals>
 
+
+    <!-- Offline neural translation (fork feature) -->
+    <string name="quick_action__ime_ui_mode_translate" comment="Please mind the limited available space for the quick action strings">Translate</string>
+    <string name="quick_action__ime_ui_mode_translate__tooltip">Open the offline translator</string>
+    <string name="translate__direction_label">{source} → {target}</string>
+    <string name="translate__language_arabic">Arabic</string>
+    <string name="translate__language_english">English</string>
+    <string name="translate__swap_direction">Swap translation direction</string>
+    <string name="translate__empty_source">Type something to translate</string>
+    <string name="translate__hint_press_translate">Press Translate to translate the text on this device</string>
+    <string name="translate__preparing_model">Preparing the offline model…</string>
+    <string name="translate__translating">Translating…</string>
+    <string name="translate__action_translate">Translate</string>
+    <string name="translate__action_replace">Replace</string>
+    <string name="translate__action_copy">Copy</string>
+    <string name="translate__error_model_unavailable">Translation model could not be loaded</string>
+    <string name="translate__error_failed">Translation failed, please try again</string>
 </resources>

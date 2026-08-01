@@ -170,6 +170,11 @@ data class EmojiData(
             "${language}.txt".takeIf { emojiAssets.contains(it) }?.let {
                 return makePath(it)
             }
+            // Fall back to the locale-neutral root data instead of silently yielding an empty
+            // emoji set (which killed emoji suggestions for any locale without its own file).
+            "root.txt".takeIf { emojiAssets.contains(it) }?.let {
+                return makePath(it)
+            }
             return null
         }
     }

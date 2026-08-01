@@ -99,6 +99,34 @@ class PersonalLearningTest : FunSpec({
         }
     }
 
+    context("rerankByContext") {
+        test("a known follower overtakes a slightly better stray candidate") {
+            val ranked = listOf(
+                ranked("الخيار", 200, score = 200.0, correction = true),
+                ranked("الخير", 190, score = 190.0, correction = true),
+            )
+            val followers = mapOf(ArabicNormalizer.normalize("الخير") to 250)
+            val out = PersonalLearning.rerankByContext(ranked, followers, ArabicNormalizer)
+            out.first().entry.word shouldBe "الخير" // 190 * (1 + 0.6*250/255) ≈ 302 > 200
+        }
+        test("exact match stays pinned first even when a follower is boosted") {
+            val ranked = listOf(
+                ranked("شو", 255, score = WordIndex.EXACT_MATCH_BASE + 255, exact = true),
+                ranked("شوي", 200, score = 200.0),
+            )
+            val followers = mapOf(ArabicNormalizer.normalize("شوي") to 255)
+            PersonalLearning.rerankByContext(ranked, followers, ArabicNormalizer)
+                .first().entry.word shouldBe "شو"
+        }
+        test("no followers means untouched order") {
+            val ranked = listOf(
+                ranked("كلمه", 100, score = 100.0),
+                ranked("كلام", 90, score = 90.0),
+            )
+            PersonalLearning.rerankByContext(ranked, emptyMap(), ArabicNormalizer) shouldBe ranked
+        }
+    }
+
     context("mergeNextWords") {
         test("personal pairs merge with static ones, best freq wins") {
             val static = listOf("الخير" to 250, "النور" to 240)

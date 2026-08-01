@@ -65,3 +65,7 @@ debug/
 target/
 **/*.rs.bk
 *.pdb
+
+# Raw translation model downloads (the staged copies under app/src/main/assets/translate are committed)
+dictionaries/sources/raw/translate/
+dictionaries/sources/raw/cldr_*.xml

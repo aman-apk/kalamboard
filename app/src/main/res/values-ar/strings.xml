@@ -1118,4 +1118,21 @@
     <string name="unit__percent__symbol">{v}%</string>
     <string name="unit__display_pixel__symbol">{v} dp</string>
     <string name="unit__display_pixel_per_seconds__symbol">{v} dp/s</string>
+
+    <!-- Offline neural translation (fork feature) -->
+    <string name="quick_action__ime_ui_mode_translate" comment="Please mind the limited available space for the quick action strings">ترجمة</string>
+    <string name="quick_action__ime_ui_mode_translate__tooltip">فتح المترجم بلا إنترنت</string>
+    <string name="translate__direction_label">{source} ← {target}</string>
+    <string name="translate__language_arabic">العربية</string>
+    <string name="translate__language_english">الإنكليزية</string>
+    <string name="translate__swap_direction">عكس اتجاه الترجمة</string>
+    <string name="translate__empty_source">اكتب نصاً لترجمته</string>
+    <string name="translate__hint_press_translate">اضغط «ترجمة» لترجمة النص على هذا الجهاز</string>
+    <string name="translate__preparing_model">جارٍ تجهيز النموذج…</string>
+    <string name="translate__translating">جارٍ الترجمة…</string>
+    <string name="translate__action_translate">ترجمة</string>
+    <string name="translate__action_replace">استبدال</string>
+    <string name="translate__action_copy">نسخ</string>
+    <string name="translate__error_model_unavailable">تعذّر تحميل نموذج الترجمة</string>
+    <string name="translate__error_failed">فشلت الترجمة، حاول مرة أخرى</string>
 </resources>

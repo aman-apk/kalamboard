@@ -292,6 +292,9 @@ dependencies {
     implementation(libs.kotlin.reflect)
     implementation(libs.kotlinx.coroutines)
     implementation(libs.kotlinx.serialization.json)
+    // Offline neural translation runtime (prebuilt AAR, no NDK/CMake needed; contains no
+    // networking code — the offline guard's catalog scan is unaffected).
+    implementation(libs.onnxruntime.android)
     implementation(libs.mikepenz.aboutlibraries.core)
     implementation(libs.mikepenz.aboutlibraries.compose)
     implementation(libs.patrickgold.compose.tooltip)
@@ -307,6 +310,8 @@ dependencies {
     // OFFLINE BUILD (phase 6): projects.lib.native unhooked together with the module, see settings.gradle.kts.
     implementation(projects.lib.snygg)
 
+    // Same ai.onnxruntime API as the Android AAR, so the translation engine is testable on the JVM.
+    testImplementation(libs.onnxruntime.jvm)
     testImplementation(libs.kotest.assertions.core)
     testImplementation(libs.kotest.property)
     testImplementation(libs.kotest.runner.junit5)

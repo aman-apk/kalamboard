@@ -39,10 +39,17 @@ import io.github.reactivecircus.cache4k.Cache
  * @param context The application context.
  */
 class EmojiSuggestionProvider(private val context: Context) : SuggestionProvider {
+    companion object {
+        /** Inline emoji must complement, never crowd out, the word suggestions. */
+        private const val INLINE_MAX_CANDIDATES = 2
+    }
+
     override val providerId = "org.florisboard.nlp.providers.emoji"
 
     private val prefs by FlorisPreferenceStore
-    private val lettersRegex = "^[A-Za-z]*$".toRegex()
+    // Any-letter query (upstream was ASCII-only, which rejected every Arabic word and made
+    // emoji suggestions dead for Arabic subtypes).
+    private val lettersRegex = "^\\p{L}*$".toRegex()
 
     private val cachedEmojiMappings = Cache.Builder<FlorisLocale, EmojiDataBySkinTone>().build()
 
@@ -68,17 +75,31 @@ class EmojiSuggestionProvider(private val context: Context) : SuggestionProvider
         val showName = prefs.emoji.suggestionCandidateShowName.get()
         val query = validateInputQuery(content.composingText) ?: return emptyList()
         val emojis = cachedEmojiMappings.get(subtype.primaryLocale)?.get(preferredSkinTone) ?: emptyList()
+        // In inline mode (empty prefix) emoji ride along with normal word suggestions, so the
+        // matching must be strict word-starts (contains-matching floods on everyday words) and
+        // the count small enough to never crowd out the word candidates.
+        val isInline = prefs.emoji.suggestionType.get().prefix.isEmpty()
+        val effectiveLimit = if (isInline) minOf(INLINE_MAX_CANDIDATES, maxCandidateCount) else maxCandidateCount
         val candidates = withContext(Dispatchers.Default) {
             emojis.parallelStream()
                 .map { emoji ->
-                    val nameWeight = emoji.name.containsWeighted(query, ignoreCase = true)
-                    val keywordWeight = emoji.keywords
-                        .any { it.contains(query, ignoreCase = true) }
-                        .let { if (it) 1.0 else 0.0 }
+                    val nameWeight: Double
+                    val keywordWeight: Double
+                    if (isInline) {
+                        nameWeight = if (emoji.name.split(' ').any { it.startsWith(query, ignoreCase = true) }) {
+                            query.length.toDouble() / emoji.name.length.toDouble()
+                        } else 0.0
+                        keywordWeight = if (emoji.keywords.any { it.startsWith(query, ignoreCase = true) }) 1.0 else 0.0
+                    } else {
+                        nameWeight = emoji.name.containsWeighted(query, ignoreCase = true)
+                        keywordWeight = emoji.keywords
+                            .any { it.contains(query, ignoreCase = true) }
+                            .let { if (it) 1.0 else 0.0 }
+                    }
                     emoji to (nameWeight * 0.7 + keywordWeight * 0.3)
                 }
                 .sorted { (_, a), (_, b) -> b.compareTo(a) }
-                .limit(maxCandidateCount.toLong())
+                .limit(effectiveLimit.toLong())
                 .filter { (_, a) -> a > 0 }
                 .map { (emoji, _) ->
                     EmojiSuggestionCandidate(

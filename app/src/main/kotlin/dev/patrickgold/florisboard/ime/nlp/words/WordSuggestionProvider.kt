@@ -72,6 +72,9 @@ class WordSuggestionProvider(context: Context) : SpellingProvider, SuggestionPro
         /** Only ever keep this many language dictionaries in memory at the same time. */
         private const val MAX_LOADED_DICTIONARIES = 3
 
+        /** How many followers of the previous word are fetched for contextual reranking. */
+        private const val CONTEXT_FOLLOWER_FETCH = 16
+
         private const val AUTO_CORRECT_MIN_COMPOSING_LENGTH = 3
         private const val AUTO_CORRECT_MAX_DISTANCE = 1.0
         private const val AUTO_CORRECT_MIN_FREQ = 40
@@ -193,13 +196,34 @@ class WordSuggestionProvider(context: Context) : SpellingProvider, SuggestionPro
         val staticRanked = dictionary?.index?.suggest(query, maxCandidateCount * 2, allowPossiblyOffensive)
             ?: emptyList()
         val userRanked = userIndexFor(language).suggest(query, maxCandidateCount, allowPossiblyOffensive)
-        val ranked = PersonalLearning.mergeRanked(
+        val merged = PersonalLearning.mergeRanked(
             static = staticRanked,
             user = userRanked,
             blocked = learning.blockedWords(language),
             maxCount = maxCandidateCount,
         )
-        if (ranked.isEmpty()) return emptyList()
+        if (merged.isEmpty()) return emptyList()
+
+        // Contextual reranking: what usually FOLLOWS the previous word wins ties and close calls
+        // among corrections/completions ("صباح الخ" -> الخير even if a stray match scores higher).
+        val ranked = run {
+            val beforeComposing = if (content.composing.isValid) {
+                content.textBeforeSelection.dropLast(composing.length)
+            } else {
+                content.textBeforeSelection
+            }
+            val previousWord = extractLastWord(beforeComposing)
+            if (previousWord.isEmpty()) return@run merged
+            val prevNorm = normalizer.normalize(previousWord)
+            val followers = HashMap<String, Int>(32)
+            dictionary?.nextWords(prevNorm, CONTEXT_FOLLOWER_FETCH)?.forEach { (word, freq) ->
+                followers.merge(normalizer.normalize(word), freq, ::maxOf)
+            }
+            learning.bigramsFor(language, prevNorm, CONTEXT_FOLLOWER_FETCH).forEach { (word, count) ->
+                followers.merge(normalizer.normalize(word), PersonalLearning.userBigramFreq(count), ::maxOf)
+            }
+            PersonalLearning.rerankByContext(merged, followers, normalizer)
+        }
 
         val hasExactMatch = ranked.first().isExactMatch
         val autoCorrectEnabled = prefs.correction.autoCorrectEnabled.get()

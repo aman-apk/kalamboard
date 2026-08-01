@@ -81,6 +81,38 @@ object PersonalLearning {
             .toList()
     }
 
+    /** Weight of the previous-word (bigram) signal when reranking corrections/completions. */
+    const val CONTEXT_BOOST_WEIGHT = 0.6
+
+    /**
+     * Context-aware reranking: candidates whose normalized form is a known follower of the
+     * previous word get their score boosted proportionally to the bigram frequency, so typing
+     * "صباح الخ" ranks "الخير" above an otherwise more frequent stray match, and an ambiguous
+     * correction resolves toward what actually follows the preceding word.
+     *
+     * Exact matches keep their pinned-first position (their score is orders of magnitude above
+     * the boost anyway); everything else re-sorts by the boosted score.
+     *
+     * @param followers normalized follower word -> bigram freq (0..255) for the preceding word.
+     */
+    fun rerankByContext(
+        ranked: List<RankedWord>,
+        followers: Map<String, Int>,
+        normalizer: WordNormalizer,
+    ): List<RankedWord> {
+        if (followers.isEmpty() || ranked.size < 2) return ranked
+        var changed = false
+        val boosted = ranked.map { candidate ->
+            val bigramFreq = followers[normalizer.normalize(candidate.entry.word)] ?: return@map candidate
+            changed = true
+            candidate.copy(score = candidate.score * (1.0 + CONTEXT_BOOST_WEIGHT * (bigramFreq / 255.0)))
+        }
+        if (!changed) return ranked
+        return boosted.sortedWith(
+            compareByDescending<RankedWord> { it.isExactMatch }.thenByDescending { it.score }
+        )
+    }
+
     /**
      * Merges static and personal next-word predictions ((word, freq 0..255) pairs, each list
      * already sorted best-first), deduplicating on word with max freq and dropping blocked words.
