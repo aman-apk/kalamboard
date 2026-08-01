@@ -13,7 +13,7 @@
     <color name="textColorError">#FFFFFF</color><!-- White -->
 
     <!-- Offline-Arabic fork identity: near-black icon background, gold foreground -->
-    <color name="ic_app_icon_background">#0E0E10</color>
+    <color name="ic_app_icon_background">#000000</color>
 
     <color name="cardViewBackgroundColor">#FFFFFF</color><!-- White -->
     <color name="navigationBarColor">#000000</color><!-- Black -->

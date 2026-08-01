@@ -598,6 +598,12 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
             key = "localization__subtypes",
             default = "[]",
         )
+        // KalamBoard: guards the one-time seeding of the default Arabic+English subtypes, so a
+        // user who deliberately removes a language never gets it re-added.
+        val defaultsSeeded = boolean(
+            key = "localization__defaults_seeded",
+            default = false,
+        )
     }
 
     val other = Other()
@@ -730,17 +736,16 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
             key = "theme__mode",
             default = ThemeMode.FOLLOW_SYSTEM,
         )
-        // Offline-Arabic fork: the visual identity is dark graphite kohl-lined with gold — the
-        // Golden Dark theme is the default for BOTH day and night (upstream themes stay
-        // selectable in the theme manager).
+        // KalamBoard: Kalam Black (pure black, whisper of gold) is the default for BOTH day and
+        // night; every other bundled theme stays selectable in the theme manager.
         val dayThemeId = custom(
             key = "theme__day_theme_id",
-            default = ExtensionComponentName("org.florisboard.themes.golden", "golden_night"),
+            default = ExtensionComponentName("org.kalamboard.themes", "kalam_black"),
             serializer = ExtensionComponentName.Serializer,
         )
         val nightThemeId = custom(
             key = "theme__night_theme_id",
-            default = ExtensionComponentName("org.florisboard.themes.golden", "golden_night"),
+            default = ExtensionComponentName("org.kalamboard.themes", "kalam_black"),
             serializer = ExtensionComponentName.Serializer,
         )
         val accentColor = custom(

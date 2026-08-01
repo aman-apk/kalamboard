@@ -19,6 +19,7 @@ package dev.patrickgold.florisboard.ime.core
 import android.content.Context
 import dev.patrickgold.florisboard.app.FlorisPreferenceStore
 import dev.patrickgold.florisboard.ime.keyboard.CurrencySet
+import dev.patrickgold.florisboard.appContext
 import dev.patrickgold.florisboard.keyboardManager
 import dev.patrickgold.florisboard.lib.FlorisLocale
 import dev.patrickgold.florisboard.lib.devtools.flogDebug
@@ -26,6 +27,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import org.florisboard.lib.kotlin.collectLatestIn
@@ -42,6 +44,7 @@ val SubtypeJsonConfig = Json {
  */
 class SubtypeManager(context: Context) {
     private val prefs by FlorisPreferenceStore
+    private val appContext by context.appContext()
     private val keyboardManager by context.keyboardManager()
     private val scope = CoroutineScope(Dispatchers.Default)
 
@@ -58,6 +61,32 @@ class SubtypeManager(context: Context) {
         private set(v) { activeSubtypeFlow.value = v }
 
     init {
+        // KalamBoard: ship ready to type — on the very first launch the keyboard seeds one Arabic
+        // (ar-SY, western digits) and one English (en-US qwerty) subtype instead of starting
+        // empty. Users can change or remove them in Settings > Languages & layouts; the seeded
+        // flag guarantees this runs exactly once per installation.
+        scope.launch {
+            appContext.preferenceStoreLoaded.first { it }
+            if (prefs.localization.defaultsSeeded.get()) return@launch
+            val presets = keyboardManager.resources.subtypePresets.first { it.isNotEmpty() }
+            if (prefs.localization.subtypes.get().let { it.isBlank() || it == "[]" }) {
+                val arabicPreset = presets.find { it.locale.languageTag() == "ar-SY" }
+                    ?: presets.find { it.locale.language == "ar" }
+                val englishPreset = presets.find { it.locale.languageTag() == "en-US" }
+                    ?: presets.find { it.locale.language == "en" }
+                val seededSubtypes = buildList {
+                    arabicPreset?.let { add(it.toSubtype().copy(id = System.currentTimeMillis())) }
+                    englishPreset?.let { add(it.toSubtype().copy(id = System.currentTimeMillis() + 1)) }
+                }
+                if (seededSubtypes.isNotEmpty()) {
+                    val listRaw = SubtypeJsonConfig.encodeToString(seededSubtypes)
+                    prefs.localization.subtypes.set(listRaw)
+                    prefs.localization.activeSubtypeId.set(seededSubtypes.first().id)
+                }
+            }
+            prefs.localization.defaultsSeeded.set(true)
+        }
+
         prefs.localization.subtypes.asFlow().collectLatestIn(scope) { listRaw ->
             flogDebug { listRaw }
             val list = if (listRaw.isNotBlank()) {

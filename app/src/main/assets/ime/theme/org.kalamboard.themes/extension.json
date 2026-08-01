@@ -1,0 +1,47 @@
+{
+  "$": "ime.extension.theme",
+  "meta": {
+    "id": "org.kalamboard.themes",
+    "version": "1.0.0",
+    "title": "KalamBoard themes",
+    "description": "The KalamBoard theme collection: pure black, graphite, navy and midnight",
+    "maintainers": [
+      "KalamBoard"
+    ],
+    "license": "apache-2.0"
+  },
+  "themes": [
+    {
+      "id": "kalam_black",
+      "label": "Kalam Black",
+      "authors": [
+        "KalamBoard"
+      ],
+      "isNight": true
+    },
+    {
+      "id": "kalam_graphite",
+      "label": "Kalam Graphite",
+      "authors": [
+        "KalamBoard"
+      ],
+      "isNight": true
+    },
+    {
+      "id": "kalam_navy",
+      "label": "Kalam Navy",
+      "authors": [
+        "KalamBoard"
+      ],
+      "isNight": true
+    },
+    {
+      "id": "kalam_midnight",
+      "label": "Kalam Midnight",
+      "authors": [
+        "KalamBoard"
+      ],
+      "isNight": true
+    }
+  ]
+}

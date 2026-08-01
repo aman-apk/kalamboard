@@ -67,7 +67,9 @@ configure<ApplicationExtension> {
     }
 
     defaultConfig {
-        applicationId = "dev.patrickgold.florisboard"
+        // KalamBoard identity. The Kotlin namespace stays dev.patrickgold.florisboard (internal,
+        // never user-visible) so the fork remains mergeable with upstream.
+        applicationId = "org.kalamboard.keyboard"
         minSdk = projectMinSdk.toInt()
         targetSdk = projectTargetSdk.toInt()
         versionCode = projectVersionCode.toInt()
@@ -98,35 +100,6 @@ configure<ApplicationExtension> {
     buildFeatures {
         buildConfig = true
         compose = true
-    }
-
-    // ---------------------------------------------------------------------------------------
-    // Product flavors: the offline translation models are ~214 MB of the APK, which is most of
-    // its size. `full` bundles them (translation works out of the box); `lite` omits them and
-    // the keyboard simply hides the translate action. Everything else is identical.
-    //
-    //   ./gradlew :app:assembleFullDebug   -> ~249 MB, with translation
-    //   ./gradlew :app:assembleLiteDebug   -> ~35 MB, without translation
-    // ---------------------------------------------------------------------------------------
-    flavorDimensions += "models"
-    productFlavors {
-        create("full") {
-            dimension = "models"
-            buildConfigField("boolean", "HAS_TRANSLATION_MODELS", "true")
-        }
-        create("lite") {
-            dimension = "models"
-            applicationIdSuffix = ".lite"
-            versionNameSuffix = "-lite"
-            buildConfigField("boolean", "HAS_TRANSLATION_MODELS", "false")
-        }
-    }
-
-    sourceSets {
-        // Only the `full` flavor carries the ONNX model assets.
-        getByName("full") {
-            assets.srcDirs("src/main/assets-translate")
-        }
     }
 
     buildTypes {
@@ -321,9 +294,6 @@ dependencies {
     implementation(libs.kotlin.reflect)
     implementation(libs.kotlinx.coroutines)
     implementation(libs.kotlinx.serialization.json)
-    // Offline neural translation runtime (prebuilt AAR, no NDK/CMake needed; contains no
-    // networking code — the offline guard's catalog scan is unaffected).
-    "fullImplementation"(libs.onnxruntime.android)
     implementation(libs.mikepenz.aboutlibraries.core)
     implementation(libs.mikepenz.aboutlibraries.compose)
     implementation(libs.patrickgold.compose.tooltip)
@@ -339,8 +309,6 @@ dependencies {
     // OFFLINE BUILD (phase 6): projects.lib.native unhooked together with the module, see settings.gradle.kts.
     implementation(projects.lib.snygg)
 
-    // Same ai.onnxruntime API as the Android AAR, so the translation engine is testable on the JVM.
-    "testFullImplementation"(libs.onnxruntime.jvm)
     testImplementation(libs.kotest.assertions.core)
     testImplementation(libs.kotest.property)
     testImplementation(libs.kotest.runner.junit5)
