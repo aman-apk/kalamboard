@@ -219,6 +219,9 @@ class FlorisLocale private constructor(val base: Locale) {
     val supportsCapitalization: Boolean
         get() = when (language) {
             "zh", "ko", "th", "bn", "hi" -> false
+            // Arabic-script languages have no letter case; without this the shift logic treats
+            // them as bicameral (wrong Shift/caps behavior for ar subtypes).
+            "ar", "fa", "ur" -> false
             else -> true
         }
 

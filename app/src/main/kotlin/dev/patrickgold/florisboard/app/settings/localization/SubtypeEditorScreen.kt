@@ -334,7 +334,7 @@ fun SubtypeEditorScreen(id: Long?) = FlorisScreen {
                                         DisplayLanguageNamesIn.SYSTEM_LOCALE -> suggestedPreset.locale.displayName()
                                         DisplayLanguageNamesIn.NATIVE_LOCALE -> suggestedPreset.locale.displayName(suggestedPreset.locale)
                                     },
-                                    secondaryText = suggestedPreset.preferred.characters.componentId,
+                                    secondaryText = suggestedPreset.preferred.presetDisplayLabel(),
                                     colors = ListItemDefaults.colors(containerColor = CardDefaults.cardColors().containerColor),
                                 )
                             }
@@ -505,7 +505,7 @@ fun SubtypeEditorScreen(id: Long?) = FlorisScreen {
                                     DisplayLanguageNamesIn.SYSTEM_LOCALE -> subtypePreset.locale.displayName()
                                     DisplayLanguageNamesIn.NATIVE_LOCALE -> subtypePreset.locale.displayName(subtypePreset.locale)
                                 },
-                                secondaryText = subtypePreset.preferred.characters.componentId,
+                                secondaryText = subtypePreset.preferred.presetDisplayLabel(),
                                 colors = ListItemDefaults.colors(containerColor = AlertDialogDefaults.containerColor),
                             )
                         }
@@ -573,4 +573,18 @@ private fun SubtypeGroupSpacer() {
     Spacer(modifier = Modifier
         .fillMaxWidth()
         .height(32.dp))
+}
+
+/**
+ * Secondary label for a preset row in the preset pickers. Shows the characters layout, plus the
+ * numeric-row layout whenever it deviates from the app-wide western default — this is what
+ * distinguishes e.g. the Arabic preset with western digits (123) from its secondary variant with
+ * Eastern Arabic-Indic digits (١٢٣).
+ */
+private fun SubtypeLayoutMap.presetDisplayLabel(): String = buildString {
+    append(characters.componentId)
+    if (numericRow.componentId != "western_arabic") {
+        append(" · ")
+        append(numericRow.componentId)
+    }
 }

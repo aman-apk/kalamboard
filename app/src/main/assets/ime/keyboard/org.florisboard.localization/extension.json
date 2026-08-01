@@ -22,6 +22,15 @@
       "symbolsPrecedingPhantomSpace": ".,;:?‽!&%)]}»©®™",
       "symbolsFollowingPhantomSpace": "¿⸘¡([{",
       "symbolsTerminatingSentence": ".?‽!"
+    },
+    {
+      "id": "arabic",
+      "label": "Arabic",
+      "symbolsPrecedingAutoSpace": ".,?‽!\"&%)]}»،؟؛٪",
+      "symbolsFollowingAutoSpace": "",
+      "symbolsPrecedingPhantomSpace": ".,;:?‽!&%)]}»©®™،؟؛٪",
+      "symbolsFollowingPhantomSpace": "¿⸘¡([{",
+      "symbolsTerminatingSentence": ".?‽!؟"
     }
   ],
   "popupMappings": [
@@ -356,9 +365,36 @@
       }
     },
     {
+      "languageTag": "ar-SY",
+      "composer": "org.florisboard.composers:appender",
+      "currencySet": "org.florisboard.currencysets:syrian_pound",
+      "punctuationRule": "org.florisboard.localization:arabic",
+      "popupMapping": "org.florisboard.localization:ar",
+      "preferred": {
+        "characters": "org.florisboard.layouts:arabic",
+        "symbols": "org.florisboard.layouts:eastern",
+        "symbols2": "org.florisboard.layouts:eastern",
+        "numericRow": "org.florisboard.layouts:western_arabic"
+      }
+    },
+    {
       "languageTag": "ar",
       "composer": "org.florisboard.composers:appender",
       "currencySet": "org.florisboard.currencysets:rial",
+      "punctuationRule": "org.florisboard.localization:arabic",
+      "popupMapping": "org.florisboard.localization:ar",
+      "preferred": {
+        "characters": "org.florisboard.layouts:arabic",
+        "symbols": "org.florisboard.layouts:eastern",
+        "symbols2": "org.florisboard.layouts:eastern",
+        "numericRow": "org.florisboard.layouts:western_arabic"
+      }
+    },
+    {
+      "languageTag": "ar",
+      "composer": "org.florisboard.composers:appender",
+      "currencySet": "org.florisboard.currencysets:rial",
+      "punctuationRule": "org.florisboard.localization:arabic",
       "popupMapping": "org.florisboard.localization:ar",
       "preferred": {
         "characters": "org.florisboard.layouts:arabic",
