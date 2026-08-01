@@ -175,6 +175,21 @@ interface SuggestionProvider : NlpProvider {
     suspend fun removeSuggestion(subtype: Subtype, candidate: SuggestionCandidate): Boolean
 
     /**
+     * Is called whenever a word has been finalized in the target editor — regardless of how: the user typed it out
+     * and ended it with a separator, tapped a candidate, an auto-commit happened, or glide typing committed it.
+     * This is THE signal providers should use for on-device learning (new-word acquisition, frequency adaptation
+     * and personal next-word bigrams). Default implementation does nothing.
+     *
+     * @param subtype Information about the current subtype, primarily used for getting the primary and secondary
+     *  language for correct dictionary selection.
+     * @param word The word that has been committed to the editor.
+     * @param precedingWord The word immediately before [word] in the editor, or an empty string if there is none.
+     *  Useful for learning personal bigrams.
+     * @param isPrivateSession If true, the provider MUST NOT persist anything derived from this event.
+     */
+    suspend fun notifyWordCommitted(subtype: Subtype, word: String, precedingWord: String, isPrivateSession: Boolean) {}
+
+    /**
      * Interop method allowing the glide typing logic to perform its own magic.
      *
      * @param subtype Information about the current subtype, primarily used for getting the primary and secondary

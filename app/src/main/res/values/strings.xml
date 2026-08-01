@@ -924,6 +924,10 @@
     <string name="general__url_copied_to_clipboard" comment="Shown instead of opening a link, because this build never hands URLs to other apps.">Offline build &#8212; link copied to clipboard: {url}</string>
     <string name="correction__auto_correct_enabled_toast">Autocorrect enabled</string>
     <string name="correction__auto_correct_disabled_toast">Autocorrect disabled</string>
+    <string name="pref__suggestion__learn_from_typing__label" comment="Preference title">Learn from typing</string>
+    <string name="pref__suggestion__learn_from_typing__summary" comment="Preference summary">Learn new words and your personal next-word pairs on this device only. Never active in incognito mode</string>
+    <string name="pref__correction__auto_correct_enabled__label" comment="Preference title">Autocorrect</string>
+    <string name="pref__correction__auto_correct_enabled__summary" comment="Preference summary">Automatically replace a mistyped word with the closest suggestion on space or punctuation</string>
     <string name="general__select_dropdown_value_placeholder">&#45; select &#45;</string>
     <string name="general__unlimited">Unlimited</string>
     <string name="general__file_name">File name</string>

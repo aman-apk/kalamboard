@@ -269,6 +269,20 @@ class NlpManager(context: Context) {
         return activeCandidates.firstOrNull { it.isEligibleForAutoCommit }
     }
 
+    /**
+     * Notifies the active suggestion provider that a word has been finalized in the editor (typed
+     * out, tapped, auto-committed or glide-committed), so it can learn from the user's typing.
+     * See [SuggestionProvider.notifyWordCommitted].
+     */
+    fun notifyWordCommitted(word: String, precedingWord: String) {
+        if (word.isBlank()) return
+        val subtype = subtypeManager.activeSubtype
+        val isPrivateSession = keyboardManager.activeState.isIncognitoMode
+        scope.launch {
+            getSuggestionProvider(subtype).notifyWordCommitted(subtype, word, precedingWord, isPrivateSession)
+        }
+    }
+
     fun removeSuggestion(subtype: Subtype, candidate: SuggestionCandidate): Boolean {
         return runBlocking { candidate.sourceProvider?.removeSuggestion(subtype, candidate) == true }.also { result ->
             if (result) {

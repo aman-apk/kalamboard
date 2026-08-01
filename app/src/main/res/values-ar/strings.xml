@@ -711,6 +711,10 @@
     <string name="general__url_copied_to_clipboard" comment="Shown instead of opening a link, because this build never hands URLs to other apps.">نسخة بلا إنترنت &#8212; تم نسخ الرابط: {url}</string>
     <string name="correction__auto_correct_enabled_toast">تم تفعيل التصحيح التلقائي</string>
     <string name="correction__auto_correct_disabled_toast">تم تعطيل التصحيح التلقائي</string>
+    <string name="pref__suggestion__learn_from_typing__label" comment="Preference title">التعلّم من كتابتك</string>
+    <string name="pref__suggestion__learn_from_typing__summary" comment="Preference summary">تعلّم الكلمات الجديدة وأزواج كلماتك المتتالية على هذا الجهاز فقط. لا يعمل أبداً في وضع التخفي</string>
+    <string name="pref__correction__auto_correct_enabled__label" comment="Preference title">التصحيح التلقائي</string>
+    <string name="pref__correction__auto_correct_enabled__summary" comment="Preference summary">استبدال الكلمة المكتوبة خطأً بأقرب اقتراح تلقائياً عند المسافة أو الترقيم</string>
     <string name="general__select_dropdown_value_placeholder">&#45; اختيار &#45;</string>
     <string name="general__unlimited">غير محدود</string>
     <!-- Screen orientation strings -->

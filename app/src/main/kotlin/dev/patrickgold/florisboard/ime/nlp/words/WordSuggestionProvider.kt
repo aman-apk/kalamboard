@@ -20,6 +20,8 @@ import android.content.Context
 import dev.patrickgold.florisboard.app.FlorisPreferenceStore
 import dev.patrickgold.florisboard.appContext
 import dev.patrickgold.florisboard.ime.core.Subtype
+import dev.patrickgold.florisboard.ime.dictionary.DictionaryManager
+import dev.patrickgold.florisboard.ime.dictionary.UserDictionaryEntry
 import dev.patrickgold.florisboard.ime.editor.EditorContent
 import dev.patrickgold.florisboard.ime.nlp.SpellingProvider
 import dev.patrickgold.florisboard.ime.nlp.SpellingResult
@@ -27,6 +29,7 @@ import dev.patrickgold.florisboard.ime.nlp.SuggestionCandidate
 import dev.patrickgold.florisboard.ime.nlp.SuggestionProvider
 import dev.patrickgold.florisboard.ime.nlp.WordSuggestionCandidate
 import dev.patrickgold.florisboard.lib.devtools.flogDebug
+import dev.patrickgold.florisboard.lib.devtools.flogError
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -40,14 +43,25 @@ import kotlinx.coroutines.withContext
  *
  * Behavior per keystroke (see [suggest]):
  * - while composing a word: exact matches, then prefix completions, then proximity-weighted fuzzy
- *   corrections from [WordIndex], all ranked by frequency;
- * - right after committing a word (empty composing region): next-word predictions from the
- *   on-disk bigram table ([SqliteWordDictionary.nextWords]) — this is how multi-word phrases like
- *   "يعطيك العافية" chain themselves word by word;
+ *   corrections from [WordIndex] — merged with the user's personal dictionary (boosted), minus the
+ *   user's blocklist;
+ * - right after committing a word (empty composing region): next-word predictions from the static
+ *   bigram table merged with the personal bigrams learned from the user's own typing — this is how
+ *   multi-word phrases like "يعطيك العافية" chain themselves word by word;
  * - autocorrect: when the composing word is NOT a known word and a close high-confidence
  *   correction exists, that correction is flagged [SuggestionCandidate.isEligibleForAutoCommit],
  *   which the existing commit logic in `KeyboardManager` applies on space/punctuation. Gated
- *   behind the `correction__auto_correct_enabled` pref (toggleable via the autocorrect key).
+ *   behind the `correction__auto_correct_enabled` pref and suppressed for words whose correction
+ *   the user has repeatedly reverted.
+ *
+ * On-device learning (see [notifyWordCommitted], all local, none of it in private sessions):
+ * - an unknown word typed [PersonalLearning.PENDING_THRESHOLD] times is added to the Floris user
+ *   dictionary (visible/editable/exportable in Settings → Dictionary);
+ * - a re-typed or accepted user-dictionary word gets its frequency bumped;
+ * - every commit also feeds the personal bigram table (`floris_learning` DB) powering
+ *   personalized next-word prediction;
+ * - backspacing an auto-correction records a negative signal; long-pressing a suggestion away
+ *   blocklists it permanently.
  */
 class WordSuggestionProvider(context: Context) : SpellingProvider, SuggestionProvider {
     companion object {
@@ -71,10 +85,19 @@ class WordSuggestionProvider(context: Context) : SpellingProvider, SuggestionPro
     /** language code -> dictionary; iteration order = load order (used for eviction). */
     private val dictionaries = LinkedHashMap<String, SqliteWordDictionary>()
 
+    private val learning by lazy { LearningStore(appContext) }
+    private val dictionaryManager get() = DictionaryManager.default()
+
+    /** Small per-language index over the user dictionary; rebuilt lazily after learning writes. */
+    private val userIndexGuard = Mutex()
+    private var userIndexLanguage: String? = null
+    private var userIndex: WordIndex? = null
+    @Volatile private var userIndexDirty = true
+
     override val providerId = ProviderId
 
     override suspend fun create() {
-        // No language-independent setup needed.
+        learning.decayIfDue(System.currentTimeMillis())
     }
 
     override suspend fun preload(subtype: Subtype) = withContext(Dispatchers.IO) {
@@ -85,7 +108,7 @@ class WordSuggestionProvider(context: Context) : SpellingProvider, SuggestionPro
                 context = appContext,
                 language = language,
                 normalizer = WordNormalizer.forLanguage(language),
-            ) ?: return@withLock // No dictionary asset for this language: suggest() stays empty.
+            ) ?: return@withLock // No dictionary asset for this language: static suggestions stay empty.
             dictionaries[language] = dictionary
             while (dictionaries.size > MAX_LOADED_DICTIONARIES) {
                 val eldest = dictionaries.entries.first()
@@ -93,12 +116,60 @@ class WordSuggestionProvider(context: Context) : SpellingProvider, SuggestionPro
                 eldest.value.close()
             }
         }
+        // Warm the user index for this language as well.
+        userIndexFor(language)
+        Unit
     }
 
     private suspend fun dictionaryFor(subtype: Subtype): SqliteWordDictionary? {
         val language = subtype.primaryLocale.language
         return dictionariesGuard.withLock { dictionaries[language] }
     }
+
+    // --- user dictionary index -------------------------------------------------------------------
+
+    private fun matchesLanguage(localeStr: String?, language: String): Boolean {
+        if (localeStr == null) return true
+        val tag = localeStr.replace('_', '-').lowercase()
+        return tag == language || tag.startsWith("$language-")
+    }
+
+    private suspend fun userIndexFor(language: String): WordIndex = userIndexGuard.withLock {
+        val cached = userIndex
+        if (cached != null && userIndexLanguage == language && !userIndexDirty) return@withLock cached
+        val normalizer = WordNormalizer.forLanguage(language)
+        val entries = try {
+            dictionaryManager.loadUserDictionariesIfNecessary()
+            buildList {
+                dictionaryManager.florisUserDictionaryDao()?.queryAll()?.let { addAll(it) }
+                dictionaryManager.systemUserDictionaryDao()?.queryAll()?.let { addAll(it) }
+            }
+        } catch (e: Exception) {
+            flogError { "failed to read user dictionaries: $e" }
+            emptyList()
+        }
+        val wordEntries = entries.asSequence()
+            .filter { matchesLanguage(it.locale, language) }
+            .groupBy { it.word }
+            .map { (word, group) ->
+                WordEntry(
+                    word = word,
+                    norm = normalizer.normalize(word),
+                    freq = group.maxOf { it.freq }.coerceIn(1, 255),
+                )
+            }
+        val index = WordIndex(wordEntries, KeyProximity.forLanguage(language))
+        userIndexLanguage = language
+        userIndex = index
+        userIndexDirty = false
+        index
+    }
+
+    private fun invalidateUserIndex() {
+        userIndexDirty = true
+    }
+
+    // --- suggestion ------------------------------------------------------------------------------
 
     override suspend fun suggest(
         subtype: Subtype,
@@ -107,17 +178,27 @@ class WordSuggestionProvider(context: Context) : SpellingProvider, SuggestionPro
         allowPossiblyOffensive: Boolean,
         isPrivateSession: Boolean,
     ): List<SuggestionCandidate> {
-        val dictionary = dictionaryFor(subtype) ?: return emptyList()
-        val normalizer = WordNormalizer.forLanguage(dictionary.language)
+        val language = subtype.primaryLocale.language
+        val dictionary = dictionaryFor(subtype)
+        val normalizer = WordNormalizer.forLanguage(language)
         val composing = content.composingText
 
         if (composing.isBlank()) {
-            return suggestNextWords(dictionary, normalizer, content, maxCandidateCount)
+            return suggestNextWords(language, dictionary, normalizer, content, maxCandidateCount)
         }
 
         val query = normalizer.normalize(composing)
         if (query.isEmpty()) return emptyList()
-        val ranked = dictionary.index.suggest(query, maxCandidateCount, allowPossiblyOffensive)
+
+        val staticRanked = dictionary?.index?.suggest(query, maxCandidateCount * 2, allowPossiblyOffensive)
+            ?: emptyList()
+        val userRanked = userIndexFor(language).suggest(query, maxCandidateCount, allowPossiblyOffensive)
+        val ranked = PersonalLearning.mergeRanked(
+            static = staticRanked,
+            user = userRanked,
+            blocked = learning.blockedWords(language),
+            maxCount = maxCandidateCount,
+        )
         if (ranked.isEmpty()) return emptyList()
 
         val hasExactMatch = ranked.first().isExactMatch
@@ -130,7 +211,8 @@ class WordSuggestionProvider(context: Context) : SpellingProvider, SuggestionPro
             composing.length >= AUTO_CORRECT_MIN_COMPOSING_LENGTH &&
             top.distance <= AUTO_CORRECT_MAX_DISTANCE &&
             top.entry.freq >= AUTO_CORRECT_MIN_FREQ &&
-            (second == null || top.score >= second.score * AUTO_CORRECT_MIN_SCORE_MARGIN)
+            (second == null || top.score >= second.score * AUTO_CORRECT_MIN_SCORE_MARGIN) &&
+            !learning.isAutocorrectBlocked(top.entry.word)
 
         return ranked.mapIndexed { i, rankedWord ->
             WordSuggestionCandidate(
@@ -146,9 +228,10 @@ class WordSuggestionProvider(context: Context) : SpellingProvider, SuggestionPro
         }
     }
 
-    /** Next-word prediction from the bigram table, driven by the last committed word. */
-    private fun suggestNextWords(
-        dictionary: SqliteWordDictionary,
+    /** Next-word prediction: static bigram table merged with the user's personal bigrams. */
+    private suspend fun suggestNextWords(
+        language: String,
+        dictionary: SqliteWordDictionary?,
         normalizer: WordNormalizer,
         content: EditorContent,
         maxCandidateCount: Int,
@@ -156,7 +239,25 @@ class WordSuggestionProvider(context: Context) : SpellingProvider, SuggestionPro
         val previousWord = extractLastWord(content.textBeforeSelection)
         if (previousWord.isEmpty()) return emptyList()
         val prevNorm = normalizer.normalize(previousWord)
-        return dictionary.nextWords(prevNorm, maxCandidateCount).map { (word, freq) ->
+
+        val staticNext = dictionary?.nextWords(prevNorm, maxCandidateCount) ?: emptyList()
+        val userIdx = userIndexFor(language)
+        val personalNext = learning.bigramsFor(language, prevNorm, maxCandidateCount)
+            .filter { (word, _) ->
+                // Only predict words that are known — either statically or learned into the user
+                // dictionary — so junk never resurfaces from the raw bigram log.
+                val norm = normalizer.normalize(word)
+                dictionary?.index?.exact(norm)?.isNotEmpty() == true || userIdx.exact(norm).isNotEmpty()
+            }
+            .map { (word, count) -> word to PersonalLearning.userBigramFreq(count) }
+
+        val merged = PersonalLearning.mergeNextWords(
+            static = staticNext,
+            personal = personalNext,
+            blocked = learning.blockedWords(language),
+            maxCount = maxCandidateCount,
+        )
+        return merged.map { (word, freq) ->
             WordSuggestionCandidate(
                 text = word,
                 secondaryText = null,
@@ -172,11 +273,13 @@ class WordSuggestionProvider(context: Context) : SpellingProvider, SuggestionPro
         val text = textBeforeSelection.trimEnd()
         if (text.isEmpty()) return ""
         var start = text.length
-        while (start > 0 && text[start - 1].isLetter()) {
+        while (start > 0 && (text[start - 1].isLetter() || text[start - 1] == '\'')) {
             start--
         }
         return text.substring(start)
     }
+
+    // --- spelling --------------------------------------------------------------------------------
 
     override suspend fun spell(
         subtype: Subtype,
@@ -187,10 +290,14 @@ class WordSuggestionProvider(context: Context) : SpellingProvider, SuggestionPro
         allowPossiblyOffensive: Boolean,
         isPrivateSession: Boolean,
     ): SpellingResult {
+        val language = subtype.primaryLocale.language
         val dictionary = dictionaryFor(subtype) ?: return SpellingResult.unspecified()
-        val normalizer = WordNormalizer.forLanguage(dictionary.language)
+        val normalizer = WordNormalizer.forLanguage(language)
         val norm = normalizer.normalize(word)
-        if (norm.isEmpty() || dictionary.index.exact(norm).isNotEmpty()) {
+        if (norm.isEmpty() ||
+            dictionary.index.exact(norm).isNotEmpty() ||
+            userIndexFor(language).exact(norm).isNotEmpty()
+        ) {
             return SpellingResult.validWord()
         }
         val corrections = dictionary.index.suggest(norm, maxSuggestionCount, allowPossiblyOffensive)
@@ -203,21 +310,88 @@ class WordSuggestionProvider(context: Context) : SpellingProvider, SuggestionPro
         }
     }
 
+    // --- learning --------------------------------------------------------------------------------
+
+    override suspend fun notifyWordCommitted(
+        subtype: Subtype,
+        word: String,
+        precedingWord: String,
+        isPrivateSession: Boolean,
+    ): Unit = withContext(Dispatchers.IO) {
+        if (isPrivateSession || !prefs.suggestion.learnFromTyping.get()) return@withContext
+        val language = subtype.primaryLocale.language
+        val cleanWord = word.trim()
+        if (!PersonalLearning.isLearnableWord(cleanWord)) return@withContext
+        if (learning.isWordBlocked(language, cleanWord)) return@withContext
+        val normalizer = WordNormalizer.forLanguage(language)
+        val dictionary = dictionaryFor(subtype)
+
+        // Unigram learning: bump user words, acquire unknown words after repeated sightings.
+        try {
+            dictionaryManager.loadUserDictionariesIfNecessary()
+            val dao = dictionaryManager.florisUserDictionaryDao()
+            val userEntry = dao?.queryExact(cleanWord)?.firstOrNull { matchesLanguage(it.locale, language) }
+            when {
+                userEntry != null -> {
+                    dao.update(userEntry.copy(freq = PersonalLearning.bumpedFreq(userEntry.freq)))
+                    invalidateUserIndex()
+                }
+                dictionary?.index?.exact(normalizer.normalize(cleanWord))?.isNotEmpty() == true -> {
+                    // Known static word: nothing to acquire (its frequency is corpus-driven).
+                }
+                else -> {
+                    val count = learning.recordPendingWord(language, cleanWord)
+                    if (count >= PersonalLearning.PENDING_THRESHOLD && dao != null) {
+                        dao.insert(UserDictionaryEntry(0, cleanWord, PersonalLearning.NEW_WORD_FREQ, language, null))
+                        learning.clearPendingWord(language, cleanWord)
+                        invalidateUserIndex()
+                        flogDebug { "learned new word: $cleanWord ($language)" }
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            flogError { "unigram learning failed: $e" }
+        }
+
+        // Personal bigram learning.
+        val prev = precedingWord.trim()
+        if (PersonalLearning.isLearnableWord(prev)) {
+            learning.recordBigram(language, normalizer.normalize(prev), cleanWord)
+        }
+    }
+
     override suspend fun notifySuggestionAccepted(subtype: Subtype, candidate: SuggestionCandidate) {
-        // Personal learning lands in phase 4 (user dictionary + personal bigrams).
+        // Unigram/bigram learning is handled uniformly by notifyWordCommitted, which fires for
+        // candidate commits too (see KeyboardManager.commitCandidate).
         flogDebug { "accepted: ${candidate.text}" }
     }
 
     override suspend fun notifySuggestionReverted(subtype: Subtype, candidate: SuggestionCandidate) {
-        // Personal learning lands in phase 4 (revert = negative signal for this correction).
-        flogDebug { "reverted: ${candidate.text}" }
+        // The user undid an auto-correction with backspace: negative signal. After enough reverts
+        // the engine stops auto-committing to this word (it remains a tappable suggestion).
+        withContext(Dispatchers.IO) {
+            learning.recordAutocorrectRevert(candidate.text.toString())
+        }
     }
 
     override suspend fun removeSuggestion(subtype: Subtype, candidate: SuggestionCandidate): Boolean {
-        // Personal blocklist lands in phase 4.
-        flogDebug { "remove requested: ${candidate.text}" }
-        return false
+        return withContext(Dispatchers.IO) {
+            val language = subtype.primaryLocale.language
+            val word = candidate.text.toString()
+            learning.blockWord(language, word)
+            try {
+                dictionaryManager.florisUserDictionaryDao()?.let { dao ->
+                    dao.queryExact(word).filter { matchesLanguage(it.locale, language) }.forEach { dao.delete(it) }
+                }
+            } catch (e: Exception) {
+                flogError { "failed to delete user dictionary entry: $e" }
+            }
+            invalidateUserIndex()
+            true
+        }
     }
+
+    // --- glide interop ---------------------------------------------------------------------------
 
     override suspend fun getListOfWords(subtype: Subtype): List<String> {
         return dictionaryFor(subtype)?.index?.words() ?: emptyList()
@@ -234,5 +408,6 @@ class WordSuggestionProvider(context: Context) : SpellingProvider, SuggestionPro
             dictionaries.values.forEach { it.close() }
             dictionaries.clear()
         }
+        learning.close()
     }
 }

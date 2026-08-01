@@ -48,7 +48,6 @@ import dev.patrickgold.jetpref.datastore.ui.Preference
 import dev.patrickgold.jetpref.datastore.ui.PreferenceGroup
 import dev.patrickgold.jetpref.datastore.ui.SwitchPreference
 import org.florisboard.lib.android.AndroidVersion
-import org.florisboard.lib.compose.FlorisErrorCard
 import org.florisboard.lib.compose.stringRes
 
 @OptIn(ExperimentalJetPrefDatastoreUi::class)
@@ -60,20 +59,20 @@ fun TypingScreen() = FlorisScreen {
     val navController = LocalNavController.current
 
     content {
-        // This card is temporary and is therefore not using a string resource (not so temporary as we thought...)
-        FlorisErrorCard(
-            modifier = Modifier.padding(8.dp),
-            text = """
-                Suggestions (except system autofill) and spell checking are not available in this release. All
-                preferences in the "Corrections" group are properly implemented though.
-            """.trimIndent().replace('\n', ' '),
-        )
+        // Offline-Arabic fork: the upstream "suggestions are not available" error card is gone —
+        // word suggestions, autocorrect and on-device learning are implemented in this build.
 
         PreferenceGroup(title = stringRes(R.string.pref__suggestion__title)) {
             SwitchPreference(
                 prefs.suggestion.enabled,
                 title = stringRes(R.string.pref__suggestion__enabled__label),
                 summary = stringRes(R.string.pref__suggestion__enabled__summary),
+            )
+            SwitchPreference(
+                prefs.suggestion.learnFromTyping,
+                title = stringRes(R.string.pref__suggestion__learn_from_typing__label),
+                summary = stringRes(R.string.pref__suggestion__learn_from_typing__summary),
+                enabledIf = { prefs.suggestion.enabled isEqualTo true },
             )
             SwitchPreference(
                 prefs.suggestion.blockPossiblyOffensive,
@@ -96,6 +95,12 @@ fun TypingScreen() = FlorisScreen {
         }
 
         PreferenceGroup(title = stringRes(R.string.pref__correction__title)) {
+            SwitchPreference(
+                prefs.correction.autoCorrectEnabled,
+                title = stringRes(R.string.pref__correction__auto_correct_enabled__label),
+                summary = stringRes(R.string.pref__correction__auto_correct_enabled__summary),
+                enabledIf = { prefs.suggestion.enabled isEqualTo true },
+            )
             SwitchPreference(
                 prefs.correction.autoCapitalization,
                 title = stringRes(R.string.pref__correction__auto_capitalization__label),

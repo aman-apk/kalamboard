@@ -692,6 +692,12 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
             key = "suggestion__enabled",
             default = true,
         )
+        // On-device learning: new words + personal next-word pairs. Never active in private
+        // sessions regardless of this setting; all data stays local (excluded from backup).
+        val learnFromTyping = boolean(
+            key = "suggestion__learn_from_typing",
+            default = true,
+        )
         val displayMode = enum(
             key = "suggestion__display_mode",
             default = CandidatesDisplayMode.DYNAMIC_SCROLLABLE,

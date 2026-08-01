@@ -288,12 +288,42 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
         }
         when (candidate) {
             is ClipboardSuggestionCandidate -> editorInstance.commitClipboardItem(candidate.clipboardItem)
-            else -> editorInstance.commitCompletion(candidate)
+            else -> {
+                captureWordCommitForLearning(candidate.text.toString())
+                editorInstance.commitCompletion(candidate)
+            }
         }
     }
 
     fun commitGesture(word: String) {
-        editorInstance.commitGesture(fixCase(word))
+        val cased = fixCase(word)
+        captureWordCommitForLearning(cased)
+        editorInstance.commitGesture(cased)
+    }
+
+    /**
+     * If the user finished typing a word themselves (word separator with no auto-commit candidate),
+     * forwards the composing word to the NLP learning pipeline. Must be called BEFORE the separator
+     * is committed, while the composing region still holds the word.
+     */
+    private fun captureTypedWordCommitForLearning() {
+        val composing = editorInstance.activeContent.composingText
+        if (composing.isNotBlank()) captureWordCommitForLearning(composing)
+    }
+
+    /**
+     * Forwards a finalized [word] plus the word preceding it to [NlpManager.notifyWordCommitted]
+     * for on-device learning. Reads the editor content BEFORE the commit mutates it.
+     */
+    private fun captureWordCommitForLearning(word: String) {
+        val content = editorInstance.activeContent
+        val beforeWord = if (content.composing.isValid) {
+            content.textBeforeSelection.dropLast(content.composingText.length)
+        } else {
+            content.textBeforeSelection
+        }
+        val precedingWord = beforeWord.trimEnd().takeLastWhile { it.isLetter() || it == '\'' }
+        nlpManager.notifyWordCommitted(word, precedingWord)
     }
 
     /**
@@ -536,6 +566,7 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
      */
     fun handleHardwareKeyboardSpace() {
         val candidate = nlpManager.getAutoCommitCandidate()
+        if (candidate == null) captureTypedWordCommitForLearning()
         candidate?.let { commitCandidate(it) }
         // Skip handling changing to characters keyboard and double space periods
         // TODO: this is whether we commit space after selecting candidate. Should be determined by SuggestionProvider
@@ -551,6 +582,7 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
      */
     private fun handleSpace(data: KeyData) {
         val candidate = nlpManager.getAutoCommitCandidate()
+        if (candidate == null) captureTypedWordCommitForLearning()
         candidate?.let { commitCandidate(it) }
         if (prefs.keyboard.spaceBarSwitchesToCharacters.get()) {
             when (activeState.keyboardMode) {
@@ -815,7 +847,9 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
                         KeyType.CHARACTER, KeyType.NUMERIC ->{
                             val text = data.asString(isForDisplay = false)
                             if (!UCharacter.isUAlphabetic(UCharacter.codePointAt(text, 0))) {
-                                nlpManager.getAutoCommitCandidate()?.let { commitCandidate(it) }
+                                val autoCommitCandidate = nlpManager.getAutoCommitCandidate()
+                                if (autoCommitCandidate == null) captureTypedWordCommitForLearning()
+                                autoCommitCandidate?.let { commitCandidate(it) }
                             }
                             editorInstance.commitChar(text)
                         }
