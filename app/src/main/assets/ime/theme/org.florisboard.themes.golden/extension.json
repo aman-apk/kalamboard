@@ -3,8 +3,8 @@
   "meta": {
     "id": "org.florisboard.themes.golden",
     "version": "1.0.0",
-    "title": "Golden Dark themes",
-    "description": "The visual identity of this offline Arabic fork: black and graphite, kohl-lined with gold",
+    "title": "Golden Black themes",
+    "description": "The KalamBoard identity: black and graphite, kohl-lined with a touch of gold",
     "maintainers": [
       "Floris Offline"
     ],
@@ -13,25 +13,25 @@
   "themes": [
     {
       "id": "golden_night",
-      "label": "Golden Dark",
+      "label": "Golden Black",
       "authors": [
-        "Floris Offline"
+        "KalamBoard"
       ],
       "isNight": true
     },
     {
       "id": "golden_night_borderless",
-      "label": "Golden Dark (Borderless)",
+      "label": "Golden Black (Borderless)",
       "authors": [
-        "Floris Offline"
+        "KalamBoard"
       ],
       "isNight": true
     },
     {
       "id": "golden_amoled",
-      "label": "Golden Dark (AMOLED)",
+      "label": "Golden Black (AMOLED)",
       "authors": [
-        "Floris Offline"
+        "KalamBoard"
       ],
       "isNight": true
     }
