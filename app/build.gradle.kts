@@ -100,6 +100,35 @@ configure<ApplicationExtension> {
         compose = true
     }
 
+    // ---------------------------------------------------------------------------------------
+    // Product flavors: the offline translation models are ~214 MB of the APK, which is most of
+    // its size. `full` bundles them (translation works out of the box); `lite` omits them and
+    // the keyboard simply hides the translate action. Everything else is identical.
+    //
+    //   ./gradlew :app:assembleFullDebug   -> ~249 MB, with translation
+    //   ./gradlew :app:assembleLiteDebug   -> ~35 MB, without translation
+    // ---------------------------------------------------------------------------------------
+    flavorDimensions += "models"
+    productFlavors {
+        create("full") {
+            dimension = "models"
+            buildConfigField("boolean", "HAS_TRANSLATION_MODELS", "true")
+        }
+        create("lite") {
+            dimension = "models"
+            applicationIdSuffix = ".lite"
+            versionNameSuffix = "-lite"
+            buildConfigField("boolean", "HAS_TRANSLATION_MODELS", "false")
+        }
+    }
+
+    sourceSets {
+        // Only the `full` flavor carries the ONNX model assets.
+        getByName("full") {
+            assets.srcDirs("src/main/assets-translate")
+        }
+    }
+
     buildTypes {
         named("debug") {
             applicationIdSuffix = ".debug"
@@ -294,7 +323,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     // Offline neural translation runtime (prebuilt AAR, no NDK/CMake needed; contains no
     // networking code — the offline guard's catalog scan is unaffected).
-    implementation(libs.onnxruntime.android)
+    "fullImplementation"(libs.onnxruntime.android)
     implementation(libs.mikepenz.aboutlibraries.core)
     implementation(libs.mikepenz.aboutlibraries.compose)
     implementation(libs.patrickgold.compose.tooltip)
@@ -311,7 +340,7 @@ dependencies {
     implementation(projects.lib.snygg)
 
     // Same ai.onnxruntime API as the Android AAR, so the translation engine is testable on the JVM.
-    testImplementation(libs.onnxruntime.jvm)
+    "testFullImplementation"(libs.onnxruntime.jvm)
     testImplementation(libs.kotest.assertions.core)
     testImplementation(libs.kotest.property)
     testImplementation(libs.kotest.runner.junit5)

@@ -77,6 +77,10 @@ class OnnxTranslationEngine(
         if (trimmed.isEmpty()) return ""
 
         val inputIds = tokenizer.encode(trimmed)
+        // Output length tracks input length closely for this model family. Bounding it avoids
+        // paying for 96 decoder passes on a three-word phrase (each pass re-reads the whole
+        // prefix, so the tail steps are the expensive ones).
+        val effectiveMaxNewTokens = minOf(maxNewTokens, inputIds.size * 2 + 8)
         val sourceLength = inputIds.size.toLong()
         val inputIdsLong = LongArray(inputIds.size) { inputIds[it].toLong() }
         val attentionMask = LongArray(inputIds.size) { 1L }
@@ -88,7 +92,7 @@ class OnnxTranslationEngine(
                 )
                 encoderOut.use {
                     val hidden = it.get(0) as OnnxTensor
-                    return decodeGreedy(hidden, maskTensor, maxNewTokens, isCancelled)
+                    return decodeGreedy(hidden, maskTensor, effectiveMaxNewTokens, isCancelled)
                 }
             }
         }
@@ -157,6 +161,9 @@ class OnnxTranslationEngine(
     companion object {
         const val DEFAULT_MAX_NEW_TOKENS = 96
 
+        /** Translation is a short user-initiated burst, so use the little cores too (capped at 4). */
+        val DEFAULT_THREADS: Int = Runtime.getRuntime().availableProcessors().coerceIn(2, 4)
+
         /**
          * Opens an engine over a staged model directory containing `encoder.onnx`, `decoder.onnx`,
          * `vocab.tsv` and `model_config.json`.
@@ -164,7 +171,7 @@ class OnnxTranslationEngine(
         fun open(
             modelDir: java.io.File,
             env: OrtEnvironment = OrtEnvironment.getEnvironment(),
-            threads: Int = 2,
+            threads: Int = DEFAULT_THREADS,
         ): OnnxTranslationEngine {
             val tokenizer = java.io.File(modelDir, "vocab.tsv").bufferedReader().use {
                 MarianTokenizer.fromVocabTsv(it)

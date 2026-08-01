@@ -1,9 +1,9 @@
 {
   "$schema": "https://schemas.florisboard.org/snygg/v2/stylesheet",
   "@defines": {
-    "--primary": "#d4af37",
+    "--primary": "#e0b64a",
     "--primary-variant": "#a8842c",
-    "--secondary": "#f0c75e",
+    "--secondary": "#f5d98a",
     "--secondary-variant": "#c89b3c",
     "--background": "#0e0e10",
     "--background-variant": "#1a1a1d",
@@ -16,12 +16,14 @@
     "--one-hand-background": "#201a0c",
     "--one-hand-foreground": "#d4af37",
     "--incognito-icon-color": "#d4af3711",
-    "--on-primary": "#191203",
-    "--on-background": "#e8e6e3",
+    "--on-primary": "#141008",
+    "--on-background": "#ece8e1",
     "--on-background-disabled": "#e8e6e348",
-    "--on-surface": "#f5f2ea",
-    "--on-surface-variant": "#a89968",
+    "--on-surface": "#f7f4ec",
+    "--on-surface-variant": "#b4a577",
 
+    "--kohl": "#3a3320",
+    "--kohl-strong": "#6b5a2a",
     "--shape": "rounded-corner(8dp, 8dp, 8dp, 8dp)",
     "--shape-variant": "rounded-corner(12dp, 12dp, 12dp, 12dp)",
     "--shape-chip": "rounded-corner(50%, 50%, 50%, 50%)"
@@ -67,11 +69,12 @@
     "foreground": "var(--on-surface)",
     "font-size": "22sp",
     "shape": "var(--shape)",
-    "text-max-lines": "1"
+    "text-max-lines": "1",
+    "shadow-elevation": "0dp"
   },
   "key:pressed": {
-    "background": "var(--surface)",
-    "foreground": "var(--on-surface)"
+    "background": "var(--surface-variant)",
+    "foreground": "var(--primary)"
   },
   "key[code=10]": {
     "background": "var(--primary)",
@@ -114,7 +117,9 @@
     "foreground": "var(--on-surface)",
     "font-size": "22sp",
     "shape": "var(--shape)",
-    "shadow-elevation": "2dp"
+    "shadow-elevation": "2dp",
+    "border-color": "var(--kohl-strong)",
+    "border-width": "1dp"
   },
   "key-popup-element:focus": {
     "background": "var(--focused-popup-surface)",

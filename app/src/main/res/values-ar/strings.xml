@@ -1135,4 +1135,5 @@
     <string name="translate__action_copy">نسخ</string>
     <string name="translate__error_model_unavailable">تعذّر تحميل نموذج الترجمة</string>
     <string name="translate__error_failed">فشلت الترجمة، حاول مرة أخرى</string>
+    <string name="translate__unavailable_in_lite">الترجمة غير متوفرة في النسخة الخفيفة</string>
 </resources>

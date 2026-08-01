@@ -31,7 +31,7 @@ import java.io.File
  * rather than only "looks about right".
  */
 class MarianTokenizerTest : FunSpec({
-    val assetsDir = File("src/main/assets/translate")
+    val assetsDir = File("src/main/assets-translate/translate")
 
     fun tokenizer(direction: String): MarianTokenizer =
         File(assetsDir, "$direction/vocab.tsv").bufferedReader().use { MarianTokenizer.fromVocabTsv(it) }
@@ -96,7 +96,7 @@ class MarianTokenizerTest : FunSpec({
  * direction and greedily decodes, which takes a few seconds on a desktop CPU.
  */
 class OnnxTranslationEngineTest : FunSpec({
-    val assetsDir = File("src/main/assets/translate")
+    val assetsDir = File("src/main/assets-translate/translate")
     val modelsPresent = File(assetsDir, "ar-en/encoder.onnx").exists() &&
         File(assetsDir, "en-ar/encoder.onnx").exists()
 

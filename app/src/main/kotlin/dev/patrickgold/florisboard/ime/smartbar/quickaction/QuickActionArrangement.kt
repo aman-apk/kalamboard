@@ -16,6 +16,7 @@
 
 package dev.patrickgold.florisboard.ime.smartbar.quickaction
 
+import dev.patrickgold.florisboard.BuildConfig
 import dev.patrickgold.florisboard.ime.text.keyboard.TextKeyData
 import dev.patrickgold.florisboard.lib.io.DefaultJsonConfig
 import dev.patrickgold.jetpref.datastore.model.PreferenceSerializer
@@ -67,14 +68,16 @@ data class QuickActionArrangement(
     companion object {
         val Default = QuickActionArrangement(
             stickyAction = QuickAction.InsertKey(TextKeyData.VOICE_INPUT),
-            dynamicActions = listOf(
+            dynamicActions = listOfNotNull(
                 QuickAction.InsertKey(TextKeyData.UNDO),
                 QuickAction.InsertKey(TextKeyData.REDO),
                 QuickAction.InsertKey(TextKeyData.SETTINGS),
                 QuickAction.InsertKey(TextKeyData.TOGGLE_FLOATING_WINDOW),
                 QuickAction.InsertKey(TextKeyData.TOGGLE_RESIZE_MODE),
                 QuickAction.InsertKey(TextKeyData.IME_UI_MODE_CLIPBOARD),
-                QuickAction.InsertKey(TextKeyData.IME_UI_MODE_TRANSLATE),
+                // Translation is only shipped in the `full` flavor (the models are ~214 MB).
+                QuickAction.InsertKey(TextKeyData.IME_UI_MODE_TRANSLATE)
+                    .takeIf { BuildConfig.HAS_TRANSLATION_MODELS },
                 QuickAction.InsertKey(TextKeyData.IME_UI_MODE_MEDIA),
                 QuickAction.InsertKey(TextKeyData.TOGGLE_COMPACT_LAYOUT),
                 QuickAction.InsertKey(TextKeyData.TOGGLE_AUTOCORRECT),

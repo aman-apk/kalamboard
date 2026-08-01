@@ -1207,4 +1207,5 @@
     <string name="translate__action_copy">Copy</string>
     <string name="translate__error_model_unavailable">Translation model could not be loaded</string>
     <string name="translate__error_failed">Translation failed, please try again</string>
+    <string name="translate__unavailable_in_lite">Translation is not available in the Lite build</string>
 </resources>
