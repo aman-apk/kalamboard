@@ -16,8 +16,12 @@
 
 package dev.patrickgold.florisboard.app.settings.clipboard
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.History
 import androidx.compose.runtime.Composable
 import dev.patrickgold.florisboard.R
+import dev.patrickgold.florisboard.app.LocalNavController
+import dev.patrickgold.florisboard.app.Routes
 import dev.patrickgold.florisboard.app.enumDisplayEntriesOf
 import dev.patrickgold.florisboard.ime.clipboard.CLIPBOARD_HISTORY_NUM_GRID_COLUMNS_AUTO
 import dev.patrickgold.florisboard.ime.clipboard.ClipboardSyncBehavior
@@ -25,6 +29,7 @@ import dev.patrickgold.florisboard.lib.compose.FlorisScreen
 import dev.patrickgold.jetpref.datastore.ui.DialogSliderPreference
 import dev.patrickgold.jetpref.datastore.ui.ExperimentalJetPrefDatastoreUi
 import dev.patrickgold.jetpref.datastore.ui.ListPreference
+import dev.patrickgold.jetpref.datastore.ui.Preference
 import dev.patrickgold.jetpref.datastore.ui.PreferenceGroup
 import dev.patrickgold.jetpref.datastore.ui.SwitchPreference
 import org.florisboard.lib.android.AndroidVersion
@@ -36,6 +41,8 @@ import org.florisboard.lib.compose.stringRes
 fun ClipboardScreen() = FlorisScreen {
     title = stringRes(R.string.settings__clipboard__title)
     previewFieldVisible = true
+
+    val navController = LocalNavController.current
 
     content {
         SwitchPreference(
@@ -78,6 +85,13 @@ fun ClipboardScreen() = FlorisScreen {
                 prefs.clipboard.historyEnabled,
                 title = stringRes(R.string.pref__clipboard__enable_clipboard_history__label),
                 summary = stringRes(R.string.pref__clipboard__enable_clipboard_history__summary),
+            )
+            Preference(
+                icon = Icons.Default.History,
+                title = stringRes(R.string.settings__clipboard_history__title),
+                summary = stringRes(R.string.settings__clipboard_history__entry_summary),
+                onClick = { navController.navigate(Routes.Settings.ClipboardHistory) },
+                enabledIf = { prefs.clipboard.historyEnabled isEqualTo true },
             )
             DialogSliderPreference(
                 primaryPref = prefs.clipboard.historyNumGridColumnsPortrait,

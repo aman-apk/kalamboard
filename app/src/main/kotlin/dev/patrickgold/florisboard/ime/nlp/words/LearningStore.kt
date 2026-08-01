@@ -20,6 +20,8 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import dev.patrickgold.florisboard.lib.devtools.flogError
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 
 /**
  * On-device persistence for the personal-learning metadata that does NOT belong in the
@@ -195,6 +197,100 @@ class LearningStore(context: Context) : SQLiteOpenHelper(context, DB_NAME, null,
 
     private fun setMetaLong(db: SQLiteDatabase, key: String, value: Long) {
         db.execSQL("INSERT OR REPLACE INTO meta (key, value) VALUES (?, ?)", arrayOf(key, value.toString()))
+    }
+
+    // --- backup / restore ------------------------------------------------------------------------
+
+    @Serializable
+    data class Snapshot(
+        val version: Int = 1,
+        val pendingWords: List<PendingWordRow> = emptyList(),
+        val userBigrams: List<UserBigramRow> = emptyList(),
+        val blockedWords: List<BlockedWordRow> = emptyList(),
+        val autocorrectReverts: List<AutocorrectRevertRow> = emptyList(),
+    ) {
+        @Serializable data class PendingWordRow(val lang: String, val word: String, val count: Int)
+        @Serializable data class UserBigramRow(val lang: String, val w1Norm: String, val w2: String, val count: Int)
+        @Serializable data class BlockedWordRow(val lang: String, val word: String)
+        @Serializable data class AutocorrectRevertRow(val word: String, val count: Int)
+    }
+
+    /** Dumps the entire learning state as a JSON snapshot for the local backup archive. */
+    @Synchronized
+    fun exportSnapshotJson(): String = runSafely("{}") {
+        val db = readableDatabase
+        fun <T> rows(sql: String, map: (android.database.Cursor) -> T): List<T> =
+            db.rawQuery(sql, null).use { c -> buildList { while (c.moveToNext()) add(map(c)) } }
+        val snapshot = Snapshot(
+            pendingWords = rows("SELECT lang, word, count FROM pending_words") {
+                Snapshot.PendingWordRow(it.getString(0), it.getString(1), it.getInt(2))
+            },
+            userBigrams = rows("SELECT lang, w1_norm, w2, count FROM user_bigrams") {
+                Snapshot.UserBigramRow(it.getString(0), it.getString(1), it.getString(2), it.getInt(3))
+            },
+            blockedWords = rows("SELECT lang, word FROM blocked_words") {
+                Snapshot.BlockedWordRow(it.getString(0), it.getString(1))
+            },
+            autocorrectReverts = rows("SELECT word, count FROM autocorrect_reverts") {
+                Snapshot.AutocorrectRevertRow(it.getString(0), it.getInt(1))
+            },
+        )
+        Json.encodeToString(Snapshot.serializer(), snapshot)
+    }
+
+    /**
+     * Restores a snapshot produced by [exportSnapshotJson]. With [erase] the current state is
+     * wiped first; otherwise the snapshot is merged (counters keep the higher value, blocklists
+     * are unioned) so restoring an old backup never regresses fresher on-device learning.
+     */
+    @Synchronized
+    fun importSnapshot(json: String, erase: Boolean) = runSafely(Unit) {
+        val snapshot = Json { ignoreUnknownKeys = true }.decodeFromString(Snapshot.serializer(), json)
+        val db = writableDatabase
+        db.beginTransaction()
+        try {
+            if (erase) {
+                db.execSQL("DELETE FROM pending_words")
+                db.execSQL("DELETE FROM user_bigrams")
+                db.execSQL("DELETE FROM blocked_words")
+                db.execSQL("DELETE FROM autocorrect_reverts")
+            }
+            // NOTE: classic insert-then-update instead of UPSERT syntax, which needs SQLite 3.24+
+            // (Android 11) while this app supports minSdk 26.
+            for (row in snapshot.pendingWords) {
+                db.execSQL("INSERT OR IGNORE INTO pending_words (lang, word, count) VALUES (?, ?, 0)", arrayOf(row.lang, row.word))
+                db.execSQL(
+                    "UPDATE pending_words SET count = MAX(count, ?) WHERE lang = ? AND word = ?",
+                    arrayOf<Any>(row.count, row.lang, row.word),
+                )
+            }
+            for (row in snapshot.userBigrams) {
+                db.execSQL(
+                    "INSERT OR IGNORE INTO user_bigrams (lang, w1_norm, w2, count) VALUES (?, ?, ?, 0)",
+                    arrayOf(row.lang, row.w1Norm, row.w2),
+                )
+                db.execSQL(
+                    "UPDATE user_bigrams SET count = MAX(count, ?) WHERE lang = ? AND w1_norm = ? AND w2 = ?",
+                    arrayOf<Any>(row.count, row.lang, row.w1Norm, row.w2),
+                )
+            }
+            for (row in snapshot.blockedWords) {
+                db.execSQL("INSERT OR IGNORE INTO blocked_words (lang, word) VALUES (?, ?)", arrayOf(row.lang, row.word))
+            }
+            for (row in snapshot.autocorrectReverts) {
+                db.execSQL("INSERT OR IGNORE INTO autocorrect_reverts (word, count) VALUES (?, 0)", arrayOf(row.word))
+                db.execSQL(
+                    "UPDATE autocorrect_reverts SET count = MAX(count, ?) WHERE word = ?",
+                    arrayOf<Any>(row.count, row.word),
+                )
+            }
+            db.setTransactionSuccessful()
+        } finally {
+            db.endTransaction()
+        }
+        // Drop in-memory caches so a same-process reader sees the restored state.
+        blockedCache.clear()
+        autocorrectRevertCache = null
     }
 
     private inline fun <T> runSafely(fallback: T, block: () -> T): T {

@@ -49,6 +49,8 @@ import dev.patrickgold.florisboard.cacheManager
 import dev.patrickgold.florisboard.clipboardManager
 import dev.patrickgold.florisboard.ime.clipboard.provider.ClipboardFileStorage
 import dev.patrickgold.florisboard.ime.clipboard.provider.ItemType
+import dev.patrickgold.florisboard.ime.dictionary.DictionaryManager
+import dev.patrickgold.florisboard.ime.nlp.words.LearningStore
 import dev.patrickgold.florisboard.lib.cache.CacheManager
 import dev.patrickgold.florisboard.lib.compose.FlorisScreen
 import dev.patrickgold.florisboard.lib.devtools.flogError
@@ -80,6 +82,14 @@ object Backup {
     const val CLIPBOARD_IMAGES_JSON_NAME = "clipboard_images.json"
     const val CLIPBOARD_VIDEO_JSON_NAME = "clipboard_video.json"
 
+    // Offline-Arabic fork additions: the learned words + personal-learning data are the whole
+    // point of a phone-migration backup, so they live in the archive alongside the upstream
+    // entries. Formats are version-tolerant (text combined-list / JSON), never raw DB files.
+    const val USER_DICTIONARY_DIR_NAME = "user_dictionary"
+    const val USER_DICTIONARY_FILE_NAME = "floris_user_dictionary.clb"
+    const val LEARNING_DATA_DIR_NAME = "learning"
+    const val LEARNING_DATA_FILE_NAME = "learning_data.json"
+
     fun defaultFileName(metadata: Metadata): String {
         return "backup_${metadata.packageName}_${metadata.versionCode}_${metadata.timestamp}.zip"
     }
@@ -93,7 +103,11 @@ object Backup {
         var jetprefDatastore by mutableStateOf(true)
         var imeKeyboard by mutableStateOf(true)
         var imeTheme by mutableStateOf(true)
-        var clipboardTextItems by mutableStateOf(false)
+        var imeLanguagePack by mutableStateOf(true)
+        var userDictionary by mutableStateOf(true)
+        var learningData by mutableStateOf(true)
+        // Fork: text clips default to ON — the long-term clipboard should survive a phone change.
+        var clipboardTextItems by mutableStateOf(true)
         var clipboardImageItems by mutableStateOf(false)
         var clipboardVideoItems by mutableStateOf(false)
 
@@ -120,7 +134,8 @@ object Backup {
         }
 
         fun atLeastOneSelected(): Boolean {
-            return jetprefDatastore || imeKeyboard || imeTheme || clipboardTextItems || clipboardImageItems || clipboardVideoItems
+            return jetprefDatastore || imeKeyboard || imeTheme || imeLanguagePack || userDictionary ||
+                learningData || clipboardTextItems || clipboardImageItems || clipboardVideoItems
         }
     }
 
@@ -190,6 +205,35 @@ fun BackupScreen() = FlorisScreen {
         if (backupFilesSelector.imeTheme) {
             context.filesDir.subDir(ExtensionManager.IME_THEME_PATH).let { dir ->
                 dir.copyRecursively(workspaceFilesDir.subDir(ExtensionManager.IME_THEME_PATH))
+            }
+        }
+        if (backupFilesSelector.imeLanguagePack) {
+            context.filesDir.subDir(ExtensionManager.IME_LANGUAGEPACK_PATH).let { dir ->
+                if (dir.exists()) {
+                    dir.copyRecursively(workspaceFilesDir.subDir(ExtensionManager.IME_LANGUAGEPACK_PATH))
+                }
+            }
+        }
+
+        if (backupFilesSelector.userDictionary) {
+            val dictionaryManager = DictionaryManager.default()
+            dictionaryManager.loadUserDictionariesIfNecessary()
+            dictionaryManager.florisUserDictionaryDatabase()?.let { db ->
+                val dictDir = workspace.inputDir.subDir(Backup.USER_DICTIONARY_DIR_NAME)
+                dictDir.mkdirs()
+                dictDir.subFile(Backup.USER_DICTIONARY_FILE_NAME).bufferedWriter().use { writer ->
+                    db.exportCombinedList(writer, Backup.USER_DICTIONARY_FILE_NAME, BuildConfig.APPLICATION_ID)
+                }
+            }
+        }
+        if (backupFilesSelector.learningData) {
+            val learningDir = workspace.inputDir.subDir(Backup.LEARNING_DATA_DIR_NAME)
+            learningDir.mkdirs()
+            val learningStore = LearningStore(context.applicationContext)
+            try {
+                learningDir.subFile(Backup.LEARNING_DATA_FILE_NAME).writeText(learningStore.exportSnapshotJson())
+            } finally {
+                learningStore.close()
             }
         }
 
@@ -334,6 +378,21 @@ internal fun BackupFilesSelector(
             onClick = { filesSelector.imeTheme = !filesSelector.imeTheme },
             checked = filesSelector.imeTheme,
             text = stringRes(R.string.backup_and_restore__back_up__files_ime_theme),
+        )
+        CheckboxListItem(
+            onClick = { filesSelector.imeLanguagePack = !filesSelector.imeLanguagePack },
+            checked = filesSelector.imeLanguagePack,
+            text = stringRes(R.string.backup_and_restore__back_up__files_ime_languagepack),
+        )
+        CheckboxListItem(
+            onClick = { filesSelector.userDictionary = !filesSelector.userDictionary },
+            checked = filesSelector.userDictionary,
+            text = stringRes(R.string.backup_and_restore__back_up__files_user_dictionary),
+        )
+        CheckboxListItem(
+            onClick = { filesSelector.learningData = !filesSelector.learningData },
+            checked = filesSelector.learningData,
+            text = stringRes(R.string.backup_and_restore__back_up__files_learning_data),
         )
 
         TriStateCheckboxListItem(

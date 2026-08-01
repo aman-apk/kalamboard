@@ -928,6 +928,29 @@
     <string name="pref__suggestion__learn_from_typing__summary" comment="Preference summary">Learn new words and your personal next-word pairs on this device only. Never active in incognito mode</string>
     <string name="pref__correction__auto_correct_enabled__label" comment="Preference title">Autocorrect</string>
     <string name="pref__correction__auto_correct_enabled__summary" comment="Preference summary">Automatically replace a mistyped word with the closest suggestion on space or punctuation</string>
+    <string name="settings__clipboard_history__title" comment="Screen title">Clipboard history</string>
+    <string name="settings__clipboard_history__entry_summary" comment="Preference summary">Browse, pin, copy back or delete every stored clip</string>
+    <string name="settings__clipboard_history__summary" comment="Header, count placeholder">{count} items stored on this device only</string>
+    <string name="settings__clipboard_history__search_placeholder">Search clipboard…</string>
+    <string name="settings__clipboard_history__empty">No clipboard items yet. Everything you copy will be kept here.</string>
+    <string name="settings__clipboard_history__section_pinned">Pinned</string>
+    <string name="settings__clipboard_history__section_history">History</string>
+    <string name="settings__clipboard_history__sensitive_content">Sensitive content (hidden)</string>
+    <string name="settings__clipboard_history__image_item">Image</string>
+    <string name="settings__clipboard_history__video_item">Video</string>
+    <string name="settings__clipboard_history__copied_toast">Copied to clipboard</string>
+    <string name="settings__clipboard_history__item_actions">Clipboard item</string>
+    <string name="settings__clipboard_history__action_copy">Copy to clipboard</string>
+    <string name="settings__clipboard_history__action_pin">Pin</string>
+    <string name="settings__clipboard_history__action_unpin">Unpin</string>
+    <string name="settings__clipboard_history__action_delete">Delete</string>
+    <string name="settings__clipboard_history__clear_unpinned">Clear unpinned</string>
+    <string name="settings__clipboard_history__clear_unpinned_confirm">Delete all unpinned clipboard items? Pinned items are kept.</string>
+    <string name="settings__clipboard_history__clear_all">Clear all</string>
+    <string name="settings__clipboard_history__clear_all_confirm">Delete the entire clipboard history, including pinned items? This cannot be undone.</string>
+    <string name="backup_and_restore__back_up__files_ime_languagepack">Installed language packs</string>
+    <string name="backup_and_restore__back_up__files_user_dictionary">User dictionary (learned words)</string>
+    <string name="backup_and_restore__back_up__files_learning_data">Personal learning data (word pairs, blocklist)</string>
     <string name="general__select_dropdown_value_placeholder">&#45; select &#45;</string>
     <string name="general__unlimited">Unlimited</string>
     <string name="general__file_name">File name</string>

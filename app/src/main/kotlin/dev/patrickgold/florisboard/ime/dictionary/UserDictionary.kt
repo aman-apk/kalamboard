@@ -39,6 +39,8 @@ import dev.patrickgold.florisboard.lib.ValidationRule
 import org.florisboard.lib.android.readText
 import org.florisboard.lib.android.writeText
 import org.florisboard.lib.kotlin.tryOrNull
+import java.io.BufferedReader
+import java.io.BufferedWriter
 import java.lang.ref.WeakReference
 
 private const val WORDS_TABLE = "words"
@@ -138,6 +140,13 @@ interface UserDictionaryDatabase {
 
     fun importCombinedList(context: Context, uri: Uri) {
         context.contentResolver.readText(uri) { src ->
+            importCombinedList(src)
+        }
+    }
+
+    /** Reader-based core of [importCombinedList], also used by the backup/restore feature. */
+    fun importCombinedList(src: BufferedReader) {
+        run {
             var isFirstLine = true
             src.forEachLine { line ->
                 if (isFirstLine) {
@@ -187,13 +196,20 @@ interface UserDictionaryDatabase {
 
     fun exportCombinedList(context: Context, uri: Uri) {
         context.contentResolver.writeText(uri) { dst ->
+            exportCombinedList(dst, uri.lastPathSegment ?: "user-dictionary", context.packageName)
+        }
+    }
+
+    /** Writer-based core of [exportCombinedList], also used by the backup/restore feature. */
+    fun exportCombinedList(dst: BufferedWriter, dictionaryName: String, generatedBy: String) {
+        run {
             StringBuilder().apply {
                 append("dictionary=")
-                append(uri.lastPathSegment)
+                append(dictionaryName)
                 append(";date=")
                 append(System.currentTimeMillis())
                 append(";generated-by=")
-                append(context.packageName)
+                append(generatedBy)
                 append(";version=1")
                 appendLine()
                 dst.write(toString())

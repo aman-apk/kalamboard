@@ -715,6 +715,29 @@
     <string name="pref__suggestion__learn_from_typing__summary" comment="Preference summary">تعلّم الكلمات الجديدة وأزواج كلماتك المتتالية على هذا الجهاز فقط. لا يعمل أبداً في وضع التخفي</string>
     <string name="pref__correction__auto_correct_enabled__label" comment="Preference title">التصحيح التلقائي</string>
     <string name="pref__correction__auto_correct_enabled__summary" comment="Preference summary">استبدال الكلمة المكتوبة خطأً بأقرب اقتراح تلقائياً عند المسافة أو الترقيم</string>
+    <string name="settings__clipboard_history__title" comment="Screen title">سجل الحافظة</string>
+    <string name="settings__clipboard_history__entry_summary" comment="Preference summary">استعرض كل ما نسخته: تثبيت، نسخ مجدداً، أو حذف</string>
+    <string name="settings__clipboard_history__summary" comment="Header, count placeholder">{count} عنصراً محفوظاً على هذا الجهاز فقط</string>
+    <string name="settings__clipboard_history__search_placeholder">ابحث في الحافظة…</string>
+    <string name="settings__clipboard_history__empty">لا عناصر بعد. كل ما تنسخه سيُحفظ هنا.</string>
+    <string name="settings__clipboard_history__section_pinned">المثبتة</string>
+    <string name="settings__clipboard_history__section_history">السجل</string>
+    <string name="settings__clipboard_history__sensitive_content">محتوى حساس (مخفي)</string>
+    <string name="settings__clipboard_history__image_item">صورة</string>
+    <string name="settings__clipboard_history__video_item">فيديو</string>
+    <string name="settings__clipboard_history__copied_toast">تم النسخ إلى الحافظة</string>
+    <string name="settings__clipboard_history__item_actions">عنصر الحافظة</string>
+    <string name="settings__clipboard_history__action_copy">نسخ إلى الحافظة</string>
+    <string name="settings__clipboard_history__action_pin">تثبيت</string>
+    <string name="settings__clipboard_history__action_unpin">إلغاء التثبيت</string>
+    <string name="settings__clipboard_history__action_delete">حذف</string>
+    <string name="settings__clipboard_history__clear_unpinned">مسح غير المثبتة</string>
+    <string name="settings__clipboard_history__clear_unpinned_confirm">حذف كل العناصر غير المثبتة؟ تبقى العناصر المثبتة محفوظة.</string>
+    <string name="settings__clipboard_history__clear_all">مسح الكل</string>
+    <string name="settings__clipboard_history__clear_all_confirm">حذف كامل سجل الحافظة بما فيه المثبتة؟ لا يمكن التراجع عن هذا.</string>
+    <string name="backup_and_restore__back_up__files_ime_languagepack">حزم اللغات المثبتة</string>
+    <string name="backup_and_restore__back_up__files_user_dictionary">قاموس المستخدم (الكلمات المتعلَّمة)</string>
+    <string name="backup_and_restore__back_up__files_learning_data">بيانات التعلّم الشخصي (أزواج الكلمات وقائمة الحظر)</string>
     <string name="general__select_dropdown_value_placeholder">&#45; اختيار &#45;</string>
     <string name="general__unlimited">غير محدود</string>
     <!-- Screen orientation strings -->

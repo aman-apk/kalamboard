@@ -97,9 +97,12 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
             key = "clipboard__suggestion_timeout",
             default = 60,
         )
+        // Offline-Arabic fork: long-term clipboard is a headline feature — history is on by
+        // default and unlimited (no size cap, no auto-expiry). Everything stays on-device and
+        // is excluded from platform backup; the user prunes via the in-app history browser.
         val historyEnabled = boolean(
             key = "clipboard__history_enabled",
-            default = false,
+            default = true,
         )
         val historyNumGridColumnsPortrait = int(
             key = "clipboard__history_num_grid_columns_portrait",
@@ -136,7 +139,7 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
         )
         val historySizeLimitEnabled = boolean(
             key = "clipboard__history_size_limit_enabled",
-            default = true,
+            default = false, // fork: unlimited history by default, see historyEnabled comment
         )
         val historySizeLimit = int(
             key = "clipboard__history_size_limit",

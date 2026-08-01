@@ -57,6 +57,7 @@ import dev.patrickgold.florisboard.app.settings.advanced.BackupScreen
 import dev.patrickgold.florisboard.app.settings.advanced.OtherScreen
 import dev.patrickgold.florisboard.app.settings.advanced.PhysicalKeyboardScreen
 import dev.patrickgold.florisboard.app.settings.advanced.RestoreScreen
+import dev.patrickgold.florisboard.app.settings.clipboard.ClipboardHistoryScreen
 import dev.patrickgold.florisboard.app.settings.clipboard.ClipboardScreen
 import dev.patrickgold.florisboard.app.settings.dictionary.DictionaryScreen
 import dev.patrickgold.florisboard.app.settings.dictionary.UserDictionaryScreen
@@ -167,6 +168,10 @@ object Routes {
         @Serializable
         @Deeplink("settings/clipboard")
         object Clipboard
+
+        @Serializable
+        @Deeplink("settings/clipboard/history")
+        object ClipboardHistory
 
         @Serializable
         @Deeplink("settings/media")
@@ -311,6 +316,8 @@ object Routes {
             composableWithDeepLink(Settings.Gestures::class) { GesturesScreen() }
 
             composableWithDeepLink(Settings.Clipboard::class) { ClipboardScreen() }
+
+            composableWithDeepLink(Settings.ClipboardHistory::class) { ClipboardHistoryScreen() }
 
             composableWithDeepLink(Settings.Media::class) { MediaScreen() }
 

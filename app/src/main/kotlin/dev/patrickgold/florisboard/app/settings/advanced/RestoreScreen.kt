@@ -51,6 +51,8 @@ import dev.patrickgold.florisboard.clipboardManager
 import dev.patrickgold.florisboard.ime.clipboard.provider.ClipboardFileStorage
 import dev.patrickgold.florisboard.ime.clipboard.provider.ClipboardItem
 import dev.patrickgold.florisboard.ime.clipboard.provider.ItemType
+import dev.patrickgold.florisboard.ime.dictionary.DictionaryManager
+import dev.patrickgold.florisboard.ime.nlp.words.LearningStore
 import dev.patrickgold.florisboard.lib.cache.CacheManager
 import dev.patrickgold.florisboard.lib.compose.FlorisScreen
 import dev.patrickgold.florisboard.lib.ext.ExtensionManager
@@ -177,8 +179,53 @@ fun RestoreScreen() = FlorisScreen {
                 srcDir.copyRecursively(dstDir, overwrite = true)
             }
         }
+        if (restoreFilesSelector.imeLanguagePack) {
+            val srcDir = workspaceFilesDir.subDir(ExtensionManager.IME_LANGUAGEPACK_PATH)
+            val dstDir = context.filesDir.subDir(ExtensionManager.IME_LANGUAGEPACK_PATH)
+            if (shouldReset) {
+                dstDir.deleteContentsRecursively()
+            }
+            if (srcDir.exists()) {
+                srcDir.copyRecursively(dstDir, overwrite = true)
+            }
+        }
+
+        if (restoreFilesSelector.userDictionary) {
+            val dictFile = workspace.outputDir
+                .subDir(Backup.USER_DICTIONARY_DIR_NAME)
+                .subFile(Backup.USER_DICTIONARY_FILE_NAME)
+            if (dictFile.exists()) {
+                val dictionaryManager = DictionaryManager.default()
+                dictionaryManager.loadUserDictionariesIfNecessary()
+                dictionaryManager.florisUserDictionaryDatabase()?.let { db ->
+                    if (shouldReset) {
+                        db.userDictionaryDao().deleteAll()
+                    }
+                    dictFile.bufferedReader().use { reader ->
+                        db.importCombinedList(reader)
+                    }
+                }
+            }
+        }
+        if (restoreFilesSelector.learningData) {
+            val learningFile = workspace.outputDir
+                .subDir(Backup.LEARNING_DATA_DIR_NAME)
+                .subFile(Backup.LEARNING_DATA_FILE_NAME)
+            if (learningFile.exists()) {
+                val learningStore = LearningStore(context.applicationContext)
+                try {
+                    learningStore.importSnapshot(learningFile.readText(), erase = shouldReset)
+                } finally {
+                    learningStore.close()
+                }
+            }
+        }
+
         val clipboardManager = context.clipboardManager().value
-        if (shouldReset) {
+        // Upstream bug fixed here: an erase-mode restore used to wipe the clipboard history even
+        // when the user had not selected any clipboard data — with the long-term clipboard that
+        // would be catastrophic. The wipe now only happens when clipboard data is being restored.
+        if (shouldReset && restoreFilesSelector.provideClipboardItems()) {
             clipboardManager.clearFullHistory()
             ClipboardFileStorage.resetClipboardFileStorage(context)
         }
