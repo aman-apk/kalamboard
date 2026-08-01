@@ -48,5 +48,8 @@ include(":lib:android")
 include(":lib:color")
 include(":lib:compose")
 include(":lib:kotlin")
-include(":lib:native")
+// OFFLINE BUILD (phase 6): the :lib:native Rust placeholder is unhooked — it shipped only a
+// dummyAdd() function yet made every build require a Rust + CMake 4.1.2 + NDK 29 toolchain.
+// Re-include it here (and in app/build.gradle.kts) if a native NLP engine is ever implemented.
+//include(":lib:native")
 include(":lib:snygg")

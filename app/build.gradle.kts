@@ -304,7 +304,7 @@ dependencies {
     implementation(projects.lib.color)
     implementation(projects.lib.compose)
     implementation(projects.lib.kotlin)
-    implementation(projects.lib.native)
+    // OFFLINE BUILD (phase 6): projects.lib.native unhooked together with the module, see settings.gradle.kts.
     implementation(projects.lib.snygg)
 
     testImplementation(libs.kotest.assertions.core)

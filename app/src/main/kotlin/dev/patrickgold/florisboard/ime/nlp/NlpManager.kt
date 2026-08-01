@@ -22,8 +22,6 @@ import android.util.LruCache
 import dev.patrickgold.florisboard.app.FlorisPreferenceStore
 import dev.patrickgold.florisboard.clipboardManager
 import dev.patrickgold.florisboard.editorInstance
-import dev.patrickgold.florisboard.ime.clipboard.provider.ClipboardItem
-import dev.patrickgold.florisboard.ime.clipboard.provider.ItemType
 import dev.patrickgold.florisboard.ime.core.Subtype
 import dev.patrickgold.florisboard.ime.editor.EditorContent
 import dev.patrickgold.florisboard.ime.editor.EditorRange
@@ -31,7 +29,6 @@ import dev.patrickgold.florisboard.ime.media.emoji.EmojiSuggestionProvider
 import dev.patrickgold.florisboard.ime.nlp.han.HanShapeBasedLanguageProvider
 import dev.patrickgold.florisboard.ime.nlp.words.WordSuggestionProvider
 import dev.patrickgold.florisboard.keyboardManager
-import dev.patrickgold.florisboard.lib.util.NetworkUtils
 import dev.patrickgold.florisboard.subtypeManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -49,11 +46,7 @@ import org.florisboard.lib.kotlin.collectLatestIn
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.properties.Delegates
 
-private const val BLANK_STR_PATTERN = "^\\s*$"
-
 class NlpManager(context: Context) {
-    private val blankStrRegex = Regex(BLANK_STR_PATTERN)
-
     private val prefs by FlorisPreferenceStore
     private val clipboardManager by context.clipboardManager()
     private val editorInstance by context.editorInstance()
@@ -385,110 +378,4 @@ class NlpManager(context: Context) {
         }
     }
 
-    inner class ClipboardSuggestionProvider internal constructor(private val context: Context) : SuggestionProvider {
-        private var lastClipboardItemId: Long = -1
-
-        override val providerId = "org.florisboard.nlp.providers.clipboard"
-
-        override suspend fun create() {
-            // Do nothing
-        }
-
-        override suspend fun preload(subtype: Subtype) {
-            // Do nothing
-        }
-
-        override suspend fun suggest(
-            subtype: Subtype,
-            content: EditorContent,
-            maxCandidateCount: Int,
-            allowPossiblyOffensive: Boolean,
-            isPrivateSession: Boolean,
-        ): List<SuggestionCandidate> {
-            // Check if enabled
-            if (!prefs.clipboard.suggestionEnabled.get()) return emptyList()
-
-            val currentItem = validateClipboardItem(clipboardManager.primaryClip, lastClipboardItemId, content.text)
-                ?: return emptyList()
-
-            return buildList {
-                val now = System.currentTimeMillis()
-                if ((now - currentItem.creationTimestampMs) < prefs.clipboard.suggestionTimeout.get() * 1000) {
-                    add(ClipboardSuggestionCandidate(currentItem, sourceProvider = this@ClipboardSuggestionProvider, context = context))
-                    if (currentItem.isSensitive) {
-                        return@buildList
-                    }
-                    if (currentItem.type == ItemType.TEXT) {
-                        val text = currentItem.stringRepresentation()
-                        val matches = buildList {
-                            addAll(NetworkUtils.getEmailAddresses(text))
-                            addAll(NetworkUtils.getUrls(text))
-                            addAll(NetworkUtils.getPhoneNumbers(text))
-                        }
-                        matches.forEachIndexed { i, match ->
-                            val isUniqueMatch = matches.subList(0, i).all { prevMatch ->
-                                prevMatch.value != match.value && prevMatch.range.intersect(match.range).isEmpty()
-                            }
-                            if (match.value != text && isUniqueMatch) {
-                                add(ClipboardSuggestionCandidate(
-                                    clipboardItem = currentItem.copy(
-                                        // TODO: adjust regex of phone number so we don't need to manually strip the
-                                        //  parentheses from the match results
-                                        text = if (match.value.startsWith("(") && match.value.endsWith(")")) {
-                                            match.value.substring(1, match.value.length - 1)
-                                        } else {
-                                            match.value
-                                        }
-                                    ),
-                                    sourceProvider = this@ClipboardSuggestionProvider,
-                                    context = context,
-                                ))
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        override suspend fun notifySuggestionAccepted(subtype: Subtype, candidate: SuggestionCandidate) {
-            if (candidate is ClipboardSuggestionCandidate) {
-                lastClipboardItemId = candidate.clipboardItem.id
-            }
-        }
-
-        override suspend fun notifySuggestionReverted(subtype: Subtype, candidate: SuggestionCandidate) {
-            // Do nothing
-        }
-
-        override suspend fun removeSuggestion(subtype: Subtype, candidate: SuggestionCandidate): Boolean {
-            if (candidate is ClipboardSuggestionCandidate) {
-                lastClipboardItemId = candidate.clipboardItem.id
-                return true
-            }
-            return false
-        }
-
-        override suspend fun getListOfWords(subtype: Subtype): List<String> {
-            return emptyList()
-        }
-
-        override suspend fun getFrequencyForWord(subtype: Subtype, word: String): Double {
-            return 0.0
-        }
-
-        override suspend fun destroy() {
-            // Do nothing
-        }
-
-        private fun validateClipboardItem(currentItem: ClipboardItem?, lastItemId: Long, contentText: String) =
-            currentItem?.takeIf {
-                // Check if already used
-                it.id != lastItemId
-                    // Check if content is empty
-                    && contentText.isBlank()
-                    // Check if clipboard content has any valid characters
-                    && !currentItem.text.isNullOrBlank()
-                    && !blankStrRegex.matches(currentItem.text)
-            }
-    }
 }

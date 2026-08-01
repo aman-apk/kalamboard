@@ -266,10 +266,10 @@
       "label": "Syrian Pound (ل.س)",
       "slots": [
         { "code": 0, "label": "ل.س" },
+        { "code": 8378, "label": "₺" },
         { "code": 36, "label": "$" },
         { "code": 8364, "label": "€" },
         { "code": 163, "label": "£" },
-        { "code": 165, "label": "¥" },
         { "code": 65020, "label": "﷼" }
       ]
     },
