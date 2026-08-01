@@ -1,0 +1,39 @@
+{
+  "$": "ime.extension.theme",
+  "meta": {
+    "id": "org.florisboard.themes.golden",
+    "version": "1.0.0",
+    "title": "Golden Dark themes",
+    "description": "The visual identity of this offline Arabic fork: black and graphite, kohl-lined with gold",
+    "maintainers": [
+      "Floris Offline"
+    ],
+    "license": "apache-2.0"
+  },
+  "themes": [
+    {
+      "id": "golden_night",
+      "label": "Golden Dark",
+      "authors": [
+        "Floris Offline"
+      ],
+      "isNight": true
+    },
+    {
+      "id": "golden_night_borderless",
+      "label": "Golden Dark (Borderless)",
+      "authors": [
+        "Floris Offline"
+      ],
+      "isNight": true
+    },
+    {
+      "id": "golden_amoled",
+      "label": "Golden Dark (AMOLED)",
+      "authors": [
+        "Floris Offline"
+      ],
+      "isNight": true
+    }
+  ]
+}

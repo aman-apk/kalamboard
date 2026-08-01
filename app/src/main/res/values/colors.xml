@@ -12,7 +12,8 @@
     <color name="colorError">#B00020</color><!-- Red 1000? -->
     <color name="textColorError">#FFFFFF</color><!-- White -->
 
-    <color name="ic_app_icon_background">#3D3E42</color>
+    <!-- Offline-Arabic fork identity: near-black icon background, gold foreground -->
+    <color name="ic_app_icon_background">#0E0E10</color>
 
     <color name="cardViewBackgroundColor">#FFFFFF</color><!-- White -->
     <color name="navigationBarColor">#000000</color><!-- Black -->

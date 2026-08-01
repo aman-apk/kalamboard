@@ -52,7 +52,6 @@ import dev.patrickgold.florisboard.ime.text.key.KeyHintMode
 import dev.patrickgold.florisboard.ime.text.key.UtilityKeyAction
 import dev.patrickgold.florisboard.ime.text.keyboard.TextKeyData
 import dev.patrickgold.florisboard.ime.theme.ThemeMode
-import dev.patrickgold.florisboard.ime.theme.extCoreTheme
 import dev.patrickgold.florisboard.ime.window.ImeWindowConfig
 import dev.patrickgold.florisboard.lib.ext.ExtensionComponentName
 import dev.patrickgold.florisboard.lib.util.VersionName
@@ -726,14 +725,17 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
             key = "theme__mode",
             default = ThemeMode.FOLLOW_SYSTEM,
         )
+        // Offline-Arabic fork: the visual identity is dark graphite kohl-lined with gold — the
+        // Golden Dark theme is the default for BOTH day and night (upstream themes stay
+        // selectable in the theme manager).
         val dayThemeId = custom(
             key = "theme__day_theme_id",
-            default = extCoreTheme("floris_day"),
+            default = ExtensionComponentName("org.florisboard.themes.golden", "golden_night"),
             serializer = ExtensionComponentName.Serializer,
         )
         val nightThemeId = custom(
             key = "theme__night_theme_id",
-            default = extCoreTheme("floris_night"),
+            default = ExtensionComponentName("org.florisboard.themes.golden", "golden_night"),
             serializer = ExtensionComponentName.Serializer,
         )
         val accentColor = custom(
