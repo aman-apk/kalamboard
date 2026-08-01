@@ -76,8 +76,8 @@ configure<ApplicationExtension> {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField("String", "BUILD_COMMIT_HASH", "\"${getGitCommitHash().get()}\"")
-        buildConfigField("String", "FLADDONS_API_VERSION", "\"v~draft2\"")
-        buildConfigField("String", "FLADDONS_STORE_URL", "\"beta.addons.florisboard.org\"")
+        // OFFLINE BUILD: FLADDONS_API_VERSION / FLADDONS_STORE_URL removed together with the
+        // addons-store button and the extension update checker that consumed them.
 
         sourceSets {
             maybeCreate("main").apply {
@@ -147,6 +147,95 @@ configure<ApplicationExtension> {
         }
         unitTests.all {
             it.useJUnitPlatform()
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------------------------
+// OFFLINE BUILD GUARD
+//
+// This fork must never be able to talk to the network. Removing the calls is not enough on its
+// own: any dependency (direct or transitive) may inject <uses-permission android:name="INTERNET"/>
+// into the merged manifest, and once that permission is present the whole guarantee is gone
+// silently. This task therefore inspects the *merged* manifest of every variant and fails the
+// build if a network permission reappears, plus it scans the version catalog for well-known
+// networking libraries so they are caught at review time rather than at runtime.
+// ---------------------------------------------------------------------------------------------
+
+abstract class VerifyOfflineBuildTask : DefaultTask() {
+    @get:InputFile
+    @get:PathSensitive(PathSensitivity.NONE)
+    abstract val mergedManifest: RegularFileProperty
+
+    @get:InputFile
+    @get:PathSensitive(PathSensitivity.NONE)
+    abstract val versionCatalog: RegularFileProperty
+
+    @get:OutputFile
+    abstract val reportFile: RegularFileProperty
+
+    @TaskAction
+    fun verify() {
+        val violations = mutableListOf<String>()
+
+        val manifest = mergedManifest.get().asFile.readText()
+        val forbiddenPermissions = listOf(
+            "android.permission.INTERNET",
+            "android.permission.ACCESS_NETWORK_STATE",
+            "android.permission.ACCESS_WIFI_STATE",
+            "android.permission.CHANGE_NETWORK_STATE",
+            "android.permission.CHANGE_WIFI_STATE",
+        )
+        for (permission in forbiddenPermissions) {
+            if (manifest.contains(permission)) {
+                violations += "merged manifest declares $permission"
+            }
+        }
+        if (manifest.contains("android:allowBackup=\"true\"")) {
+            violations += "merged manifest re-enables android:allowBackup, which would upload the " +
+                "user dictionary and settings through the platform backup transport"
+        }
+
+        val catalog = versionCatalog.get().asFile.readText()
+        val forbiddenModules = listOf(
+            "com.squareup.okhttp3", "com.squareup.retrofit2", "io.ktor",
+            "com.android.volley", "coil-network", "com.google.firebase",
+            "io.sentry", "ch.acra", "com.google.android.gms",
+        )
+        for (module in forbiddenModules) {
+            if (catalog.contains(module)) {
+                violations += "version catalog references networking library '$module'"
+            }
+        }
+
+        if (violations.isNotEmpty()) {
+            throw GradleException(
+                buildString {
+                    appendLine("OFFLINE BUILD GUARD FAILED — this build is required to have no network access.")
+                    violations.forEach { appendLine("  - $it") }
+                    appendLine("Revert the change or, if it is genuinely intended, update the guard in app/build.gradle.kts.")
+                }
+            )
+        }
+
+        reportFile.get().asFile.writeText(
+            "offline build guard passed\nno network permission in merged manifest\nno networking library in version catalog\n"
+        )
+    }
+}
+
+androidComponents {
+    onVariants { variant ->
+        val variantName = variant.name.replaceFirstChar { it.uppercase() }
+        val guardTask = tasks.register<VerifyOfflineBuildTask>("verify${variantName}OfflineBuild") {
+            group = "verification"
+            description = "Fails the build if $variantName regained any network capability."
+            mergedManifest.set(variant.artifacts.get(com.android.build.api.artifact.SingleArtifact.MERGED_MANIFEST))
+            versionCatalog.set(rootProject.layout.projectDirectory.file("gradle/libs.versions.toml"))
+            reportFile.set(layout.buildDirectory.file("reports/offline-guard/$variantName.txt"))
+        }
+        tasks.matching { it.name == "assemble$variantName" }.configureEach {
+            dependsOn(guardTask)
         }
     }
 }

@@ -18,7 +18,6 @@ package dev.patrickgold.florisboard.ime.media.emoji
 
 import android.annotation.SuppressLint
 import android.content.Context
-import androidx.emoji2.text.DefaultEmojiCompatConfig
 import androidx.emoji2.text.EmojiCompat
 import dev.patrickgold.florisboard.lib.devtools.flogError
 import dev.patrickgold.florisboard.lib.devtools.flogInfo
@@ -32,12 +31,18 @@ import kotlinx.coroutines.launch
 /**
  * Helper object which manages two separate EmojiCompat instances, something EmojiCompat by default does not want us
  * to do for unknown reasons. Additionally we implement a proper loaded callback and a state flow, so the UI can always
- * receive the EmojiCompat instance as soon as it is loaded. This helper still uses the default config and thus relies
- * either on a system font with emoji or Google GMS services with their downloadable font provider.
+ * receive the EmojiCompat instance as soon as it is loaded.
  *
- * TODO: investigate how AOSP-like ROMs without any GMS services installed handle backwards emoji compatibility. Same
- *  goes for newer Huawei devices, which are subjected to no Google services. (Probably these devices rely on the good
- *  old method of just querying the system painter, which we already use as a fallback in the palette logic).
+ * OFFLINE BUILD: upstream used `DefaultEmojiCompatConfig.create()` here, which resolves to the Google Play Services
+ * *downloadable font provider*. Even though FlorisBoard itself holds no INTERNET permission, that config makes the
+ * GMS process fetch the emoji font over the network on behalf of this app — the one remaining indirect network path.
+ * This build therefore uses no EmojiCompat config at all: [InstanceHandler.config] is always null, the published
+ * instance flow stays null, and every consumer falls back to rendering emoji with the system font (the same fallback
+ * the palette logic already implements for GMS-less/AOSP devices).
+ *
+ * If full emoji coverage on old Android versions is ever required, the offline-safe way to restore it is to add the
+ * `androidx.emoji2:emoji2-bundled` artifact (ships the Noto Color Emoji font inside the APK, ~10 MB) and build a
+ * `BundledEmojiCompatConfig` below — never `DefaultEmojiCompatConfig`.
  *
  * TODO: investigate if having two instances of EmojiCompat has significant memory impact. Based on the docs one
  *  instance has ~300kB, so two should have ~600kB, which should not cause issues.
@@ -91,7 +96,11 @@ object FlorisEmojiCompat {
         return instanceFlow
     }
 
+    // `context` is retained because the documented offline alternative, BundledEmojiCompatConfig,
+    // needs it; it is unused while the config below stays null.
+    @Suppress("UNUSED_PARAMETER")
     private class InstanceHandler(context: Context, replaceAll: Boolean = false) {
+        @Suppress("unused") // kept as the wiring for the offline BundledEmojiCompatConfig path, see class KDoc
         private val initCallback: EmojiCompat.InitCallback = object : EmojiCompat.InitCallback() {
             override fun onInitialized() {
                 super.onInitialized()
@@ -105,11 +114,10 @@ object FlorisEmojiCompat {
             }
         }
 
-        private val config: EmojiCompat.Config? = DefaultEmojiCompatConfig.create(context)?.apply {
-            setReplaceAll(replaceAll)
-            setMetadataLoadStrategy(EmojiCompat.LOAD_STRATEGY_MANUAL)
-            registerInitCallback(initCallback)
-        }
+        // OFFLINE BUILD: intentionally null. Upstream called DefaultEmojiCompatConfig.create(context) here, which
+        // binds the Google Play Services downloadable font provider and makes GMS fetch the emoji font from the
+        // network. With a null config no EmojiCompat instance is created and emoji render via the system font.
+        private val config: EmojiCompat.Config? = null
 
         // Despite its name, `EmojiCompat.reset()` actually creates a new instance, exactly what we need
         private val instance: EmojiCompat? = if (config != null) EmojiCompat.reset(config) else null

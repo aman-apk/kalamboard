@@ -23,21 +23,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Input
 import androidx.compose.material.icons.filled.Shop
-import androidx.compose.material.icons.outlined.FileDownload
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import dev.patrickgold.florisboard.BuildConfig
 import dev.patrickgold.florisboard.R
 import dev.patrickgold.florisboard.app.LocalNavController
 import dev.patrickgold.florisboard.app.Routes
-import dev.patrickgold.florisboard.lib.ext.Extension
-import dev.patrickgold.florisboard.lib.ext.generateUpdateUrl
-import dev.patrickgold.florisboard.lib.util.launchUrl
 import org.florisboard.lib.compose.FlorisOutlinedBox
 import org.florisboard.lib.compose.FlorisTextButton
 import org.florisboard.lib.compose.defaultFlorisOutlinedBox
@@ -46,7 +40,6 @@ import org.florisboard.lib.kotlin.curlyFormat
 
 @Composable
 fun ImportExtensionBox(navController: NavController) {
-    val context = LocalContext.current
     FlorisOutlinedBox(
         modifier = Modifier.defaultFlorisOutlinedBox(),
     ) {
@@ -60,13 +53,9 @@ fun ImportExtensionBox(navController: NavController) {
                 .fillMaxWidth()
                 .padding(horizontal = 6.dp),
         ) {
-            FlorisTextButton(
-                onClick = {
-                    context.launchUrl("https://${BuildConfig.FLADDONS_STORE_URL}/")
-                },
-                icon = Icons.Default.Shop,
-                text = stringRes(id = R.string.ext__home__visit_store),
-            )
+            // OFFLINE BUILD: the "visit addons store" button used to open
+            // https://<FLADDONS_STORE_URL>/ in an external browser. Extensions are installed
+            // exclusively from local files, so the button and its BuildConfig fields are gone.
             Spacer(modifier = Modifier.weight(1f))
             FlorisTextButton(
                 onClick = {
@@ -79,31 +68,24 @@ fun ImportExtensionBox(navController: NavController) {
     }
 }
 
+/**
+ * Informational box telling the user that extension updates have to be applied manually.
+ *
+ * OFFLINE BUILD: this box used to carry a "search for updates" button which handed a
+ * `https://<store>/check-updates#data={...}` URL to an external browser. That URL embedded the id
+ * and version of *every installed extension*, making it the only outbound data payload the app had.
+ * Both the button and the `generateUpdateUrl` builder behind it have been removed.
+ */
 @Composable
-fun UpdateBox(extensionIndex: List<Extension>) {
-    val context = LocalContext.current
+fun UpdateBox() {
     FlorisOutlinedBox(
         modifier = Modifier.defaultFlorisOutlinedBox(),
     ) {
         Text(
-            modifier = Modifier.padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 4.dp),
+            modifier = Modifier.padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 8.dp),
             text = stringRes(id = R.string.ext__update_box__internet_permission_hint),
             style = MaterialTheme.typography.bodySmall,
         )
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 6.dp),
-        ) {
-            FlorisTextButton(
-                onClick = {
-                    context.launchUrl(extensionIndex.generateUpdateUrl())
-                },
-                icon = Icons.Outlined.FileDownload,
-                text = stringRes(id = R.string.ext__update_box__search_for_updates)
-            )
-            Spacer(modifier = Modifier.weight(1f))
-        }
     }
 }
 

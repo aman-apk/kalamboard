@@ -23,9 +23,8 @@
 
     <application
         android:name="dev.patrickgold.florisboard.FlorisApplication"
-        android:allowBackup="true"
-        android:dataExtractionRules="@xml/backup_rules"
-        android:fullBackupContent="@xml/backup_rules"
+        android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
         android:icon="@mipmap/floris_app_icon"
         android:label="@string/floris_app_name"
         android:enableOnBackInvokedCallback="true"
@@ -72,12 +71,12 @@
             android:windowSoftInputMode="adjustResize"
             android:theme="@style/FlorisAppTheme.Splash"
             android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="ui" android:host="florisboard" android:pathPrefix="/" />
-            </intent-filter>
+            <!--
+                OFFLINE BUILD: the inbound "ui://florisboard/..." BROWSABLE deep link filter was
+                removed. Nothing inside the app ever built such an Intent (the in-app deep links in
+                Routes.kt are resolved by Navigation Compose without it); it only let external apps
+                and browsers launch arbitrary settings screens of this keyboard.
+            -->
             <intent-filter android:label="Import Extension">
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>

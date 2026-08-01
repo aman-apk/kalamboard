@@ -17,35 +17,41 @@
 package dev.patrickgold.florisboard.lib.util
 
 import android.content.ActivityNotFoundException
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
 import androidx.annotation.StringRes
 import dev.patrickgold.florisboard.R
 import dev.patrickgold.florisboard.lib.devtools.flogError
-import dev.patrickgold.florisboard.lib.io.FlorisRef
 import org.florisboard.lib.android.stringRes
+import org.florisboard.lib.android.systemServiceOrNull
 import org.florisboard.lib.kotlin.CurlyArg
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.reflect.KClass
 
+/**
+ * OFFLINE BUILD — DOES NOT OPEN ANYTHING. The name is kept unchanged on purpose, so that merges
+ * with upstream stay manageable, but the behaviour is deliberately different.
+ *
+ * Upstream fired an [Intent.ACTION_VIEW] here, handing [url] to whichever external app claims it
+ * (normally a browser). That is a hand-off this build must never initiate: it is the single point
+ * through which every "visit repo / privacy policy / changelog / maintainer homepage" button, and
+ * every link inside an *imported third-party extension manifest*, could reach the network.
+ *
+ * Instead the URL is copied to the system clipboard and shown to the user, who stays free to open
+ * it deliberately in an app of their own choosing. No component is ever started from here.
+ */
 fun Context.launchUrl(url: String) {
-    val intent = Intent().also {
-        it.action = Intent.ACTION_VIEW
-        it.data = FlorisRef.fromUrl(url).uri
-        it.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-    }
-    try {
-        this.startActivity(intent)
-    } catch (e: ActivityNotFoundException) {
-        flogError { e.toString() }
-        Toast.makeText(
-            this,
-            this.stringRes(R.string.general__no_browser_app_found_for_url, "url" to url),
-            Toast.LENGTH_LONG,
-        ).show()
-    }
+    val clipboardManager = this.systemServiceOrNull(ClipboardManager::class)
+    clipboardManager?.setPrimaryClip(ClipData.newPlainText(url, url))
+    Toast.makeText(
+        this,
+        this.stringRes(R.string.general__url_copied_to_clipboard, "url" to url),
+        Toast.LENGTH_LONG,
+    ).show()
 }
 
 fun Context.launchUrl(@StringRes url: Int) {

@@ -20,8 +20,6 @@ import android.annotation.SuppressLint
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
@@ -124,12 +122,20 @@ class CrashDialogActivity : ComponentActivity() {
             Toast.makeText(this, toastMessage, Toast.LENGTH_SHORT).show()
         }
 
+        // OFFLINE BUILD: this used to hand the issue tracker URL to an external browser via
+        // Intent.ACTION_VIEW. Like Context.launchUrl, it now only copies the address, so reporting
+        // a crash never makes this app initiate a hand-off to a networked app.
         openBugReportForm.setOnClickListener {
-            val browserIntent = Intent(
-                Intent.ACTION_VIEW,
-                Uri.parse(resources.getString(R.string.florisboard__issue_tracker_url))
-            )
-            startActivity(browserIntent)
+            val issueTrackerUrl = resources.getString(R.string.florisboard__issue_tracker_url)
+            val clipboardManager = getSystemService(Context.CLIPBOARD_SERVICE)
+            if (clipboardManager is ClipboardManager) {
+                clipboardManager.setPrimaryClip(ClipData.newPlainText(issueTrackerUrl, issueTrackerUrl))
+            }
+            Toast.makeText(
+                this,
+                stringRes(R.string.general__url_copied_to_clipboard, "url" to issueTrackerUrl),
+                Toast.LENGTH_LONG,
+            ).show()
         }
 
         close.setOnClickListener {
