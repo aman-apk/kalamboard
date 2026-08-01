@@ -162,6 +162,10 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
             key = "correction__auto_capitalization",
             default = true,
         )
+        val autoCorrectEnabled = boolean(
+            key = "correction__auto_correct_enabled",
+            default = true,
+        )
         val autoSpacePunctuation = boolean(
             key = "correction__auto_space_punctuation",
             default = false,
@@ -682,9 +686,11 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
             key = "suggestion__api30_inline_suggestions_enabled",
             default = true,
         )
+        // Offline-Arabic fork: word suggestions are the point of this build, so they default to
+        // on (upstream default was false while the Latin provider was an empty stub).
         val enabled = boolean(
             key = "suggestion__enabled",
-            default = false,
+            default = true,
         )
         val displayMode = enum(
             key = "suggestion__display_mode",

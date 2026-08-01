@@ -29,12 +29,13 @@ import dev.patrickgold.florisboard.ime.editor.EditorContent
 import dev.patrickgold.florisboard.ime.editor.EditorRange
 import dev.patrickgold.florisboard.ime.media.emoji.EmojiSuggestionProvider
 import dev.patrickgold.florisboard.ime.nlp.han.HanShapeBasedLanguageProvider
-import dev.patrickgold.florisboard.ime.nlp.latin.LatinLanguageProvider
+import dev.patrickgold.florisboard.ime.nlp.words.WordSuggestionProvider
 import dev.patrickgold.florisboard.keyboardManager
 import dev.patrickgold.florisboard.lib.util.NetworkUtils
 import dev.patrickgold.florisboard.subtypeManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -64,7 +65,7 @@ class NlpManager(context: Context) {
     private val emojiSuggestionProvider = EmojiSuggestionProvider(context)
     private val providers = guardedByLock {
         mapOf(
-            LatinLanguageProvider.ProviderId to ProviderInstanceWrapper(LatinLanguageProvider(context)),
+            WordSuggestionProvider.ProviderId to ProviderInstanceWrapper(WordSuggestionProvider(context)),
             HanShapeBasedLanguageProvider.ProviderId to ProviderInstanceWrapper(HanShapeBasedLanguageProvider(context)),
         )
     }
@@ -193,9 +194,14 @@ class NlpManager(context: Context) {
             || prefs.emoji.suggestionEnabled.get()
             || providerForcesSuggestionOn(subtypeManager.activeSubtype)
 
+    private var suggestJob: Job? = null
+
     fun suggest(subtype: Subtype, content: EditorContent) {
         val reqTime = SystemClock.uptimeMillis()
-        scope.launch {
+        // Conflate: a newer keystroke makes the previous in-flight request pointless. The reqTime
+        // staleness check below stays as the second line of defense for jobs past cancellation.
+        suggestJob?.cancel()
+        suggestJob = scope.launch {
             val emojiSuggestions = when {
                 prefs.emoji.suggestionEnabled.get() -> {
                     emojiSuggestionProvider.suggest(
@@ -235,15 +241,27 @@ class NlpManager(context: Context) {
 
     fun suggestDirectly(suggestions: List<SuggestionCandidate>) {
         val reqTime = SystemClock.uptimeMillis()
+        // Unlike the original implementation this acquires the guard and performs the same
+        // staleness check as suggest(), so an in-flight suggest() coroutine with a newer reqTime
+        // can no longer overwrite glide-typing results (and vice versa).
         runBlocking {
-            internalSuggestions = reqTime to suggestions
+            internalSuggestionsGuard.withLock {
+                if (internalSuggestions.first < reqTime) {
+                    internalSuggestions = reqTime to suggestions
+                }
+            }
         }
     }
 
     fun clearSuggestions() {
         val reqTime = SystemClock.uptimeMillis()
+        suggestJob?.cancel()
         runBlocking {
-            internalSuggestions = reqTime to emptyList()
+            internalSuggestionsGuard.withLock {
+                if (internalSuggestions.first < reqTime) {
+                    internalSuggestions = reqTime to emptyList()
+                }
+            }
         }
     }
 
@@ -276,23 +294,30 @@ class NlpManager(context: Context) {
 
     private fun assembleCandidates() {
         runBlocking {
-            val candidates = when {
-                isSuggestionOn() -> {
+            // Clipboard suggestions have their own toggle and must not be gated behind the word/
+            // emoji suggestion toggles (upstream bug: with suggestions off, clipboard chips never
+            // appeared even when the user had them enabled). The provider itself checks its pref.
+            val clipboardCandidates = when {
+                isSuggestionOn() || prefs.clipboard.suggestionEnabled.get() -> {
                     clipboardSuggestionProvider.suggest(
                         subtype = Subtype.DEFAULT,
                         content = editorInstance.activeContent,
                         maxCandidateCount = 8,
                         allowPossiblyOffensive = !prefs.suggestion.blockPossiblyOffensive.get(),
                         isPrivateSession = keyboardManager.activeState.isIncognitoMode,
-                    ).ifEmpty {
-                        buildList {
-                            internalSuggestionsGuard.withLock {
-                                addAll(internalSuggestions.second)
-                            }
-                        }
-                    }
+                    )
                 }
                 else -> emptyList()
+            }
+            val candidates = clipboardCandidates.ifEmpty {
+                when {
+                    isSuggestionOn() -> buildList {
+                        internalSuggestionsGuard.withLock {
+                            addAll(internalSuggestions.second)
+                        }
+                    }
+                    else -> emptyList()
+                }
             }
             activeCandidates = candidates
             autoExpandCollapseSmartbarActions(candidates, NlpInlineAutofill.suggestions.value)

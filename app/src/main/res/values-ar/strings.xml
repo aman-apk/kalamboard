@@ -709,6 +709,8 @@
     <string name="general__example_given" comment="This string is used where an example will be inserted in the {example} block. When translating, use the abbreviation used in your language for 'example given'.">مثلا. {example}</string>
     <string name="general__no_browser_app_found_for_url">لم يتم العثور على تطبيق متصفح للتعامل مع عنوان URL {url}</string>
     <string name="general__url_copied_to_clipboard" comment="Shown instead of opening a link, because this build never hands URLs to other apps.">نسخة بلا إنترنت &#8212; تم نسخ الرابط: {url}</string>
+    <string name="correction__auto_correct_enabled_toast">تم تفعيل التصحيح التلقائي</string>
+    <string name="correction__auto_correct_disabled_toast">تم تعطيل التصحيح التلقائي</string>
     <string name="general__select_dropdown_value_placeholder">&#45; اختيار &#45;</string>
     <string name="general__unlimited">غير محدود</string>
     <!-- Screen orientation strings -->

@@ -603,13 +603,25 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
     }
 
     /**
-     * Handles a [KeyCode.TOGGLE_AUTOCORRECT] event.
+     * Handles a [KeyCode.TOGGLE_AUTOCORRECT] event: flips the autocorrect pref, which
+     * [dev.patrickgold.florisboard.ime.nlp.words.WordSuggestionProvider] consults before flagging
+     * its top correction as eligible for auto-commit.
      */
     private fun handleToggleAutocorrect() {
-        lastToastReference.get()?.cancel()
-        lastToastReference = WeakReference(
-            appContext.showLongToastSync("Autocorrect toggle is a placeholder and not yet implemented")
-        )
+        scope.launch {
+            val newValue = !prefs.correction.autoCorrectEnabled.get()
+            prefs.correction.autoCorrectEnabled.set(newValue)
+            lastToastReference.get()?.cancel()
+            lastToastReference = WeakReference(
+                appContext.showLongToastSync(
+                    if (newValue) {
+                        appContext.getString(R.string.correction__auto_correct_enabled_toast)
+                    } else {
+                        appContext.getString(R.string.correction__auto_correct_disabled_toast)
+                    }
+                )
+            )
+        }
     }
 
     /**

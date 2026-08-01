@@ -922,6 +922,8 @@
     <string name="general__example_given" comment="This string is used where an example will be inserted in the {example} block. When translating, use the abbreviation used in your language for 'example given'.">e.g. {example}</string>
     <string name="general__no_browser_app_found_for_url">No browser app found for handling URL {url}</string>
     <string name="general__url_copied_to_clipboard" comment="Shown instead of opening a link, because this build never hands URLs to other apps.">Offline build &#8212; link copied to clipboard: {url}</string>
+    <string name="correction__auto_correct_enabled_toast">Autocorrect enabled</string>
+    <string name="correction__auto_correct_disabled_toast">Autocorrect disabled</string>
     <string name="general__select_dropdown_value_placeholder">&#45; select &#45;</string>
     <string name="general__unlimited">Unlimited</string>
     <string name="general__file_name">File name</string>

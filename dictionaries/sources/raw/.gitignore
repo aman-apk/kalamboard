@@ -1,0 +1,3 @@
+# Raw downloaded corpora are not committed; derived TSVs are.
+*
+!.gitignore
