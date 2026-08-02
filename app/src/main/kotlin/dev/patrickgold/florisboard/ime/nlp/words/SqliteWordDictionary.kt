@@ -84,7 +84,11 @@ class SqliteWordDictionary private constructor(
                         }
                     }
                 }
-            } catch (e: SQLiteException) {
+            } catch (e: Exception) {
+                // Deliberately broad: a dialect-change reload (or LRU eviction) may close this
+                // instance while an in-flight suggestion pass still holds it, and a closed
+                // SQLiteDatabase throws IllegalStateException — NOT a SQLiteException. That one
+                // stale pass gracefully losing its n-gram signal beats crashing the IME process.
                 flogError { "ngram query failed for '$key': $e" }
                 emptyList()
             }.also { result -> synchronized(cache) { cache[key] = result } }

@@ -47,6 +47,7 @@ import dev.patrickgold.florisboard.R
 import dev.patrickgold.florisboard.ime.nlp.words.LearningStore
 import dev.patrickgold.florisboard.lib.compose.FlorisScreen
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.florisboard.lib.compose.FlorisOutlinedBox
 import org.florisboard.lib.compose.FlorisTextButton
@@ -87,27 +88,31 @@ fun TypingStatsScreen() = FlorisScreen {
     previewFieldVisible = false
 
     val context = LocalContext.current
-    val learningStore = remember { LearningStore(context.applicationContext) }
-    androidx.compose.runtime.DisposableEffect(Unit) {
-        onDispose { learningStore.close() }
-    }
+    val scope = androidx.compose.runtime.rememberCoroutineScope()
     var reloadTrigger by remember { mutableIntStateOf(0) }
     var showClearDialog by remember { mutableStateOf(false) }
 
+    // Short-lived store per query, opened and closed inside the same IO block — no remembered
+    // instance whose close() could race an in-flight read on screen exit.
     val stats by produceState<TypingStats?>(initialValue = null, reloadTrigger) {
         value = withContext(Dispatchers.IO) {
-            val (words, chars, activeDays) = learningStore.statsTotals()
-            val daily = learningStore.dailyStats(90)
-            val dates = daily.mapNotNull { runCatching { LocalDate.parse(it.date) }.getOrNull() }.toSet()
-            TypingStats(
-                totalWords = words,
-                totalChars = chars,
-                activeDays = activeDays,
-                streakDays = computeStreak(dates, LocalDate.now()),
-                bestDay = daily.maxByOrNull { it.words },
-                lastDays = daily.take(14).reversed(),
-                topWords = learningStore.topWords(12),
-            )
+            val store = LearningStore(context.applicationContext)
+            try {
+                val (words, chars, activeDays) = store.statsTotals()
+                val daily = store.dailyStats(90)
+                val dates = daily.mapNotNull { runCatching { LocalDate.parse(it.date) }.getOrNull() }.toSet()
+                TypingStats(
+                    totalWords = words,
+                    totalChars = chars,
+                    activeDays = activeDays,
+                    streakDays = computeStreak(dates, LocalDate.now()),
+                    bestDay = daily.maxByOrNull { it.words },
+                    lastDays = daily.take(14).reversed(),
+                    topWords = store.topWords(12),
+                )
+            } finally {
+                store.close()
+            }
         }
     }
 
@@ -234,9 +239,16 @@ fun TypingStatsScreen() = FlorisScreen {
                 title = stringRes(R.string.settings__typing_stats__clear),
                 confirmLabel = stringRes(R.string.action__yes),
                 onConfirm = {
-                    learningStore.clearStats()
                     showClearDialog = false
-                    reloadTrigger++
+                    scope.launch(Dispatchers.IO) {
+                        val store = LearningStore(context.applicationContext)
+                        try {
+                            store.clearStats()
+                        } finally {
+                            store.close()
+                        }
+                        reloadTrigger++
+                    }
                 },
                 dismissLabel = stringRes(R.string.action__no),
                 onDismiss = { showClearDialog = false },

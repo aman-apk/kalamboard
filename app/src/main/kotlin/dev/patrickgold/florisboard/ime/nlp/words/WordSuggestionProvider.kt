@@ -87,6 +87,9 @@ class WordSuggestionProvider(context: Context) : SpellingProvider, SuggestionPro
     private val dictionariesGuard = Mutex()
     /** language code -> dictionary; iteration order = load order (used for eviction). */
     private val dictionaries = LinkedHashMap<String, SqliteWordDictionary>()
+    /** language -> overlayKey of the last FAILED load attempt (no asset / broken asset), so a
+     *  language without a shipped dictionary doesn't retry asset I/O on every keystroke. */
+    private val failedLoads = HashMap<String, String>()
 
     private val learning by lazy { LearningStore(appContext) }
     private val dictionaryManager get() = DictionaryManager.default()
@@ -122,6 +125,7 @@ class WordSuggestionProvider(context: Context) : SpellingProvider, SuggestionPro
         dictionariesGuard.withLock {
             val cached = dictionaries[language]
             if (cached != null && cached.overlayKey == overlayKey) return@withLock
+            if (failedLoads[language] == overlayKey) return@withLock // known-missing, don't re-stage per keystroke
             val dialect = if (language == "ar") prefs.suggestion.arabicDialect.get() else ArabicDialect.NONE
             val dictionary = SqliteWordDictionary.load(
                 context = appContext,
@@ -129,7 +133,13 @@ class WordSuggestionProvider(context: Context) : SpellingProvider, SuggestionPro
                 normalizer = WordNormalizer.forLanguage(language),
                 overlay = DialectOverlay.loadFromAssets(appContext, language, dialect),
                 overlayKey = overlayKey,
-            ) ?: return@withLock // No dictionary asset for this language: static suggestions stay empty.
+            )
+            if (dictionary == null) {
+                // No dictionary asset for this language: static suggestions stay empty.
+                failedLoads[language] = overlayKey
+                return@withLock
+            }
+            failedLoads.remove(language)
             dictionaries.remove(language)?.close()
             dictionaries[language] = dictionary
             while (dictionaries.size > MAX_LOADED_DICTIONARIES) {

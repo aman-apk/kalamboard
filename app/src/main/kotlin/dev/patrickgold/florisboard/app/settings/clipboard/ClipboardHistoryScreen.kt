@@ -49,7 +49,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -111,18 +110,37 @@ fun ClipboardHistoryScreen() = FlorisScreen {
             context.getSystemService(android.content.Context.KEYGUARD_SERVICE) as KeyguardManager
         }
         val lockRequired = lockEnabled && keyguardManager.isDeviceSecure
-        var unlocked by rememberSaveable { mutableStateOf(false) }
+        // Plain remember on purpose (NOT rememberSaveable): the unlock must NOT survive process
+        // death or recreation. The ON_STOP observer below additionally re-locks the moment the
+        // user leaves the app, so returning from Recents always re-prompts.
+        var unlocked by remember { mutableStateOf(false) }
+        var unlockInFlight by remember { mutableStateOf(false) }
+        val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+        androidx.compose.runtime.DisposableEffect(lifecycleOwner) {
+            val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
+                if (event == androidx.lifecycle.Lifecycle.Event.ON_STOP) unlocked = false
+            }
+            lifecycleOwner.lifecycle.addObserver(observer)
+            onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+        }
         val unlockTitle = stringRes(R.string.settings__clipboard_history__lock_prompt_title)
         val unlockSummary = stringRes(R.string.settings__clipboard_history__lock_prompt_summary)
         val unlockLauncher = rememberLauncherForActivityResult(
             ActivityResultContracts.StartActivityForResult(),
         ) { result ->
+            unlockInFlight = false
             if (result.resultCode == Activity.RESULT_OK) unlocked = true
         }
         fun launchUnlock() {
+            if (unlockInFlight) return // one credential prompt at a time (auto-launch vs button)
             @Suppress("DEPRECATION") // Replacement (BiometricPrompt) needs a FragmentActivity + extra dependency.
             val intent = keyguardManager.createConfirmDeviceCredentialIntent(unlockTitle, unlockSummary)
-            if (intent != null) unlockLauncher.launch(intent) else unlocked = true
+            if (intent != null) {
+                unlockInFlight = true
+                unlockLauncher.launch(intent)
+            } else {
+                unlocked = true
+            }
         }
         if (lockRequired && !unlocked) {
             LaunchedEffect(Unit) { launchUnlock() }

@@ -37,8 +37,10 @@ import dev.patrickgold.florisboard.ime.theme.FlorisImeUi
 import dev.patrickgold.jetpref.datastore.model.collectAsState
 import org.florisboard.lib.snygg.ui.rememberSnyggThemeQuery
 
-/** Height of the always-visible quick resize strip sitting above the smartbar. */
-val ImeQuickResizeBarHeight = 14.dp
+/** Height of the always-visible quick resize strip sitting above the smartbar.
+ *  User-directed: as thin as possible so it costs virtually no screen space — the whole strip
+ *  is still the drag target, and the modal resize editor remains the fallback for precision. */
+val ImeQuickResizeBarHeight = 6.dp
 
 /**
  * A always-visible grab bar at the very top of the keyboard for dragging its height up and down.
@@ -75,7 +77,7 @@ fun ImeQuickResizeBar(modifier: Modifier = Modifier) {
         val gripShape = remember { androidx.compose.foundation.shape.RoundedCornerShape(50) }
         Box(
             modifier = Modifier
-                .size(width = 36.dp, height = 4.dp)
+                .size(width = 28.dp, height = 2.5.dp)
                 .clip(gripShape)
                 .background(gripColor),
         )

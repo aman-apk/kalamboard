@@ -110,11 +110,18 @@ configure<ApplicationExtension> {
     if (keystorePropsFile.exists()) {
         val keystoreProps = Properties()
         keystorePropsFile.inputStream().use { stream -> keystoreProps.load(stream) }
-        signingConfigs.create("kalamboardRelease") {
-            storeFile = rootProject.file("../keystore/" + File(keystoreProps.getProperty("storeFile")).name)
-            storePassword = keystoreProps.getProperty("storePassword")
-            keyAlias = keystoreProps.getProperty("keyAlias")
-            keyPassword = keystoreProps.getProperty("keyPassword")
+        val storeFileName = keystoreProps.getProperty("storeFile")
+        if (storeFileName == null || keystoreProps.getProperty("storePassword") == null ||
+            keystoreProps.getProperty("keyAlias") == null || keystoreProps.getProperty("keyPassword") == null
+        ) {
+            logger.warn("KalamBoard: keystore.properties is incomplete (needs storeFile/storePassword/keyAlias/keyPassword) — release APK will be UNSIGNED.")
+        } else {
+            signingConfigs.create("kalamboardRelease") {
+                storeFile = rootProject.file("../keystore/" + File(storeFileName).name)
+                storePassword = keystoreProps.getProperty("storePassword")
+                keyAlias = keystoreProps.getProperty("keyAlias")
+                keyPassword = keystoreProps.getProperty("keyPassword")
+            }
         }
     } else {
         logger.warn("KalamBoard: ../keystore/keystore.properties not found — release APK will be UNSIGNED.")

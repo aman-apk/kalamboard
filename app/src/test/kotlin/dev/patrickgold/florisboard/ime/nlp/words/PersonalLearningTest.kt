@@ -183,5 +183,14 @@ class PersonalLearningTest : FunSpec({
             PersonalLearning.extractLastWords("", 2) shouldBe emptyList()
             PersonalLearning.extractLastWords("   ", 2) shouldBe emptyList()
         }
+        test("harakat are part of the word, never a context breaker") {
+            PersonalLearning.extractLastWords("مُحمد ", 2) shouldBe listOf("مُحمد")
+            PersonalLearning.extractLastWords("إن شاءَ ", 2) shouldBe listOf("إن", "شاءَ")
+            // The norm key still matches the mined static trigram ("ان شاء" -> "الله").
+            ArabicNormalizer.normalize("شاءَ") shouldBe "شاء"
+        }
+        test("bidi format marks are transparent separators") {
+            PersonalLearning.extractLastWords("مرحبا‏ كيف ", 2) shouldBe listOf("مرحبا", "كيف")
+        }
     }
 })

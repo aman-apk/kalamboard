@@ -115,21 +115,31 @@ object PersonalLearning {
     }
 
     /**
-     * Extracts up to [maxWords] trailing words before the cursor, oldest first. Any non-whitespace
-     * separator (punctuation = sentence/clause boundary) closes the context, so a trigram context
-     * never crosses «مرحبا، كيف» — only the words after the comma count.
+     * Extracts up to [maxWords] trailing words before the cursor, oldest first. Punctuation
+     * (a sentence/clause boundary) closes the context, so a trigram context never crosses
+     * «مرحبا، كيف» — only the words after the comma count.
+     *
+     * Combining marks (category Mn — Arabic harakat/shadda/tanween) are part of the word they
+     * follow, and format characters (category Cf — RLM/ALM/ZWJ that apps insert between words)
+     * are transparent separators: neither may break the context, otherwise diacritized text like
+     * «إن شاءَ» would lose its n-gram context entirely and feed wrong fragments into learning.
+     * The normalizer strips the marks later, so «شاءَ» still yields the norm key «شاء».
      */
     fun extractLastWords(text: CharSequence, maxWords: Int): List<String> {
+        fun isWordChar(ch: Char): Boolean =
+            ch.isLetter() || ch == '\'' || ch.category == CharCategory.NON_SPACING_MARK
+        fun isTransparentSeparator(ch: Char): Boolean =
+            ch.isWhitespace() || ch.category == CharCategory.FORMAT
         val words = ArrayDeque<String>()
         var end = text.length
         outer@ while (words.size < maxWords) {
-            while (end > 0 && !(text[end - 1].isLetter() || text[end - 1] == '\'')) {
-                if (!text[end - 1].isWhitespace()) break@outer
+            while (end > 0 && !isWordChar(text[end - 1])) {
+                if (!isTransparentSeparator(text[end - 1])) break@outer
                 end--
             }
             if (end == 0) break
             var start = end
-            while (start > 0 && (text[start - 1].isLetter() || text[start - 1] == '\'')) {
+            while (start > 0 && isWordChar(text[start - 1])) {
                 start--
             }
             words.addFirst(text.substring(start, end))

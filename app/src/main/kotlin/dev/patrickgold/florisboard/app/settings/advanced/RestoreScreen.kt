@@ -214,11 +214,15 @@ fun RestoreScreen() = FlorisScreen {
                 .subDir(Backup.LEARNING_DATA_DIR_NAME)
                 .subFile(Backup.LEARNING_DATA_FILE_NAME)
             if (learningFile.exists()) {
-                val learningStore = LearningStore(context.applicationContext)
-                try {
-                    learningStore.importSnapshot(learningFile.readText(), erase = shouldReset)
-                } finally {
-                    learningStore.close()
+                // Off the main thread: the v2 snapshot (bigrams + trigrams + stats) can be a
+                // large single transaction and performRestore runs on Dispatchers.Main.
+                kotlinx.coroutines.withContext(Dispatchers.IO) {
+                    val learningStore = LearningStore(context.applicationContext)
+                    try {
+                        learningStore.importSnapshot(learningFile.readText(), erase = shouldReset)
+                    } finally {
+                        learningStore.close()
+                    }
                 }
             }
         }
