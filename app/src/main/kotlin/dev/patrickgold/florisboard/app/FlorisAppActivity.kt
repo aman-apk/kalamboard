@@ -175,6 +175,7 @@ class FlorisAppActivity : ComponentActivity() {
         val previewFieldController = rememberPreviewFieldController()
 
         val isImeSetUp by prefs.internal.isImeSetUp.collectAsState()
+        val onboardingCompleted by prefs.internal.onboardingCompleted.collectAsState()
 
         CompositionLocalProvider(
             LocalNavController provides navController,
@@ -197,7 +198,11 @@ class FlorisAppActivity : ComponentActivity() {
                     Routes.AppNavHost(
                         modifier = Modifier.weight(1.0f),
                         navController = navController,
-                        startDestination = if (isImeSetUp) Routes.Settings.Home::class else Routes.Setup.Screen::class,
+                        startDestination = when {
+                            !onboardingCompleted && !isImeSetUp -> Routes.Setup.Onboarding::class
+                            isImeSetUp -> Routes.Settings.Home::class
+                            else -> Routes.Setup.Screen::class
+                        },
                     )
                     PreviewKeyboardField(previewFieldController)
                 }

@@ -1123,4 +1123,19 @@
     <string name="pref__keyboard__show_resize_bar__summary">إظهار مقبض بأعلى الكيبورد لسحب ارتفاعه</string>
     <string name="pref__keyboard__space_bar_language_arrows__label">أسهم اللغة على شريط المسافة</string>
     <string name="pref__keyboard__space_bar_language_arrows__summary">إظهار ‹ › على المسافة للتنبيه أن سحبها يبدّل اللغة</string>
+
+    <!-- Onboarding (KalamBoard) -->
+    <string name="onboarding__welcome__title">أهلاً بك في كلام بورد</string>
+    <string name="onboarding__welcome__body">كيبورد عربي أولاً، صُنع ليفهمك.</string>
+    <string name="onboarding__privacy__title">كلامك ملكك وحدك</string>
+    <string name="onboarding__privacy__body">بلا إنترنت. نهائياً. لا خوادم ولا تتبّع — كل ما تكتبه يبقى في جهازك.</string>
+    <string name="onboarding__arabic__title">يحكي عربيّتك</string>
+    <string name="onboarding__arabic__body">اقتراحات ذكية بالفصحى والشامي، وتصحيح يعرف مكان الهمزة — ويتعلّم كلماتك وأنت تكتب.</string>
+    <string name="onboarding__clipboard__title">حافظة لا تنسى</string>
+    <string name="onboarding__clipboard__body">كل ما تنسخه محفوظ لك. ثبّت المهم، وارجع له متى شئت.</string>
+    <string name="onboarding__themes__title">أسود بلمسة ذهب</string>
+    <string name="onboarding__themes__body">أربعة ثيمات مصمّمة بعناية. ونصيحة: اسحب زر المسافة لتبديل اللغة.</string>
+    <string name="onboarding__action_next">التالي</string>
+    <string name="onboarding__action_skip">تخطّي</string>
+    <string name="onboarding__action_get_started">لنبدأ</string>
 </resources>

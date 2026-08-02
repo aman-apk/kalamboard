@@ -76,6 +76,7 @@ import dev.patrickgold.florisboard.app.settings.theme.ThemeManagerScreen
 import dev.patrickgold.florisboard.app.settings.theme.ThemeManagerScreenAction
 import dev.patrickgold.florisboard.app.settings.theme.ThemeScreen
 import dev.patrickgold.florisboard.app.settings.typing.TypingScreen
+import dev.patrickgold.florisboard.app.setup.OnboardingScreen
 import dev.patrickgold.florisboard.app.setup.SetupScreen
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -100,6 +101,9 @@ inline fun <reified T : Any> NavGraphBuilder.composableWithDeepLink(
 
 object Routes {
     object Setup {
+        @Serializable
+        object Onboarding
+
         @Serializable
         object Screen
     }
@@ -279,6 +283,7 @@ object Routes {
             },
         ) {
             composable<Setup.Screen> { SetupScreen() }
+            composable<Setup.Onboarding> { OnboardingScreen() }
 
             composableWithDeepLink(Settings.Home::class) { HomeScreen() }
 

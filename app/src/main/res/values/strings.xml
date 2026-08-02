@@ -1195,4 +1195,19 @@
     <string name="pref__keyboard__show_resize_bar__summary">Show a grab bar at the top of the keyboard to drag its height</string>
     <string name="pref__keyboard__space_bar_language_arrows__label">Language arrows on space bar</string>
     <string name="pref__keyboard__space_bar_language_arrows__summary">Show ‹ › on the space bar as a hint that swiping it switches language</string>
+
+    <!-- Onboarding (KalamBoard) -->
+    <string name="onboarding__welcome__title">Welcome to KalamBoard</string>
+    <string name="onboarding__welcome__body">An Arabic-first keyboard, built to understand you.</string>
+    <string name="onboarding__privacy__title">Your words are yours alone</string>
+    <string name="onboarding__privacy__body">No internet access. Ever. No servers, no tracking — everything you type stays on this device.</string>
+    <string name="onboarding__arabic__title">It speaks your Arabic</string>
+    <string name="onboarding__arabic__body">Smart suggestions in Fusha and Shami, autocorrect that gets the hamza right — and it learns your words as you type.</string>
+    <string name="onboarding__clipboard__title">A clipboard that never forgets</string>
+    <string name="onboarding__clipboard__body">Everything you copy is saved for you. Pin what matters, find it whenever you need it.</string>
+    <string name="onboarding__themes__title">Black, kissed with gold</string>
+    <string name="onboarding__themes__body">Four hand-crafted themes. And a tip: swipe the space bar to switch language.</string>
+    <string name="onboarding__action_next">Next</string>
+    <string name="onboarding__action_skip">Skip</string>
+    <string name="onboarding__action_get_started">Get started</string>
 </resources>

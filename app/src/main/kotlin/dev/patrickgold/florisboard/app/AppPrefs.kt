@@ -455,6 +455,11 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
 
     val internal = Internal()
     inner class Internal {
+        // KalamBoard: one-time feature onboarding shown before the IME setup wizard.
+        val onboardingCompleted = boolean(
+            key = "internal__onboarding_completed",
+            default = false,
+        )
         val homeIsBetaToolboxCollapsed = boolean(
             key = "internal__home_is_beta_toolbox_collapsed_040a01",
             default = false,
