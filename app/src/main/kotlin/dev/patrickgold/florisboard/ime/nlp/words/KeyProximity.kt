@@ -48,6 +48,21 @@ class KeyProximity private constructor(private val neighbors: Map<Char, Set<Char
             "zxcvbnm",
         )
 
+        // Keep in sync with .../layouts/characters/azerty.json (French)
+        private val AZERTY_ROWS = listOf(
+            "azertyuiop",
+            "qsdfghjklm",
+            "wxcvbn",
+        )
+
+        // Keep in sync with .../layouts/characters/turkish_q.json — note both ı and i normalize
+        // to i, so the i key inherits the neighbors of both physical positions (intended).
+        private val TURKISH_Q_ROWS = listOf(
+            "qwertyuıopğü",
+            "asdfghjklşi",
+            "zxcvbnmöç",
+        )
+
         private fun build(rows: List<String>, normalizer: WordNormalizer): KeyProximity {
             val map = mutableMapOf<Char, MutableSet<Char>>()
             fun norm(ch: Char): Char {
@@ -78,10 +93,14 @@ class KeyProximity private constructor(private val neighbors: Map<Char, Set<Char
 
         val ARABIC by lazy { build(ARABIC_ROWS, ArabicNormalizer) }
         val QWERTY by lazy { build(QWERTY_ROWS, LatinNormalizer) }
+        val AZERTY by lazy { build(AZERTY_ROWS, LatinNormalizer) }
+        val TURKISH_Q by lazy { build(TURKISH_Q_ROWS, LatinNormalizer) }
 
         /** Returns the proximity map for an ISO 639-1 [language] code. */
         fun forLanguage(language: String): KeyProximity = when (language) {
             "ar" -> ARABIC
+            "fr" -> AZERTY
+            "tr" -> TURKISH_Q
             else -> QWERTY
         }
     }

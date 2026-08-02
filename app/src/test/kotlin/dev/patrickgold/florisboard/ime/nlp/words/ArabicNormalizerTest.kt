@@ -117,4 +117,16 @@ class LatinNormalizerTest : FunSpec({
     test("plain word unchanged") {
         LatinNormalizer.normalize("keyboard") shouldBe "keyboard"
     }
+    test("French accents fold, apostrophe kept") {
+        LatinNormalizer.normalize("Été") shouldBe "ete"
+        LatinNormalizer.normalize("français") shouldBe "francais"
+        LatinNormalizer.normalize("l'école") shouldBe "l'ecole"
+    }
+    test("Turkish dotted/dotless i and cedilla letters fold") {
+        LatinNormalizer.normalize("İstanbul") shouldBe "istanbul"
+        LatinNormalizer.normalize("ışık") shouldBe "isik"
+        LatinNormalizer.normalize("Işık") shouldBe "isik"
+        LatinNormalizer.normalize("çocuğu") shouldBe "cocugu"
+        LatinNormalizer.normalize("şükür") shouldBe "sukur"
+    }
 })

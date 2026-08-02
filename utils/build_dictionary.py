@@ -82,8 +82,9 @@ def normalize_ar(word: str) -> str:
 
 
 def normalize_latin(word: str) -> str:
+    # Mirror of LatinNormalizer.kt (incl. the Turkish dotless-i fold; ı has no NFD decomposition).
     decomposed = unicodedata.normalize("NFD", word.lower())
-    return "".join(ch for ch in decomposed if unicodedata.category(ch) != "Mn")
+    return "".join(ch for ch in decomposed if unicodedata.category(ch) != "Mn").replace("ı", "i")
 
 
 def normalizer_for(language: str):
@@ -363,7 +364,13 @@ GOLDEN_AR = [
     ("سنة ٢٠٢٦", "سنه 2026"), ("۱۲۳", "123"),
     ("شو", "شو"), ("هلق", "هلق"), ("منيح", "منيح"), ("بدي", "بدي"), ("كتير", "كتير"),
 ]
-GOLDEN_LATIN = [("Hello", "hello"), ("café", "cafe"), ("keyboard", "keyboard")]
+GOLDEN_LATIN = [
+    ("Hello", "hello"), ("café", "cafe"), ("keyboard", "keyboard"),
+    # French
+    ("Été", "ete"), ("français", "francais"), ("l'école", "l'ecole"),
+    # Turkish (dotted/dotless i, plus the NFD-decomposable letters)
+    ("İstanbul", "istanbul"), ("ışık", "isik"), ("Işık", "isik"), ("çocuğu", "cocugu"), ("şükür", "sukur"),
+]
 
 
 def self_test():
@@ -386,7 +393,7 @@ def self_test():
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--self-test", action="store_true", help="run normalizer golden cases and exit")
-    parser.add_argument("--language", choices=["ar", "en"], help="target language")
+    parser.add_argument("--language", choices=["ar", "en", "fr", "tr"], help="target language")
     parser.add_argument("--wordlist", action="append", default=[], help="frequency list ('word count' per line)")
     parser.add_argument("--overlay", action="append", default=[], help="curated TSV overlay (text<TAB>freq)")
     parser.add_argument("--sentences", help="sentence corpus for bigram mining (Tatoeba export, may be .bz2)")

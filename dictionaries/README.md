@@ -37,10 +37,12 @@ d=levantine  # or egyptian / gulf / iraqi
 ```bash
 # Raw sources (dev machine only — the app itself never touches the network):
 cd dictionaries/sources/raw
-curl -sLO https://raw.githubusercontent.com/hermitdave/FrequencyWords/master/content/2018/ar/ar_50k.txt
-curl -sLO https://raw.githubusercontent.com/hermitdave/FrequencyWords/master/content/2018/en/en_50k.txt
-curl -sLO https://downloads.tatoeba.org/exports/per_language/ara/ara_sentences.tsv.bz2
-curl -sLO https://downloads.tatoeba.org/exports/per_language/eng/eng_sentences.tsv.bz2
+for l in ar en fr tr; do
+  curl -sLO https://raw.githubusercontent.com/hermitdave/FrequencyWords/master/content/2018/$l/${l}_50k.txt
+done
+for l in ara eng fra tur; do
+  curl -sLO https://downloads.tatoeba.org/exports/per_language/$l/${l}_sentences.tsv.bz2
+done
 cd ../../..
 
 python3 utils/build_dictionary.py --self-test
@@ -60,7 +62,19 @@ python3 utils/build_dictionary.py --language en \
   --sources-note "OpenSubtitles 2018 frequency list (hermitdave/FrequencyWords) + Tatoeba eng sentences" \
   --license-note "FrequencyWords: CC-BY-SA-4.0; Tatoeba: CC-BY 2.0 FR" \
   --output app/src/main/assets/ime/dict/en.sqlite3
+
+# French / Turkish use the same recipe (swap fr/fra resp. tr/tur):
+python3 utils/build_dictionary.py --language fr \
+  --wordlist dictionaries/sources/raw/fr_50k.txt \
+  --sentences dictionaries/sources/raw/fra_sentences.tsv.bz2 \
+  --min-bigram 4 --min-trigram 8 --max-words 55000 \
+  --sources-note "OpenSubtitles 2018 frequency list (hermitdave/FrequencyWords) + Tatoeba fra sentences" \
+  --license-note "FrequencyWords: CC-BY-SA-4.0; Tatoeba: CC-BY 2.0 FR" \
+  --output app/src/main/assets/ime/dict/fr.sqlite3
 ```
+
+Language-specific engine notes: `WordNormalizer` folds the Turkish dotless ı to i (both sides,
+golden-tested), and `KeyProximity.forLanguage` has dedicated AZERTY (fr) and Turkish-Q (tr) rows.
 
 After rebuilding `ar.sqlite3`, also refresh the JVM test resource:
 `app/src/test/resources/ar_words.tsv` (dump `SELECT word, freq FROM words ORDER BY word`,

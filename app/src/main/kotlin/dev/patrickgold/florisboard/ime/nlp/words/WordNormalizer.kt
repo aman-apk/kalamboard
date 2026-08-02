@@ -86,6 +86,10 @@ object ArabicNormalizer : WordNormalizer {
 /**
  * Normalizer for Latin (and generic alphabetic) scripts: lowercases and strips combining
  * diacritical marks after NFD decomposition, so "Cafe" matches "café" and vice versa.
+ *
+ * Turkish dotted/dotless i: ROOT lowercasing maps İ→i̇ (NFD strips the dot ✓) but leaves ı as-is,
+ * which has no decomposition and would make «ışık» and «isik» never match — so ı folds to i
+ * explicitly. Harmless for every other language (ı barely exists outside Turkic scripts).
  */
 object LatinNormalizer : WordNormalizer {
     private val combiningMarks = Regex("\\p{Mn}+")
@@ -93,6 +97,6 @@ object LatinNormalizer : WordNormalizer {
     override fun normalize(word: String): String {
         val lowered = word.lowercase(Locale.ROOT)
         val decomposed = Normalizer.normalize(lowered, Normalizer.Form.NFD)
-        return combiningMarks.replace(decomposed, "")
+        return combiningMarks.replace(decomposed, "").replace('ı', 'i')
     }
 }
