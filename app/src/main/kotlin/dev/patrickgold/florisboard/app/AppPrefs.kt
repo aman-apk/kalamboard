@@ -729,7 +729,9 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
         )
         val displayMode = enum(
             key = "suggestion__display_mode",
-            default = CandidatesDisplayMode.DYNAMIC_SCROLLABLE,
+            // KalamBoard: candidates share the full bar width equally instead of shrinking and
+            // crowding the reading-start edge (user feedback with 3-5 Arabic suggestions).
+            default = CandidatesDisplayMode.CLASSIC,
         )
         val blockPossiblyOffensive = boolean(
             key = "suggestion__block_possibly_offensive",
