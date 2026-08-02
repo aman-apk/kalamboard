@@ -223,6 +223,7 @@ private fun ImeInnerWindow() {
         allowClip = false,
     ) {
         Column {
+            ImeQuickResizeBar()
             when (state.imeUiMode) {
                 ImeUiMode.TEXT -> TextInputLayout()
                 ImeUiMode.MEDIA -> ProvideActualLayoutDirection { MediaInputLayout() }

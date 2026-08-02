@@ -76,6 +76,16 @@ fun KeyboardScreen() = FlorisScreen {
             entries = enumDisplayEntriesOf(UtilityKeyAction::class),
             visibleIf = { prefs.keyboard.utilityKeyEnabled isEqualTo true },
         )
+        SwitchPreference(
+            prefs.keyboard.showResizeBar,
+            title = stringRes(R.string.pref__keyboard__show_resize_bar__label),
+            summary = stringRes(R.string.pref__keyboard__show_resize_bar__summary),
+        )
+        SwitchPreference(
+            prefs.keyboard.spaceBarLanguageArrows,
+            title = stringRes(R.string.pref__keyboard__space_bar_language_arrows__label),
+            summary = stringRes(R.string.pref__keyboard__space_bar_language_arrows__summary),
+        )
         ListPreference(
             prefs.keyboard.spaceBarMode,
             title = stringRes(R.string.pref__keyboard__space_bar_mode__label),

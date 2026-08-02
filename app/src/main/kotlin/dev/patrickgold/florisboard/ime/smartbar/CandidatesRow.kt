@@ -19,6 +19,11 @@ package dev.patrickgold.florisboard.ime.smartbar
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
+import android.text.TextUtils
+import android.view.View
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -70,6 +75,18 @@ fun CandidatesRow(modifier: Modifier = Modifier) {
     val displayMode by prefs.suggestion.displayMode.collectAsState()
     val candidates by nlpManager.activeCandidatesFlow.collectAsState()
 
+    // The IME root forces LTR so the window-positioning math stays in absolute coordinates, which
+    // means candidates for an RTL subtype would start at the LEFT edge — backwards for Arabic.
+    // Follow the ACTIVE SUBTYPE's script (not the system UI locale): typing Arabic puts the best
+    // candidate under the reader's eye on the right, typing English keeps it on the left.
+    val activeSubtype by subtypeManager.activeSubtypeFlow.collectAsState()
+    val candidatesLayoutDirection = remember(activeSubtype) {
+        if (TextUtils.getLayoutDirectionFromLocale(activeSubtype.primaryLocale.base) ==
+            View.LAYOUT_DIRECTION_RTL
+        ) LayoutDirection.Rtl else LayoutDirection.Ltr
+    }
+
+    CompositionLocalProvider(LocalLayoutDirection provides candidatesLayoutDirection) {
     SnyggRow(
         elementName = FlorisImeUi.SmartbarCandidatesRow.elementName,
         modifier = modifier
@@ -133,6 +150,7 @@ fun CandidatesRow(modifier: Modifier = Modifier) {
                 )
             }
         }
+    }
     }
 }
 

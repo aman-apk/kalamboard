@@ -46,6 +46,8 @@ import org.florisboard.lib.kotlin.collectLatestIn
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.properties.Delegates
 
+private const val MAX_CANDIDATE_COUNT = 5
+
 class NlpManager(context: Context) {
     private val prefs by FlorisPreferenceStore
     private val clipboardManager by context.clipboardManager()
@@ -215,7 +217,7 @@ class NlpManager(context: Context) {
                     getSuggestionProvider(subtype).suggest(
                         subtype = subtype,
                         content = content,
-                        maxCandidateCount = 8,
+                        maxCandidateCount = MAX_CANDIDATE_COUNT,
                         allowPossiblyOffensive = !prefs.suggestion.blockPossiblyOffensive.get(),
                         isPrivateSession = keyboardManager.activeState.isIncognitoMode,
                     )
@@ -309,7 +311,7 @@ class NlpManager(context: Context) {
                     clipboardSuggestionProvider.suggest(
                         subtype = Subtype.DEFAULT,
                         content = editorInstance.activeContent,
-                        maxCandidateCount = 8,
+                        maxCandidateCount = MAX_CANDIDATE_COUNT,
                         allowPossiblyOffensive = !prefs.suggestion.blockPossiblyOffensive.get(),
                         isPrivateSession = keyboardManager.activeState.isIncognitoMode,
                     )

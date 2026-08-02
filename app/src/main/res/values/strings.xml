@@ -124,8 +124,8 @@
     <string name="settings__system_default" comment="General string which is used when a preference has the system default value set">System default</string>
 
     <string name="settings__home__title" comment="Title of the Home screen">Welcome to {app_name}</string>
-    <string name="settings__home__ime_not_enabled" comment="Error message shown in Home fragment when FlorisBoard is not enabled in the system">KalamBoard is not enabled in the system and thus won\'t be available as an input method in the input picker. Click here to resolve this issue.</string>
-    <string name="settings__home__ime_not_selected" comment="Warning message shown in Home fragment when FlorisBoard is not selected as the default keyboard">KalamBoard is not selected as the default input method. Click here to resolve this issue.</string>
+    <string name="settings__home__ime_not_enabled" comment="Error message shown in Home fragment when KalamBoard is not enabled in the system">KalamBoard is not enabled in the system and thus won\'t be available as an input method in the input picker. Click here to resolve this issue.</string>
+    <string name="settings__home__ime_not_selected" comment="Warning message shown in Home fragment when KalamBoard is not selected as the default keyboard">KalamBoard is not selected as the default input method. Click here to resolve this issue.</string>
 
     <string name="settings__localization__title" comment="Title of languages and Layout screen">Languages &amp; Layouts</string>
     <string name="settings__localization__display_language_names_in__label" comment="Label of Display language names in preference">Display language names in</string>
@@ -830,7 +830,7 @@
     <string name="ext__export__failure">Failed to export extension: {error_message}</string>
     <string name="ext__import__success">Successfully imported extension!</string>
     <string name="ext__import__failure">Failed to import extension: {error_message}</string>
-    <string name="ext__import__ext_any" comment="Title of Importer screen for import of any supported FlorisBoard extension">Import extension</string>
+    <string name="ext__import__ext_any" comment="Title of Importer screen for import of any supported KalamBoard extension">Import extension</string>
     <string name="ext__import__ext_keyboard" comment="Title of Importer screen for keyboard extension import">Import keyboard extension</string>
     <string name="ext__import__ext_theme" comment="Title of Importer screen for theme extension import">Import theme extension</string>
     <string name="ext__import__ext_languagepack" comment="Title of Importer screen for language pack extension import">Import language pack extension</string>
@@ -1191,4 +1191,8 @@
     </plurals>
 
 
+    <string name="pref__keyboard__show_resize_bar__label">Keyboard resize bar</string>
+    <string name="pref__keyboard__show_resize_bar__summary">Show a grab bar at the top of the keyboard to drag its height</string>
+    <string name="pref__keyboard__space_bar_language_arrows__label">Language arrows on space bar</string>
+    <string name="pref__keyboard__space_bar_language_arrows__summary">Show ‹ › on the space bar as a hint that swiping it switches language</string>
 </resources>

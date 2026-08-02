@@ -80,6 +80,7 @@ import dev.patrickgold.florisboard.ime.text.key.KeyVariation
 import dev.patrickgold.florisboard.ime.theme.FlorisImeUi
 import dev.patrickgold.florisboard.ime.window.LocalWindowController
 import dev.patrickgold.florisboard.keyboardManager
+import dev.patrickgold.florisboard.subtypeManager
 import dev.patrickgold.florisboard.lib.FlorisRect
 import dev.patrickgold.florisboard.lib.Pointer
 import dev.patrickgold.florisboard.lib.PointerMap
@@ -106,6 +107,12 @@ import kotlin.math.sqrt
  * fires. Deliberately small so a calm swipe works, but large enough to not fight a normal tap.
  */
 private const val SPACE_BAR_ACTION_UNIT_THRESHOLD = 2
+
+/** Swipe actions that change the active subtype — used to decide if the space bar shows arrows. */
+private val SubtypeSwitchActions = setOf(
+    SwipeAction.SWITCH_TO_NEXT_SUBTYPE,
+    SwipeAction.SWITCH_TO_PREV_SUBTYPE,
+)
 
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @OptIn(ExperimentalComposeUiApi::class)
@@ -357,6 +364,21 @@ private fun TextKeyButton(
                     SpaceBarMode.NOTHING -> return@let
                     SpaceBarMode.CURRENT_LANGUAGE -> {}
                     SpaceBarMode.SPACE_BAR_KEY -> customLabel = "␣"
+                }
+                // Affordance for the swipe-to-switch-language gesture: only shown when a swipe
+                // actually switches subtypes and more than one language is installed, so it never
+                // promises something the current configuration does not do.
+                val showHint by prefs.keyboard.spaceBarLanguageArrows.collectAsState()
+                val swipesSwitchLanguage = remember(
+                    prefs.gestures.spaceBarSwipeLeft.get(), prefs.gestures.spaceBarSwipeRight.get(),
+                ) {
+                    prefs.gestures.spaceBarSwipeLeft.get() in SubtypeSwitchActions ||
+                        prefs.gestures.spaceBarSwipeRight.get() in SubtypeSwitchActions
+                }
+                if (showHint && swipesSwitchLanguage && evaluator.subtype.let { true } &&
+                    LocalContext.current.subtypeManager().value.subtypes.size > 1
+                ) {
+                    customLabel = "\u2039  $customLabel  \u203a"
                 }
             }
             SnyggText(

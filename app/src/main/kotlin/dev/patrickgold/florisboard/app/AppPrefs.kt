@@ -514,7 +514,18 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
         )
         val utilityKeyAction = enum(
             key = "keyboard__utility_key_action",
-            default = UtilityKeyAction.DYNAMIC_SWITCH_LANGUAGE_EMOJIS,
+            // KalamBoard: the utility key opens emoji. Language switching lives on the space-bar
+            // swipe (with an on-key arrow hint), so a dedicated language key would be redundant.
+            default = UtilityKeyAction.SWITCH_TO_EMOJIS,
+        )
+        // KalamBoard: a persistent grab bar above the smartbar for one-gesture height changes.
+        val showResizeBar = boolean(
+            key = "keyboard__show_resize_bar",
+            default = true,
+        )
+        val spaceBarLanguageArrows = boolean(
+            key = "keyboard__space_bar_language_arrows",
+            default = true,
         )
         val spaceBarMode = enum(
             key = "keyboard__space_bar_display_mode",
