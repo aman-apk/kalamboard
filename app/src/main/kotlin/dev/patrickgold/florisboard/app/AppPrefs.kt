@@ -38,6 +38,7 @@ import dev.patrickgold.florisboard.ime.media.emoji.EmojiHistory
 import dev.patrickgold.florisboard.ime.media.emoji.EmojiSkinTone
 import dev.patrickgold.florisboard.ime.media.emoji.EmojiSuggestionType
 import dev.patrickgold.florisboard.ime.nlp.SpellingLanguageMode
+import dev.patrickgold.florisboard.ime.nlp.words.ArabicDialect
 import dev.patrickgold.florisboard.ime.smartbar.CandidatesDisplayMode
 import dev.patrickgold.florisboard.ime.smartbar.ExtendedActionsPlacement
 import dev.patrickgold.florisboard.ime.smartbar.IncognitoDisplayMode
@@ -101,6 +102,12 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
         // is excluded from platform backup; the user prunes via the in-app history browser.
         val historyEnabled = boolean(
             key = "clipboard__history_enabled",
+            default = true,
+        )
+        // Opening the in-app history browser requires the device's own unlock (biometric or
+        // PIN/pattern). Only effective when the device actually has a secure lock configured.
+        val historyScreenLock = boolean(
+            key = "clipboard__history_screen_lock",
             default = true,
         )
         val historyNumGridColumnsPortrait = int(
@@ -460,6 +467,16 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
             key = "internal__onboarding_completed",
             default = false,
         )
+        // KalamBoard: bookkeeping for the manual-backup reminder card on the home screen.
+        // Backups themselves stay strictly user-triggered (see BackupScreen).
+        val lastBackupTimestamp = long(
+            key = "internal__last_backup_timestamp",
+            default = 0L,
+        )
+        val backupReminderSnoozedUntil = long(
+            key = "internal__backup_reminder_snoozed_until",
+            default = 0L,
+        )
         val homeIsBetaToolboxCollapsed = boolean(
             key = "internal__home_is_beta_toolbox_collapsed_040a01",
             default = false,
@@ -726,6 +743,12 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
         val learnFromTyping = boolean(
             key = "suggestion__learn_from_typing",
             default = true,
+        )
+        // Which Arabic dialect lexicon is layered on top of the MSA base dictionary
+        // (assets ime/dict/overlays/ar_<dialect>.tsv, applied by WordSuggestionProvider).
+        val arabicDialect = enum(
+            key = "suggestion__arabic_dialect",
+            default = ArabicDialect.LEVANTINE,
         )
         val displayMode = enum(
             key = "suggestion__display_mode",

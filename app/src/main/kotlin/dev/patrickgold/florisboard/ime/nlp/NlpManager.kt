@@ -269,12 +269,12 @@ class NlpManager(context: Context) {
      * out, tapped, auto-committed or glide-committed), so it can learn from the user's typing.
      * See [SuggestionProvider.notifyWordCommitted].
      */
-    fun notifyWordCommitted(word: String, precedingWord: String) {
+    fun notifyWordCommitted(word: String, precedingWords: List<String>) {
         if (word.isBlank()) return
         val subtype = subtypeManager.activeSubtype
         val isPrivateSession = keyboardManager.activeState.isIncognitoMode
         scope.launch {
-            getSuggestionProvider(subtype).notifyWordCommitted(subtype, word, precedingWord, isPrivateSession)
+            getSuggestionProvider(subtype).notifyWordCommitted(subtype, word, precedingWords, isPrivateSession)
         }
     }
 

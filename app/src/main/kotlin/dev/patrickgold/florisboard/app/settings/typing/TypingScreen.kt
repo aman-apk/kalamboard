@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.LibraryBooks
 import androidx.compose.material.icons.filled.Contacts
+import androidx.compose.material.icons.filled.Insights
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.SpaceBar
 import androidx.compose.material3.Card
@@ -39,6 +40,7 @@ import dev.patrickgold.florisboard.app.Routes
 import dev.patrickgold.florisboard.app.enumDisplayEntriesOf
 import dev.patrickgold.florisboard.ime.keyboard.IncognitoMode
 import dev.patrickgold.florisboard.ime.nlp.SpellingLanguageMode
+import dev.patrickgold.florisboard.ime.nlp.words.ArabicDialect
 import dev.patrickgold.florisboard.lib.compose.FlorisHyperlinkText
 import dev.patrickgold.florisboard.lib.compose.FlorisScreen
 import dev.patrickgold.jetpref.datastore.model.collectAsState
@@ -73,6 +75,19 @@ fun TypingScreen() = FlorisScreen {
                 title = stringRes(R.string.pref__suggestion__learn_from_typing__label),
                 summary = stringRes(R.string.pref__suggestion__learn_from_typing__summary),
                 enabledIf = { prefs.suggestion.enabled isEqualTo true },
+            )
+            ListPreference(
+                prefs.suggestion.arabicDialect,
+                icon = Icons.Default.Language,
+                title = stringRes(R.string.pref__suggestion__arabic_dialect__label),
+                entries = enumDisplayEntriesOf(ArabicDialect::class),
+                enabledIf = { prefs.suggestion.enabled isEqualTo true },
+            )
+            Preference(
+                icon = Icons.Default.Insights,
+                title = stringRes(R.string.settings__typing_stats__title),
+                summary = stringRes(R.string.settings__typing_stats__entry_summary),
+                onClick = { navController.navigate(Routes.Settings.TypingStats) },
             )
             SwitchPreference(
                 prefs.suggestion.blockPossiblyOffensive,

@@ -16,36 +16,52 @@
 
 package dev.patrickgold.florisboard.app.settings.clipboard
 
+import android.app.Activity
+import android.app.KeyguardManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.TextSnippet
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.filled.Videocam
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import dev.patrickgold.florisboard.R
 import dev.patrickgold.florisboard.clipboardManager
 import dev.patrickgold.florisboard.ime.clipboard.provider.ClipboardItem
 import dev.patrickgold.florisboard.ime.clipboard.provider.ItemType
 import dev.patrickgold.florisboard.lib.compose.FlorisScreen
+import dev.patrickgold.jetpref.datastore.model.collectAsState
 import dev.patrickgold.jetpref.material.ui.JetPrefAlertDialog
 import dev.patrickgold.jetpref.material.ui.JetPrefListItem
 import org.florisboard.lib.android.showShortToastSync
@@ -86,6 +102,57 @@ fun ClipboardHistoryScreen() = FlorisScreen {
     }
 
     content {
+        // Privacy lock: the full history browser sits behind the device's own unlock screen
+        // (fingerprint or PIN/pattern, whatever the device uses). Only enforced when the pref is
+        // on AND the device actually has a secure lock configured — otherwise there is nothing
+        // to authenticate against and the screen opens directly.
+        val lockEnabled by prefs.clipboard.historyScreenLock.collectAsState()
+        val keyguardManager = remember {
+            context.getSystemService(android.content.Context.KEYGUARD_SERVICE) as KeyguardManager
+        }
+        val lockRequired = lockEnabled && keyguardManager.isDeviceSecure
+        var unlocked by rememberSaveable { mutableStateOf(false) }
+        val unlockTitle = stringRes(R.string.settings__clipboard_history__lock_prompt_title)
+        val unlockSummary = stringRes(R.string.settings__clipboard_history__lock_prompt_summary)
+        val unlockLauncher = rememberLauncherForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+        ) { result ->
+            if (result.resultCode == Activity.RESULT_OK) unlocked = true
+        }
+        fun launchUnlock() {
+            @Suppress("DEPRECATION") // Replacement (BiometricPrompt) needs a FragmentActivity + extra dependency.
+            val intent = keyguardManager.createConfirmDeviceCredentialIntent(unlockTitle, unlockSummary)
+            if (intent != null) unlockLauncher.launch(intent) else unlocked = true
+        }
+        if (lockRequired && !unlocked) {
+            LaunchedEffect(Unit) { launchUnlock() }
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Spacer(modifier = Modifier.height(48.dp))
+                Icon(
+                    imageVector = Icons.Default.Lock,
+                    contentDescription = null,
+                    modifier = Modifier.size(56.dp),
+                    tint = MaterialTheme.colorScheme.primary,
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = stringRes(R.string.settings__clipboard_history__locked_message),
+                    style = MaterialTheme.typography.bodyLarge,
+                    textAlign = TextAlign.Center,
+                )
+                Spacer(modifier = Modifier.height(20.dp))
+                Button(onClick = { launchUnlock() }) {
+                    Text(stringRes(R.string.settings__clipboard_history__unlock_action))
+                }
+            }
+            return@content
+        }
+
         FlorisOutlinedBox(
             modifier = Modifier.defaultFlorisOutlinedBox(),
         ) {

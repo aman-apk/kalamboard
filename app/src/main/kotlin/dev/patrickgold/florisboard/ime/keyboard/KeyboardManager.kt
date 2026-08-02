@@ -46,6 +46,7 @@ import dev.patrickgold.florisboard.ime.input.InputShiftState
 import dev.patrickgold.florisboard.ime.nlp.ClipboardSuggestionCandidate
 import dev.patrickgold.florisboard.ime.nlp.PunctuationRule
 import dev.patrickgold.florisboard.ime.nlp.SuggestionCandidate
+import dev.patrickgold.florisboard.ime.nlp.words.PersonalLearning
 import dev.patrickgold.florisboard.ime.popup.PopupMappingComponent
 import dev.patrickgold.florisboard.ime.text.composing.Composer
 import dev.patrickgold.florisboard.ime.text.gestures.SwipeAction
@@ -312,8 +313,9 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
     }
 
     /**
-     * Forwards a finalized [word] plus the word preceding it to [NlpManager.notifyWordCommitted]
-     * for on-device learning. Reads the editor content BEFORE the commit mutates it.
+     * Forwards a finalized [word] plus up to two preceding words to
+     * [NlpManager.notifyWordCommitted] for on-device learning (bigrams + trigrams).
+     * Reads the editor content BEFORE the commit mutates it.
      */
     private fun captureWordCommitForLearning(word: String) {
         val content = editorInstance.activeContent
@@ -322,8 +324,7 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
         } else {
             content.textBeforeSelection
         }
-        val precedingWord = beforeWord.trimEnd().takeLastWhile { it.isLetter() || it == '\'' }
-        nlpManager.notifyWordCommitted(word, precedingWord)
+        nlpManager.notifyWordCommitted(word, PersonalLearning.extractLastWords(beforeWord, 2))
     }
 
     /**

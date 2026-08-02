@@ -145,4 +145,43 @@ class PersonalLearningTest : FunSpec({
             merged.map { it.first } shouldNotContain "سيء"
         }
     }
+
+    context("trigram context blending") {
+        test("trigram followers outweigh bigram ones for the same word") {
+            val blended = PersonalLearning.blendFollowers(
+                bigrams = mapOf("الله" to 100, "النور" to 240),
+                trigrams = mapOf("الله" to 150),
+            )
+            blended["الله"] shouldBe (150 * PersonalLearning.TRIGRAM_FOLLOWER_BOOST).toInt()
+            blended["النور"] shouldBe 240 // untouched
+        }
+        test("boost caps at 255") {
+            PersonalLearning.blendFollowers(
+                bigrams = emptyMap(),
+                trigrams = mapOf("الله" to 250),
+            )["الله"] shouldBe 255
+            PersonalLearning.boostTrigramPredictions(listOf("الله" to 250))
+                .first().second shouldBe 255
+        }
+        test("empty trigram map returns the bigram map unchanged") {
+            val bigrams = mapOf("الخير" to 200)
+            PersonalLearning.blendFollowers(bigrams, emptyMap()) shouldBe bigrams
+        }
+    }
+
+    context("extractLastWords") {
+        test("extracts up to two trailing words, oldest first") {
+            PersonalLearning.extractLastWords("قال إن شاء ", 2) shouldBe listOf("إن", "شاء")
+            PersonalLearning.extractLastWords("شاء ", 2) shouldBe listOf("شاء")
+        }
+        test("punctuation closes the context") {
+            PersonalLearning.extractLastWords("مرحبا، كيف ", 2) shouldBe listOf("كيف")
+            PersonalLearning.extractLastWords("مرحبا، ", 2) shouldBe emptyList()
+            PersonalLearning.extractLastWords("hello. how ", 2) shouldBe listOf("how")
+        }
+        test("empty and whitespace-only input") {
+            PersonalLearning.extractLastWords("", 2) shouldBe emptyList()
+            PersonalLearning.extractLastWords("   ", 2) shouldBe emptyList()
+        }
+    }
 })

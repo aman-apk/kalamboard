@@ -85,6 +85,60 @@ object PersonalLearning {
     const val CONTEXT_BOOST_WEIGHT = 0.6
 
     /**
+     * How much stronger a two-word-context (trigram) signal is than a one-word (bigram) one.
+     * A trigram follower's freq is scaled by this before being max-merged with the bigram
+     * followers, so «إن شاء» → «الله» beats whatever merely follows «شاء» alone.
+     */
+    const val TRIGRAM_FOLLOWER_BOOST = 1.35
+
+    /** Freq advantage of trigram-based next-word predictions over bigram-based ones. */
+    const val TRIGRAM_PREDICTION_BOOST = 1.25
+
+    /** Max-merges bigram followers with trigram followers, the latter scaled by
+     *  [TRIGRAM_FOLLOWER_BOOST] (capped at 255). Both maps are norm -> freq. */
+    fun blendFollowers(bigrams: Map<String, Int>, trigrams: Map<String, Int>): Map<String, Int> {
+        if (trigrams.isEmpty()) return bigrams
+        val blended = HashMap<String, Int>(bigrams.size + trigrams.size)
+        blended.putAll(bigrams)
+        for ((norm, freq) in trigrams) {
+            val boosted = (freq * TRIGRAM_FOLLOWER_BOOST).toInt().coerceAtMost(255)
+            blended.merge(norm, boosted, ::maxOf)
+        }
+        return blended
+    }
+
+    /** Scales trigram next-word predictions by [TRIGRAM_PREDICTION_BOOST] (capped at 255). */
+    fun boostTrigramPredictions(predictions: List<Pair<String, Int>>): List<Pair<String, Int>> {
+        return predictions.map { (word, freq) ->
+            word to (freq * TRIGRAM_PREDICTION_BOOST).toInt().coerceAtMost(255)
+        }
+    }
+
+    /**
+     * Extracts up to [maxWords] trailing words before the cursor, oldest first. Any non-whitespace
+     * separator (punctuation = sentence/clause boundary) closes the context, so a trigram context
+     * never crosses «مرحبا، كيف» — only the words after the comma count.
+     */
+    fun extractLastWords(text: CharSequence, maxWords: Int): List<String> {
+        val words = ArrayDeque<String>()
+        var end = text.length
+        outer@ while (words.size < maxWords) {
+            while (end > 0 && !(text[end - 1].isLetter() || text[end - 1] == '\'')) {
+                if (!text[end - 1].isWhitespace()) break@outer
+                end--
+            }
+            if (end == 0) break
+            var start = end
+            while (start > 0 && (text[start - 1].isLetter() || text[start - 1] == '\'')) {
+                start--
+            }
+            words.addFirst(text.substring(start, end))
+            end = start
+        }
+        return words.toList()
+    }
+
+    /**
      * Context-aware reranking: candidates whose normalized form is a known follower of the
      * previous word get their score boosted proportionally to the bigram frequency, so typing
      * "صباح الخ" ranks "الخير" above an otherwise more frequent stray match, and an ambiguous

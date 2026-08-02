@@ -177,6 +177,10 @@ fun BackupScreen() = FlorisScreen {
                 context.contentResolver.writeFromFile(uri, backupWorkspace!!.zipFile)
                 backupWorkspace!!.close()
             }.onSuccess {
+                scope.launch {
+                    val prefs by FlorisPreferenceStore
+                    prefs.internal.lastBackupTimestamp.set(System.currentTimeMillis())
+                }
                 context.showLongToastSync(R.string.backup_and_restore__back_up__success)
                 navController.popBackStack()
             }.onFailure { error ->
@@ -298,6 +302,11 @@ fun BackupScreen() = FlorisScreen {
                         .createChooserIntent()
                         .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     context.startActivity(shareIntent)
+                    // Best effort: the chooser gives no result back, so count the handoff itself.
+                    scope.launch {
+                        val prefs by FlorisPreferenceStore
+                        prefs.internal.lastBackupTimestamp.set(System.currentTimeMillis())
+                    }
                 }
             }
         }.onFailure { error ->

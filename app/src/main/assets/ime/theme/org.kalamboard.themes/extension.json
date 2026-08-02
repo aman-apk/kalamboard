@@ -4,7 +4,7 @@
     "id": "org.kalamboard.themes",
     "version": "1.0.0",
     "title": "KalamBoard themes",
-    "description": "The KalamBoard theme collection: pure black, graphite, navy and midnight",
+    "description": "The KalamBoard theme collection: pure black, graphite, navy, midnight and a warm paper-light day theme",
     "maintainers": [
       "KalamBoard"
     ],
@@ -42,6 +42,14 @@
         "KalamBoard"
       ],
       "isNight": true
+    },
+    {
+      "id": "kalam_light",
+      "label": "Kalam Light",
+      "authors": [
+        "KalamBoard"
+      ],
+      "isNight": false
     }
   ]
 }

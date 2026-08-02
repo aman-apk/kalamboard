@@ -34,6 +34,7 @@ import dev.patrickgold.florisboard.ime.media.emoji.EmojiHistory
 import dev.patrickgold.florisboard.ime.media.emoji.EmojiSkinTone
 import dev.patrickgold.florisboard.ime.media.emoji.EmojiSuggestionType
 import dev.patrickgold.florisboard.ime.nlp.SpellingLanguageMode
+import dev.patrickgold.florisboard.ime.nlp.words.ArabicDialect
 import dev.patrickgold.florisboard.ime.smartbar.CandidatesDisplayMode
 import dev.patrickgold.florisboard.ime.smartbar.ExtendedActionsPlacement
 import dev.patrickgold.florisboard.ime.smartbar.IncognitoDisplayMode
@@ -342,6 +343,30 @@ private val ENUM_DISPLAY_ENTRIES = mapOf<Pair<KClass<*>, String>, @Composable ()
             entry(
                 key = IncognitoDisplayMode.DISPLAY_BEHIND_KEYBOARD,
                 label = stringRes(id = R.string.enum__incognito_display_mode__display_behind_keyboard),
+            )
+        }
+    },
+    ArabicDialect::class to DEFAULT to {
+        listPrefEntries {
+            entry(
+                key = ArabicDialect.LEVANTINE,
+                label = stringRes(R.string.enum__arabic_dialect__levantine),
+            )
+            entry(
+                key = ArabicDialect.EGYPTIAN,
+                label = stringRes(R.string.enum__arabic_dialect__egyptian),
+            )
+            entry(
+                key = ArabicDialect.GULF,
+                label = stringRes(R.string.enum__arabic_dialect__gulf),
+            )
+            entry(
+                key = ArabicDialect.IRAQI,
+                label = stringRes(R.string.enum__arabic_dialect__iraqi),
+            )
+            entry(
+                key = ArabicDialect.NONE,
+                label = stringRes(R.string.enum__arabic_dialect__none),
             )
         }
     },

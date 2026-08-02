@@ -112,6 +112,9 @@
     <string name="settings__home__title" comment="Title of the Home screen">مرحبا بكم في {app_name}</string>
     <string name="settings__home__ime_not_enabled" comment="Error message shown in Home fragment when KalamBoard is not enabled in the system">لم يتم تمكين كلام بورد في النظام وبالتالي لن يكون متاحًا كطريقة إدخال في منتقي الإدخال. انقر هنا لحل هذه المشكلة.</string>
     <string name="settings__home__ime_not_selected" comment="Warning message shown in Home fragment when KalamBoard is not selected as the default keyboard">لم يتم تعيين كلام بورد كطريقة الإدخال الافتراضية. انقر هنا لحل هذه المشكلة.</string>
+    <string name="settings__home__backup_reminder" comment="Reminder card shown when the last local backup is older than 30 days">مضى وقت طويل على آخر نسخة احتياطية. كلماتك المتعلَّمة وحافظتك وإعداداتك موجودة على هذا الجهاز فقط — صدّر نسخة احتياطية كي لا تخسرها.</string>
+    <string name="settings__home__backup_reminder_now" comment="Reminder card action">انسخ الآن</string>
+    <string name="settings__home__backup_reminder_later" comment="Reminder card action">لاحقاً</string>
     <string name="settings__localization__title" comment="Title of languages and Layout screen">اللغات و التخطيطات</string>
     <string name="settings__localization__display_language_names_in__label" comment="Label of Display language names in preference">عرض أسم اللغة المفعلة</string>
     <string name="settings__localization__group_subtypes__label" comment="Label of subtypes group">أنواع الإدخال الفرعية</string>
@@ -713,10 +716,35 @@
     <string name="correction__auto_correct_disabled_toast">تم تعطيل التصحيح التلقائي</string>
     <string name="pref__suggestion__learn_from_typing__label" comment="Preference title">التعلّم من كتابتك</string>
     <string name="pref__suggestion__learn_from_typing__summary" comment="Preference summary">تعلّم الكلمات الجديدة وأزواج كلماتك المتتالية على هذا الجهاز فقط. لا يعمل أبداً في وضع التخفي</string>
+    <string name="pref__suggestion__arabic_dialect__label" comment="Preference title">اللهجة العربية</string>
+    <string name="settings__typing_stats__title" comment="Screen title">إحصاءات الكتابة</string>
+    <string name="settings__typing_stats__entry_summary" comment="Preference summary">كم كلمة كتبت، سلسلة أيامك، وأكثر كلماتك استخداماً — كلها على جهازك</string>
+    <string name="settings__typing_stats__total_words" comment="Stat label">كلمة مكتوبة</string>
+    <string name="settings__typing_stats__active_days" comment="Stat label">يوم نشاط</string>
+    <string name="settings__typing_stats__streak" comment="Stat label">أيام متتالية</string>
+    <string name="settings__typing_stats__best_day" comment="Best day line">أفضل يوم: {date} بواقع {count} كلمة</string>
+    <string name="settings__typing_stats__last_days" comment="Chart card title">آخر 14 يوماً</string>
+    <string name="settings__typing_stats__last_days_hint" comment="Chart hint">كل عمود يوم فيه نشاط كتابة، من الأقدم إلى الأحدث</string>
+    <string name="settings__typing_stats__top_words" comment="Card title">أكثر كلماتك استخداماً</string>
+    <string name="settings__typing_stats__empty" comment="Empty state">لا إحصاءات بعد — ابدأ الكتابة وعد لاحقاً</string>
+    <string name="settings__typing_stats__clear" comment="Clear button">مسح الإحصاءات</string>
+    <string name="settings__typing_stats__clear_confirm" comment="Clear confirm text">أتريد حذف كل إحصاءات الكتابة؟ الكلمات المتعلَّمة والتوقعات لن تتأثر.</string>
+    <string name="settings__typing_stats__privacy_note" comment="Privacy footnote">تُحسب الإحصاءات وتُخزن على هذا الجهاز فقط. جلسات التخفي لا تُحسب أبداً.</string>
+    <string name="enum__arabic_dialect__levantine" comment="Arabic dialect option">شامية (سورية)</string>
+    <string name="enum__arabic_dialect__egyptian" comment="Arabic dialect option">مصرية</string>
+    <string name="enum__arabic_dialect__gulf" comment="Arabic dialect option">خليجية</string>
+    <string name="enum__arabic_dialect__iraqi" comment="Arabic dialect option">عراقية</string>
+    <string name="enum__arabic_dialect__none" comment="Arabic dialect option">فصحى فقط (بدون لهجة)</string>
     <string name="pref__correction__auto_correct_enabled__label" comment="Preference title">التصحيح التلقائي</string>
     <string name="pref__correction__auto_correct_enabled__summary" comment="Preference summary">استبدال الكلمة المكتوبة خطأً بأقرب اقتراح تلقائياً عند المسافة أو الترقيم</string>
     <string name="settings__clipboard_history__title" comment="Screen title">سجل الحافظة</string>
     <string name="settings__clipboard_history__entry_summary" comment="Preference summary">استعرض كل ما نسخته: تثبيت، نسخ مجدداً، أو حذف</string>
+    <string name="pref__clipboard__history_screen_lock__label" comment="Preference title">قفل سجل الحافظة</string>
+    <string name="pref__clipboard__history_screen_lock__summary" comment="Preference summary">طلب البصمة أو قفل الشاشة قبل عرض السجل الكامل</string>
+    <string name="settings__clipboard_history__lock_prompt_title" comment="Device credential prompt title">فتح سجل الحافظة</string>
+    <string name="settings__clipboard_history__lock_prompt_summary" comment="Device credential prompt subtitle">أكّد قفل شاشتك لعرض العناصر المحفوظة</string>
+    <string name="settings__clipboard_history__locked_message" comment="Message shown on the locked history screen">سجل حافظتك مقفل. أكّد بصمتك أو قفل شاشتك لعرضه.</string>
+    <string name="settings__clipboard_history__unlock_action" comment="Unlock button">فتح القفل</string>
     <string name="settings__clipboard_history__summary" comment="Header, count placeholder">{count} عنصراً محفوظاً على هذا الجهاز فقط</string>
     <string name="settings__clipboard_history__search_placeholder">ابحث في الحافظة…</string>
     <string name="settings__clipboard_history__empty">لا عناصر بعد. كل ما تنسخه سيُحفظ هنا.</string>

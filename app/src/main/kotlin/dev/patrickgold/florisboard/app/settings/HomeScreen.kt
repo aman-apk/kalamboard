@@ -16,6 +16,9 @@
 
 package dev.patrickgold.florisboard.app.settings
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Assignment
@@ -29,8 +32,13 @@ import androidx.compose.material.icons.outlined.Build
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Keyboard
 import androidx.compose.material.icons.outlined.Palette
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -41,9 +49,13 @@ import dev.patrickgold.florisboard.lib.compose.FlorisScreen
 import dev.patrickgold.florisboard.lib.util.InputMethodUtils
 import dev.patrickgold.jetpref.datastore.model.collectAsState
 import dev.patrickgold.jetpref.datastore.ui.Preference
+import kotlinx.coroutines.launch
 import org.florisboard.lib.compose.FlorisErrorCard
 import org.florisboard.lib.compose.FlorisWarningCard
 import org.florisboard.lib.compose.stringRes
+
+private const val BACKUP_REMINDER_INTERVAL_MS = 30L * 24 * 60 * 60 * 1000
+private const val BACKUP_REMINDER_SNOOZE_MS = 7L * 24 * 60 * 60 * 1000
 
 @Composable
 fun HomeScreen() = FlorisScreen {
@@ -73,6 +85,47 @@ fun HomeScreen() = FlorisScreen {
                 text = stringRes(R.string.settings__home__ime_not_selected),
                 onClick = { InputMethodUtils.showImePicker(context) },
             )
+        }
+
+        // KalamBoard: gentle manual-backup reminder. Backups stay strictly user-triggered; this
+        // card only nudges when the last backup (or install) is older than 30 days, and can be
+        // snoozed for a week. On a fresh install the first nudge comes after the first 30 days.
+        val scope = rememberCoroutineScope()
+        val internalPrefs = prefs.internal
+        val lastBackup by internalPrefs.lastBackupTimestamp.collectAsState()
+        val snoozedUntil by internalPrefs.backupReminderSnoozedUntil.collectAsState()
+        val now = remember { System.currentTimeMillis() }
+        LaunchedEffect(lastBackup, snoozedUntil) {
+            if (lastBackup == 0L && snoozedUntil == 0L) {
+                internalPrefs.backupReminderSnoozedUntil.set(now + BACKUP_REMINDER_INTERVAL_MS)
+            }
+        }
+        val backupDue = now > snoozedUntil && snoozedUntil != 0L &&
+            (lastBackup == 0L || now - lastBackup > BACKUP_REMINDER_INTERVAL_MS)
+        if (backupDue) {
+            FlorisWarningCard(
+                modifier = Modifier.padding(8.dp),
+                showIcon = false,
+                text = stringRes(R.string.settings__home__backup_reminder),
+                onClick = { navController.navigate(Routes.Settings.Backup) },
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp),
+                horizontalArrangement = Arrangement.End,
+            ) {
+                TextButton(onClick = {
+                    scope.launch {
+                        internalPrefs.backupReminderSnoozedUntil.set(now + BACKUP_REMINDER_SNOOZE_MS)
+                    }
+                }) {
+                    Text(stringRes(R.string.settings__home__backup_reminder_later))
+                }
+                TextButton(onClick = { navController.navigate(Routes.Settings.Backup) }) {
+                    Text(stringRes(R.string.settings__home__backup_reminder_now))
+                }
+            }
         }
 
         /*Card(modifier = Modifier.padding(8.dp)) {

@@ -103,15 +103,34 @@ class WordSuggestionProvider(context: Context) : SpellingProvider, SuggestionPro
         learning.decayIfDue(System.currentTimeMillis())
     }
 
+    /** The dialect overlay key the dictionary for [language] should currently be loaded with. */
+    private suspend fun wantedOverlayKey(language: String): String {
+        if (language != "ar") return ""
+        return prefs.suggestion.arabicDialect.get().overlayKey ?: ""
+    }
+
     override suspend fun preload(subtype: Subtype) = withContext(Dispatchers.IO) {
         val language = subtype.primaryLocale.language
+        loadDictionaryIfNeeded(language)
+        // Warm the user index for this language as well.
+        userIndexFor(language)
+        Unit
+    }
+
+    private suspend fun loadDictionaryIfNeeded(language: String) {
+        val overlayKey = wantedOverlayKey(language)
         dictionariesGuard.withLock {
-            if (dictionaries.containsKey(language)) return@withLock
+            val cached = dictionaries[language]
+            if (cached != null && cached.overlayKey == overlayKey) return@withLock
+            val dialect = if (language == "ar") prefs.suggestion.arabicDialect.get() else ArabicDialect.NONE
             val dictionary = SqliteWordDictionary.load(
                 context = appContext,
                 language = language,
                 normalizer = WordNormalizer.forLanguage(language),
+                overlay = DialectOverlay.loadFromAssets(appContext, language, dialect),
+                overlayKey = overlayKey,
             ) ?: return@withLock // No dictionary asset for this language: static suggestions stay empty.
+            dictionaries.remove(language)?.close()
             dictionaries[language] = dictionary
             while (dictionaries.size > MAX_LOADED_DICTIONARIES) {
                 val eldest = dictionaries.entries.first()
@@ -119,13 +138,16 @@ class WordSuggestionProvider(context: Context) : SpellingProvider, SuggestionPro
                 eldest.value.close()
             }
         }
-        // Warm the user index for this language as well.
-        userIndexFor(language)
-        Unit
     }
 
     private suspend fun dictionaryFor(subtype: Subtype): SqliteWordDictionary? {
         val language = subtype.primaryLocale.language
+        val overlayKey = wantedOverlayKey(language)
+        dictionariesGuard.withLock { dictionaries[language] }.let { cached ->
+            // Reload transparently when the user switched their dialect setting.
+            if (cached != null && cached.overlayKey == overlayKey) return cached
+        }
+        loadDictionaryIfNeeded(language)
         return dictionariesGuard.withLock { dictionaries[language] }
     }
 
@@ -204,16 +226,17 @@ class WordSuggestionProvider(context: Context) : SpellingProvider, SuggestionPro
         )
         if (merged.isEmpty()) return emptyList()
 
-        // Contextual reranking: what usually FOLLOWS the previous word wins ties and close calls
+        // Contextual reranking: what usually FOLLOWS the preceding words wins ties and close calls
         // among corrections/completions ("صباح الخ" -> الخير even if a stray match scores higher).
+        // The two-word (trigram) context, when available, outweighs the one-word (bigram) one.
         val ranked = run {
             val beforeComposing = if (content.composing.isValid) {
                 content.textBeforeSelection.dropLast(composing.length)
             } else {
                 content.textBeforeSelection
             }
-            val previousWord = extractLastWord(beforeComposing)
-            if (previousWord.isEmpty()) return@run merged
+            val previousWords = PersonalLearning.extractLastWords(beforeComposing, 2)
+            val previousWord = previousWords.lastOrNull() ?: return@run merged
             val prevNorm = normalizer.normalize(previousWord)
             val followers = HashMap<String, Int>(32)
             dictionary?.nextWords(prevNorm, CONTEXT_FOLLOWER_FETCH)?.forEach { (word, freq) ->
@@ -222,7 +245,20 @@ class WordSuggestionProvider(context: Context) : SpellingProvider, SuggestionPro
             learning.bigramsFor(language, prevNorm, CONTEXT_FOLLOWER_FETCH).forEach { (word, count) ->
                 followers.merge(normalizer.normalize(word), PersonalLearning.userBigramFreq(count), ::maxOf)
             }
-            PersonalLearning.rerankByContext(merged, followers, normalizer)
+            val blended = if (previousWords.size == 2) {
+                val w12Norm = "${normalizer.normalize(previousWords[0])} $prevNorm"
+                val trigramFollowers = HashMap<String, Int>(16)
+                dictionary?.nextWords2(w12Norm, CONTEXT_FOLLOWER_FETCH)?.forEach { (word, freq) ->
+                    trigramFollowers.merge(normalizer.normalize(word), freq, ::maxOf)
+                }
+                learning.trigramsFor(language, w12Norm, CONTEXT_FOLLOWER_FETCH).forEach { (word, count) ->
+                    trigramFollowers.merge(normalizer.normalize(word), PersonalLearning.userBigramFreq(count), ::maxOf)
+                }
+                PersonalLearning.blendFollowers(followers, trigramFollowers)
+            } else {
+                followers
+            }
+            PersonalLearning.rerankByContext(merged, blended, normalizer)
         }
 
         val hasExactMatch = ranked.first().isExactMatch
@@ -252,7 +288,8 @@ class WordSuggestionProvider(context: Context) : SpellingProvider, SuggestionPro
         }
     }
 
-    /** Next-word prediction: static bigram table merged with the user's personal bigrams. */
+    /** Next-word prediction: static bigram/trigram tables merged with the user's personal
+     *  bigrams/trigrams; trigram-based predictions carry a freq advantage. */
     private suspend fun suggestNextWords(
         language: String,
         dictionary: SqliteWordDictionary?,
@@ -260,24 +297,39 @@ class WordSuggestionProvider(context: Context) : SpellingProvider, SuggestionPro
         content: EditorContent,
         maxCandidateCount: Int,
     ): List<SuggestionCandidate> {
-        val previousWord = extractLastWord(content.textBeforeSelection)
-        if (previousWord.isEmpty()) return emptyList()
+        val previousWords = PersonalLearning.extractLastWords(content.textBeforeSelection, 2)
+        val previousWord = previousWords.lastOrNull() ?: return emptyList()
         val prevNorm = normalizer.normalize(previousWord)
+        val userIdx = userIndexFor(language)
+
+        /** Junk filter: only predict words that are known — statically or learned. */
+        fun isKnownWord(word: String): Boolean {
+            val norm = normalizer.normalize(word)
+            return dictionary?.index?.exact(norm)?.isNotEmpty() == true || userIdx.exact(norm).isNotEmpty()
+        }
 
         val staticNext = dictionary?.nextWords(prevNorm, maxCandidateCount) ?: emptyList()
-        val userIdx = userIndexFor(language)
         val personalNext = learning.bigramsFor(language, prevNorm, maxCandidateCount)
-            .filter { (word, _) ->
-                // Only predict words that are known — either statically or learned into the user
-                // dictionary — so junk never resurfaces from the raw bigram log.
-                val norm = normalizer.normalize(word)
-                dictionary?.index?.exact(norm)?.isNotEmpty() == true || userIdx.exact(norm).isNotEmpty()
-            }
+            .filter { (word, _) -> isKnownWord(word) }
             .map { (word, count) -> word to PersonalLearning.userBigramFreq(count) }
 
+        var staticNext2 = emptyList<Pair<String, Int>>()
+        var personalNext2 = emptyList<Pair<String, Int>>()
+        if (previousWords.size == 2) {
+            val w12Norm = "${normalizer.normalize(previousWords[0])} $prevNorm"
+            staticNext2 = PersonalLearning.boostTrigramPredictions(
+                dictionary?.nextWords2(w12Norm, maxCandidateCount) ?: emptyList(),
+            )
+            personalNext2 = PersonalLearning.boostTrigramPredictions(
+                learning.trigramsFor(language, w12Norm, maxCandidateCount)
+                    .filter { (word, _) -> isKnownWord(word) }
+                    .map { (word, count) -> word to PersonalLearning.userBigramFreq(count) },
+            )
+        }
+
         val merged = PersonalLearning.mergeNextWords(
-            static = staticNext,
-            personal = personalNext,
+            static = staticNext2 + staticNext,
+            personal = personalNext2 + personalNext,
             blocked = learning.blockedWords(language),
             maxCount = maxCandidateCount,
         )
@@ -290,17 +342,6 @@ class WordSuggestionProvider(context: Context) : SpellingProvider, SuggestionPro
                 sourceProvider = this,
             )
         }
-    }
-
-    /** Extracts the trailing word (last run of letters) from the text before the cursor. */
-    private fun extractLastWord(textBeforeSelection: CharSequence): String {
-        val text = textBeforeSelection.trimEnd()
-        if (text.isEmpty()) return ""
-        var start = text.length
-        while (start > 0 && (text[start - 1].isLetter() || text[start - 1] == '\'')) {
-            start--
-        }
-        return text.substring(start)
     }
 
     // --- spelling --------------------------------------------------------------------------------
@@ -339,13 +380,17 @@ class WordSuggestionProvider(context: Context) : SpellingProvider, SuggestionPro
     override suspend fun notifyWordCommitted(
         subtype: Subtype,
         word: String,
-        precedingWord: String,
+        precedingWords: List<String>,
         isPrivateSession: Boolean,
     ): Unit = withContext(Dispatchers.IO) {
-        if (isPrivateSession || !prefs.suggestion.learnFromTyping.get()) return@withContext
+        if (isPrivateSession) return@withContext
         val language = subtype.primaryLocale.language
         val cleanWord = word.trim()
         if (!PersonalLearning.isLearnableWord(cleanWord)) return@withContext
+        // Local typing statistics: independent of the learn-from-typing switch (it's counting,
+        // not learning), but still never recorded in private sessions.
+        learning.recordTypedWord(language, cleanWord)
+        if (!prefs.suggestion.learnFromTyping.get()) return@withContext
         if (learning.isWordBlocked(language, cleanWord)) return@withContext
         val normalizer = WordNormalizer.forLanguage(language)
         val dictionary = dictionaryFor(subtype)
@@ -377,10 +422,18 @@ class WordSuggestionProvider(context: Context) : SpellingProvider, SuggestionPro
             flogError { "unigram learning failed: $e" }
         }
 
-        // Personal bigram learning.
-        val prev = precedingWord.trim()
+        // Personal bigram + trigram learning.
+        val prev = precedingWords.lastOrNull()?.trim().orEmpty()
         if (PersonalLearning.isLearnableWord(prev)) {
             learning.recordBigram(language, normalizer.normalize(prev), cleanWord)
+            val prev2 = precedingWords.getOrNull(precedingWords.size - 2)?.trim().orEmpty()
+            if (PersonalLearning.isLearnableWord(prev2)) {
+                learning.recordTrigram(
+                    language,
+                    "${normalizer.normalize(prev2)} ${normalizer.normalize(prev)}",
+                    cleanWord,
+                )
+            }
         }
     }
 

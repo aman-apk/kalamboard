@@ -16,11 +16,15 @@
 """Builds the per-language suggestion dictionaries (`<lang>.sqlite3`) consumed by
 `ime/nlp/words/SqliteWordDictionary.kt`.
 
-Schema of the produced database:
+Schema of the produced database (schema_version 2):
     meta(key TEXT PRIMARY KEY, value TEXT)
     words(word TEXT PRIMARY KEY, norm TEXT NOT NULL, freq INTEGER NOT NULL, flags INTEGER NOT NULL)
     bigrams(w1_norm TEXT NOT NULL, w2 TEXT NOT NULL, freq INTEGER NOT NULL,
             PRIMARY KEY (w1_norm, w2)) WITHOUT ROWID
+    trigrams(w12_norm TEXT NOT NULL, w3 TEXT NOT NULL, freq INTEGER NOT NULL,
+             PRIMARY KEY (w12_norm, w3)) WITHOUT ROWID
+        -- w12_norm is "norm(w1) norm(w2)" joined with a single space, so the engine can look up
+        -- the two-word context with one equality query.
 
 Inputs:
   --wordlist FILE      "word count" per line (hermitdave/FrequencyWords format). Repeatable;
@@ -149,10 +153,15 @@ def scale_frequencies(weights):
 
 
 def load_overlays(paths, language):
-    """Returns (word_boosts {word: freq}, phrase_bigrams {(w1, w2): freq})."""
+    """Returns (word_boosts {word: freq}, phrase_bigrams {(w1_norm, w2): freq},
+    phrase_trigrams {(w12_norm, w3): freq}).
+
+    NOTE: this decomposition is mirrored at runtime by `ime/nlp/words/DialectOverlay.kt`
+    (dialect TSVs shipped as assets and applied per the user's dialect setting) — keep in sync."""
     norm = normalizer_for(language)
     word_boosts = {}
     phrase_bigrams = {}
+    phrase_trigrams = {}
     for path in paths:
         with open(path, encoding="utf-8") as f:
             for line in f:
@@ -174,7 +183,10 @@ def load_overlays(paths, language):
                     for w1, w2 in zip(tokens, tokens[1:]):
                         key = (norm(w1), w2)
                         phrase_bigrams[key] = max(phrase_bigrams.get(key, 0), freq)
-    return word_boosts, phrase_bigrams
+                    for w1, w2, w3 in zip(tokens, tokens[1:], tokens[2:]):
+                        key = (f"{norm(w1)} {norm(w2)}", w3)
+                        phrase_trigrams[key] = max(phrase_trigrams.get(key, 0), freq)
+    return word_boosts, phrase_bigrams, phrase_trigrams
 
 
 def mine_bigrams(path, language, valid_norms, canonical_by_norm, min_count):
@@ -195,24 +207,43 @@ def mine_bigrams(path, language, valid_norms, canonical_by_norm, min_count):
     return {pair: c for pair, c in counts.items() if c >= min_count}
 
 
-def scale_bigrams(mined, phrase_bigrams, max_per_w1):
+def mine_trigrams(path, language, valid_norms, canonical_by_norm, min_count):
+    """Counts ("norm(w1) norm(w2)", canonical_display(w3)) triples over the same corpus."""
+    norm = normalizer_for(language)
+    counts = Counter()
+    opener = bz2.open if str(path).endswith(".bz2") else open
+    with opener(path, mode="rt", encoding="utf-8", errors="replace") as f:
+        for line in f:
+            parts = line.rstrip("\n").split("\t")
+            sentence = parts[2] if len(parts) >= 3 else parts[0]
+            tokens = tokenize(sentence)
+            norms = [norm(t) for t in tokens]
+            for i in range(len(tokens) - 2):
+                n1, n2, n3 = norms[i], norms[i + 1], norms[i + 2]
+                if n1 in valid_norms and n2 in valid_norms and n3 in valid_norms:
+                    counts[(f"{n1} {n2}", canonical_by_norm[n3])] += 1
+    return {pair: c for pair, c in counts.items() if c >= min_count}
+
+
+def scale_ngrams(mined, phrase_ngrams, max_per_key):
     """Log-scales mined counts to 1..200 (curated phrase chains keep their 200-255 band on top),
-    then caps the follower list per w1."""
+    then caps the follower list per context key. Works for bigrams (key = w1_norm) and trigrams
+    (key = "w1_norm w2_norm") alike."""
     scaled = {}
     if mined:
         top = max(mined.values())
         for pair, count in mined.items():
             scaled[pair] = max(1, round(200 * math.log1p(count) / math.log1p(top)))
-    for pair, freq in phrase_bigrams.items():
+    for pair, freq in phrase_ngrams.items():
         scaled[pair] = max(scaled.get(pair, 0), freq)
-    by_w1 = defaultdict(list)
-    for (w1, w2), freq in scaled.items():
-        by_w1[w1].append((freq, w2))
+    by_key = defaultdict(list)
+    for (key, follower), freq in scaled.items():
+        by_key[key].append((freq, follower))
     capped = {}
-    for w1, followers in by_w1.items():
+    for key, followers in by_key.items():
         followers.sort(reverse=True)
-        for freq, w2 in followers[:max_per_w1]:
-            capped[(w1, w2)] = freq
+        for freq, follower in followers[:max_per_key]:
+            capped[(key, follower)] = freq
     return capped
 
 
@@ -226,10 +257,11 @@ def build(args):
     print(f"      {len(freqs)} base words")
 
     print(f"[2/5] applying overlays: {args.overlay}")
-    word_boosts, phrase_bigrams = load_overlays(args.overlay, language)
+    word_boosts, phrase_bigrams, phrase_trigrams = load_overlays(args.overlay, language)
     for word, freq in word_boosts.items():
         freqs[word] = max(freqs.get(word, 0), freq)
-    print(f"      {len(word_boosts)} overlay words, {len(phrase_bigrams)} phrase-chain bigrams")
+    print(f"      {len(word_boosts)} overlay words, {len(phrase_bigrams)} phrase-chain bigrams, "
+          f"{len(phrase_trigrams)} phrase-chain trigrams")
 
     blocked = set()
     for path in args.blocklist:
@@ -251,15 +283,19 @@ def build(args):
     valid_norms = set(canonical_by_norm)
 
     mined = {}
+    mined_tri = {}
     if args.sentences:
-        print(f"[3/5] mining bigrams from {args.sentences}")
+        print(f"[3/5] mining bigrams + trigrams from {args.sentences}")
         mined = mine_bigrams(args.sentences, language, valid_norms, canonical_by_norm, args.min_bigram)
         print(f"      {len(mined)} mined bigrams (min count {args.min_bigram})")
+        mined_tri = mine_trigrams(args.sentences, language, valid_norms, canonical_by_norm, args.min_trigram)
+        print(f"      {len(mined_tri)} mined trigrams (min count {args.min_trigram})")
     else:
-        print("[3/5] no sentence corpus given, skipping bigram mining")
+        print("[3/5] no sentence corpus given, skipping bigram/trigram mining")
 
-    bigrams = scale_bigrams(mined, phrase_bigrams, args.max_bigrams_per_word)
-    print(f"[4/5] {len(bigrams)} bigrams after scaling/capping")
+    bigrams = scale_ngrams(mined, phrase_bigrams, args.max_bigrams_per_word)
+    trigrams = scale_ngrams(mined_tri, phrase_trigrams, args.max_trigrams_per_word)
+    print(f"[4/5] {len(bigrams)} bigrams, {len(trigrams)} trigrams after scaling/capping")
 
     out = Path(args.output)
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -283,6 +319,12 @@ def build(args):
             freq INTEGER NOT NULL,
             PRIMARY KEY (w1_norm, w2)
         ) WITHOUT ROWID;
+        CREATE TABLE trigrams (
+            w12_norm TEXT NOT NULL,
+            w3 TEXT NOT NULL,
+            freq INTEGER NOT NULL,
+            PRIMARY KEY (w12_norm, w3)
+        ) WITHOUT ROWID;
         """
     )
     db.executemany("INSERT INTO words VALUES (?,?,?,?)", rows)
@@ -290,11 +332,16 @@ def build(args):
         "INSERT INTO bigrams VALUES (?,?,?)",
         [(w1, w2, freq) for (w1, w2), freq in bigrams.items()],
     )
+    db.executemany(
+        "INSERT INTO trigrams VALUES (?,?,?)",
+        [(w12, w3, freq) for (w12, w3), freq in trigrams.items()],
+    )
     meta = {
-        "schema_version": "1",
+        "schema_version": "2",
         "language": language,
         "word_count": str(len(rows)),
         "bigram_count": str(len(bigrams)),
+        "trigram_count": str(len(trigrams)),
         "sources": args.sources_note,
         "license": args.license_note,
     }
@@ -347,6 +394,9 @@ def main():
     parser.add_argument("--max-words", type=int, default=60000)
     parser.add_argument("--min-bigram", type=int, default=2, help="min corpus count for a mined bigram")
     parser.add_argument("--max-bigrams-per-word", type=int, default=16)
+    parser.add_argument("--min-trigram", type=int, default=2, help="min corpus count for a mined trigram")
+    parser.add_argument("--max-trigrams-per-word", type=int, default=12,
+                        help="cap on followers per (w1,w2) context")
     parser.add_argument("--sources-note", default="", help="free-text source attribution stored in meta")
     parser.add_argument("--license-note", default="", help="free-text license note stored in meta")
     parser.add_argument("--output", help="output sqlite3 path")

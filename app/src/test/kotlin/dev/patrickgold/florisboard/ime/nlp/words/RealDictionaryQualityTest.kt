@@ -24,9 +24,10 @@ import io.kotest.matchers.shouldBe
 import kotlin.system.measureNanoTime
 
 /**
- * End-to-end quality + latency test of the suggestion engine over the REAL shipped Arabic lexicon
- * (`ar_words.tsv` is dumped from `assets/ime/dict/ar.sqlite3` — regenerate it with the python
- * one-liner in the file header whenever the dictionary is rebuilt).
+ * End-to-end quality + latency test of the suggestion engine over the REAL shipped Arabic lexicon:
+ * the MSA base (`ar_words.tsv`, dumped from `assets/ime/dict/ar.sqlite3` — regenerate whenever
+ * the dictionary is rebuilt) with the REAL shipped Levantine dialect overlay asset applied
+ * through the same [DialectOverlay] + [SqliteWordDictionary.mergeOverlayWords] path the app uses.
  *
  * The latency budget in the plan is < 10ms per keystroke on device; this JVM test asserts a
  * loose 25ms average / 60ms p95 so it stays green on slow CI machines while still catching an
@@ -34,8 +35,13 @@ import kotlin.system.measureNanoTime
  */
 class RealDictionaryQualityTest : FunSpec({
 
+    val overlay: DialectOverlay by lazy {
+        val asset = java.io.File("src/main/assets/ime/dict/overlays/ar_levantine.tsv")
+        DialectOverlay.parse(asset.readLines().asSequence(), WordNormalizer.forLanguage("ar"))
+    }
+
     val index: WordIndex by lazy {
-        val entries = checkNotNull(javaClass.classLoader!!.getResourceAsStream("ar_words.tsv"))
+        val base = checkNotNull(javaClass.classLoader!!.getResourceAsStream("ar_words.tsv"))
             .bufferedReader()
             .readLines()
             .asSequence()
@@ -47,6 +53,7 @@ class RealDictionaryQualityTest : FunSpec({
                 WordEntry(parts[0], ArabicNormalizer.normalize(parts[0]), freq)
             }
             .toList()
+        val entries = SqliteWordDictionary.mergeOverlayWords(base, overlay, WordNormalizer.forLanguage("ar"))
         entries.size shouldBeGreaterThan 50_000
         WordIndex(entries, KeyProximity.ARABIC)
     }
@@ -62,12 +69,16 @@ class RealDictionaryQualityTest : FunSpec({
             results.first().isExactMatch.shouldBeTrue()
             results.map { it.entry.word }.take(3) shouldContain "مرحبا"
         }
-        test("Levantine layer is on top: بدي، هلق، منيح exist as exact matches") {
+        test("Levantine overlay is on top: بدي، هلق، منيح exist as exact matches") {
             for (word in listOf("بدي", "هلق", "منيح", "كتير", "عنجد")) {
                 val results = suggest(word)
                 results.first().isExactMatch.shouldBeTrue()
                 results.first().entry.word shouldBe word
             }
+        }
+        test("overlay phrase chains: «يعطيك» predicts «العافية» via the overlay bigrams") {
+            val followers = overlay.bigrams[ArabicNormalizer.normalize("يعطيك")].orEmpty()
+            followers.map { it.first } shouldContain "العافية"
         }
         test("normalization: typing اسلام finds إسلام as exact match") {
             suggest("اسلام").first { it.isExactMatch }.entry.word shouldBe "إسلام"

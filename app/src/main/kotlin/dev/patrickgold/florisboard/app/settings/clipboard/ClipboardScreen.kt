@@ -93,6 +93,12 @@ fun ClipboardScreen() = FlorisScreen {
                 onClick = { navController.navigate(Routes.Settings.ClipboardHistory) },
                 enabledIf = { prefs.clipboard.historyEnabled isEqualTo true },
             )
+            SwitchPreference(
+                prefs.clipboard.historyScreenLock,
+                title = stringRes(R.string.pref__clipboard__history_screen_lock__label),
+                summary = stringRes(R.string.pref__clipboard__history_screen_lock__summary),
+                enabledIf = { prefs.clipboard.historyEnabled isEqualTo true },
+            )
             DialogSliderPreference(
                 primaryPref = prefs.clipboard.historyNumGridColumnsPortrait,
                 secondaryPref = prefs.clipboard.historyNumGridColumnsLandscape,

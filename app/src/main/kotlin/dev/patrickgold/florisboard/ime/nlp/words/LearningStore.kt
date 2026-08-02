@@ -48,13 +48,21 @@ class LearningStore(context: Context) : SQLiteOpenHelper(context, DB_NAME, null,
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL("CREATE TABLE pending_words (lang TEXT NOT NULL, word TEXT NOT NULL, count INTEGER NOT NULL, PRIMARY KEY (lang, word))")
         db.execSQL("CREATE TABLE user_bigrams (lang TEXT NOT NULL, w1_norm TEXT NOT NULL, w2 TEXT NOT NULL, count INTEGER NOT NULL, PRIMARY KEY (lang, w1_norm, w2))")
+        db.execSQL("CREATE TABLE user_trigrams (lang TEXT NOT NULL, w12_norm TEXT NOT NULL, w3 TEXT NOT NULL, count INTEGER NOT NULL, PRIMARY KEY (lang, w12_norm, w3))")
         db.execSQL("CREATE TABLE blocked_words (lang TEXT NOT NULL, word TEXT NOT NULL, PRIMARY KEY (lang, word))")
         db.execSQL("CREATE TABLE autocorrect_reverts (word TEXT NOT NULL PRIMARY KEY, count INTEGER NOT NULL)")
+        db.execSQL("CREATE TABLE stats_daily (date TEXT NOT NULL PRIMARY KEY, words INTEGER NOT NULL, chars INTEGER NOT NULL)")
+        db.execSQL("CREATE TABLE stats_words (lang TEXT NOT NULL, word TEXT NOT NULL, count INTEGER NOT NULL, PRIMARY KEY (lang, word))")
         db.execSQL("CREATE TABLE meta (key TEXT NOT NULL PRIMARY KEY, value TEXT NOT NULL)")
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        // v1 — nothing to migrate yet.
+        if (oldVersion < 2) {
+            // v2: personal trigrams for two-word next-word context + local typing statistics.
+            db.execSQL("CREATE TABLE IF NOT EXISTS user_trigrams (lang TEXT NOT NULL, w12_norm TEXT NOT NULL, w3 TEXT NOT NULL, count INTEGER NOT NULL, PRIMARY KEY (lang, w12_norm, w3))")
+            db.execSQL("CREATE TABLE IF NOT EXISTS stats_daily (date TEXT NOT NULL PRIMARY KEY, words INTEGER NOT NULL, chars INTEGER NOT NULL)")
+            db.execSQL("CREATE TABLE IF NOT EXISTS stats_words (lang TEXT NOT NULL, word TEXT NOT NULL, count INTEGER NOT NULL, PRIMARY KEY (lang, word))")
+        }
     }
 
     // --- pending words ---------------------------------------------------------------------------
@@ -106,6 +114,36 @@ class LearningStore(context: Context) : SQLiteOpenHelper(context, DB_NAME, null,
         readableDatabase.rawQuery(
             "SELECT w2, count FROM user_bigrams WHERE lang = ? AND w1_norm = ? ORDER BY count DESC LIMIT $maxCount",
             arrayOf(lang, w1Norm),
+        ).use { cursor ->
+            buildList {
+                while (cursor.moveToNext()) {
+                    add(cursor.getString(0) to cursor.getInt(1))
+                }
+            }
+        }
+    }
+
+    // --- personal trigrams -----------------------------------------------------------------------
+
+    @Synchronized
+    fun recordTrigram(lang: String, w12Norm: String, w3: String) = runSafely(Unit) {
+        val db = writableDatabase
+        db.execSQL(
+            "INSERT OR IGNORE INTO user_trigrams (lang, w12_norm, w3, count) VALUES (?, ?, ?, 0)",
+            arrayOf(lang, w12Norm, w3),
+        )
+        db.execSQL(
+            "UPDATE user_trigrams SET count = MIN(count + 1, 10000) WHERE lang = ? AND w12_norm = ? AND w3 = ?",
+            arrayOf(lang, w12Norm, w3),
+        )
+    }
+
+    /** Personal followers of the two-word context [w12Norm], best first, as (word, rawCount). */
+    @Synchronized
+    fun trigramsFor(lang: String, w12Norm: String, maxCount: Int): List<Pair<String, Int>> = runSafely(emptyList()) {
+        readableDatabase.rawQuery(
+            "SELECT w3, count FROM user_trigrams WHERE lang = ? AND w12_norm = ? ORDER BY count DESC LIMIT $maxCount",
+            arrayOf(lang, w12Norm),
         ).use { cursor ->
             buildList {
                 while (cursor.moveToNext()) {
@@ -167,6 +205,74 @@ class LearningStore(context: Context) : SQLiteOpenHelper(context, DB_NAME, null,
         return (cache[word] ?: 0) >= PersonalLearning.AUTOCORRECT_BLOCK_THRESHOLD
     }
 
+    // --- local typing statistics -----------------------------------------------------------------
+
+    data class DailyStat(val date: String, val words: Int, val chars: Int)
+
+    /** Bumps today's word/char counters and the all-time per-word counter. Local-only; the caller
+     *  gates on incognito. Not decayed — bounded by vocabulary size and one row per day. */
+    @Synchronized
+    fun recordTypedWord(lang: String, word: String) = runSafely(Unit) {
+        val db = writableDatabase
+        val today = java.time.LocalDate.now().toString()
+        db.execSQL("INSERT OR IGNORE INTO stats_daily (date, words, chars) VALUES (?, 0, 0)", arrayOf(today))
+        db.execSQL(
+            "UPDATE stats_daily SET words = words + 1, chars = chars + ? WHERE date = ?",
+            arrayOf<Any>(word.length, today),
+        )
+        db.execSQL("INSERT OR IGNORE INTO stats_words (lang, word, count) VALUES (?, ?, 0)", arrayOf(lang, word))
+        db.execSQL(
+            "UPDATE stats_words SET count = count + 1 WHERE lang = ? AND word = ?",
+            arrayOf(lang, word),
+        )
+    }
+
+    /** The most recent [limit] days that saw typing, newest first. */
+    @Synchronized
+    fun dailyStats(limit: Int): List<DailyStat> = runSafely(emptyList()) {
+        readableDatabase.rawQuery(
+            "SELECT date, words, chars FROM stats_daily ORDER BY date DESC LIMIT $limit", null,
+        ).use { cursor ->
+            buildList {
+                while (cursor.moveToNext()) {
+                    add(DailyStat(cursor.getString(0), cursor.getInt(1), cursor.getInt(2)))
+                }
+            }
+        }
+    }
+
+    /** (total words, total chars, active days) over the whole recorded history. */
+    @Synchronized
+    fun statsTotals(): Triple<Long, Long, Int> = runSafely(Triple(0L, 0L, 0)) {
+        readableDatabase.rawQuery(
+            "SELECT COALESCE(SUM(words), 0), COALESCE(SUM(chars), 0), COUNT(*) FROM stats_daily", null,
+        ).use { cursor ->
+            cursor.moveToFirst()
+            Triple(cursor.getLong(0), cursor.getLong(1), cursor.getInt(2))
+        }
+    }
+
+    /** The user's most-typed words across all languages, best first. */
+    @Synchronized
+    fun topWords(limit: Int): List<Pair<String, Int>> = runSafely(emptyList()) {
+        readableDatabase.rawQuery(
+            "SELECT word, SUM(count) AS total FROM stats_words GROUP BY word ORDER BY total DESC LIMIT $limit",
+            null,
+        ).use { cursor ->
+            buildList {
+                while (cursor.moveToNext()) {
+                    add(cursor.getString(0) to cursor.getInt(1))
+                }
+            }
+        }
+    }
+
+    @Synchronized
+    fun clearStats() = runSafely(Unit) {
+        writableDatabase.execSQL("DELETE FROM stats_daily")
+        writableDatabase.execSQL("DELETE FROM stats_words")
+    }
+
     // --- decay -----------------------------------------------------------------------------------
 
     /**
@@ -185,6 +291,8 @@ class LearningStore(context: Context) : SQLiteOpenHelper(context, DB_NAME, null,
         if (nowMs - getMetaLong(db, "last_bigram_decay") > BIGRAM_DECAY_INTERVAL_MS) {
             db.execSQL("UPDATE user_bigrams SET count = (count * 3) / 4")
             db.execSQL("DELETE FROM user_bigrams WHERE count <= 0")
+            db.execSQL("UPDATE user_trigrams SET count = (count * 3) / 4")
+            db.execSQL("DELETE FROM user_trigrams WHERE count <= 0")
             setMetaLong(db, "last_bigram_decay", nowMs)
         }
     }
@@ -203,16 +311,22 @@ class LearningStore(context: Context) : SQLiteOpenHelper(context, DB_NAME, null,
 
     @Serializable
     data class Snapshot(
-        val version: Int = 1,
+        val version: Int = 2,
         val pendingWords: List<PendingWordRow> = emptyList(),
         val userBigrams: List<UserBigramRow> = emptyList(),
+        val userTrigrams: List<UserTrigramRow> = emptyList(),
         val blockedWords: List<BlockedWordRow> = emptyList(),
         val autocorrectReverts: List<AutocorrectRevertRow> = emptyList(),
+        val statsDaily: List<StatsDailyRow> = emptyList(),
+        val statsWords: List<StatsWordRow> = emptyList(),
     ) {
         @Serializable data class PendingWordRow(val lang: String, val word: String, val count: Int)
         @Serializable data class UserBigramRow(val lang: String, val w1Norm: String, val w2: String, val count: Int)
+        @Serializable data class UserTrigramRow(val lang: String, val w12Norm: String, val w3: String, val count: Int)
         @Serializable data class BlockedWordRow(val lang: String, val word: String)
         @Serializable data class AutocorrectRevertRow(val word: String, val count: Int)
+        @Serializable data class StatsDailyRow(val date: String, val words: Int, val chars: Int)
+        @Serializable data class StatsWordRow(val lang: String, val word: String, val count: Int)
     }
 
     /** Dumps the entire learning state as a JSON snapshot for the local backup archive. */
@@ -228,11 +342,20 @@ class LearningStore(context: Context) : SQLiteOpenHelper(context, DB_NAME, null,
             userBigrams = rows("SELECT lang, w1_norm, w2, count FROM user_bigrams") {
                 Snapshot.UserBigramRow(it.getString(0), it.getString(1), it.getString(2), it.getInt(3))
             },
+            userTrigrams = rows("SELECT lang, w12_norm, w3, count FROM user_trigrams") {
+                Snapshot.UserTrigramRow(it.getString(0), it.getString(1), it.getString(2), it.getInt(3))
+            },
             blockedWords = rows("SELECT lang, word FROM blocked_words") {
                 Snapshot.BlockedWordRow(it.getString(0), it.getString(1))
             },
             autocorrectReverts = rows("SELECT word, count FROM autocorrect_reverts") {
                 Snapshot.AutocorrectRevertRow(it.getString(0), it.getInt(1))
+            },
+            statsDaily = rows("SELECT date, words, chars FROM stats_daily") {
+                Snapshot.StatsDailyRow(it.getString(0), it.getInt(1), it.getInt(2))
+            },
+            statsWords = rows("SELECT lang, word, count FROM stats_words") {
+                Snapshot.StatsWordRow(it.getString(0), it.getString(1), it.getInt(2))
             },
         )
         Json.encodeToString(Snapshot.serializer(), snapshot)
@@ -252,8 +375,11 @@ class LearningStore(context: Context) : SQLiteOpenHelper(context, DB_NAME, null,
             if (erase) {
                 db.execSQL("DELETE FROM pending_words")
                 db.execSQL("DELETE FROM user_bigrams")
+                db.execSQL("DELETE FROM user_trigrams")
                 db.execSQL("DELETE FROM blocked_words")
                 db.execSQL("DELETE FROM autocorrect_reverts")
+                db.execSQL("DELETE FROM stats_daily")
+                db.execSQL("DELETE FROM stats_words")
             }
             // NOTE: classic insert-then-update instead of UPSERT syntax, which needs SQLite 3.24+
             // (Android 11) while this app supports minSdk 26.
@@ -274,6 +400,16 @@ class LearningStore(context: Context) : SQLiteOpenHelper(context, DB_NAME, null,
                     arrayOf<Any>(row.count, row.lang, row.w1Norm, row.w2),
                 )
             }
+            for (row in snapshot.userTrigrams) {
+                db.execSQL(
+                    "INSERT OR IGNORE INTO user_trigrams (lang, w12_norm, w3, count) VALUES (?, ?, ?, 0)",
+                    arrayOf(row.lang, row.w12Norm, row.w3),
+                )
+                db.execSQL(
+                    "UPDATE user_trigrams SET count = MAX(count, ?) WHERE lang = ? AND w12_norm = ? AND w3 = ?",
+                    arrayOf<Any>(row.count, row.lang, row.w12Norm, row.w3),
+                )
+            }
             for (row in snapshot.blockedWords) {
                 db.execSQL("INSERT OR IGNORE INTO blocked_words (lang, word) VALUES (?, ?)", arrayOf(row.lang, row.word))
             }
@@ -282,6 +418,20 @@ class LearningStore(context: Context) : SQLiteOpenHelper(context, DB_NAME, null,
                 db.execSQL(
                     "UPDATE autocorrect_reverts SET count = MAX(count, ?) WHERE word = ?",
                     arrayOf<Any>(row.count, row.word),
+                )
+            }
+            for (row in snapshot.statsDaily) {
+                db.execSQL("INSERT OR IGNORE INTO stats_daily (date, words, chars) VALUES (?, 0, 0)", arrayOf(row.date))
+                db.execSQL(
+                    "UPDATE stats_daily SET words = MAX(words, ?), chars = MAX(chars, ?) WHERE date = ?",
+                    arrayOf<Any>(row.words, row.chars, row.date),
+                )
+            }
+            for (row in snapshot.statsWords) {
+                db.execSQL("INSERT OR IGNORE INTO stats_words (lang, word, count) VALUES (?, ?, 0)", arrayOf(row.lang, row.word))
+                db.execSQL(
+                    "UPDATE stats_words SET count = MAX(count, ?) WHERE lang = ? AND word = ?",
+                    arrayOf<Any>(row.count, row.lang, row.word),
                 )
             }
             db.setTransactionSuccessful()
@@ -304,7 +454,7 @@ class LearningStore(context: Context) : SQLiteOpenHelper(context, DB_NAME, null,
 
     companion object {
         const val DB_NAME = "floris_learning"
-        private const val DB_VERSION = 1
+        private const val DB_VERSION = 2
         private const val PENDING_DECAY_INTERVAL_MS = 7L * 24 * 60 * 60 * 1000
         private const val BIGRAM_DECAY_INTERVAL_MS = 30L * 24 * 60 * 60 * 1000
     }

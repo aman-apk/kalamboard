@@ -126,6 +126,9 @@
     <string name="settings__home__title" comment="Title of the Home screen">Welcome to {app_name}</string>
     <string name="settings__home__ime_not_enabled" comment="Error message shown in Home fragment when KalamBoard is not enabled in the system">KalamBoard is not enabled in the system and thus won\'t be available as an input method in the input picker. Click here to resolve this issue.</string>
     <string name="settings__home__ime_not_selected" comment="Warning message shown in Home fragment when KalamBoard is not selected as the default keyboard">KalamBoard is not selected as the default input method. Click here to resolve this issue.</string>
+    <string name="settings__home__backup_reminder" comment="Reminder card shown when the last local backup is older than 30 days">It has been a while since your last backup. Your learned words, clipboard and settings live only on this device — export a backup so you never lose them.</string>
+    <string name="settings__home__backup_reminder_now" comment="Reminder card action">Back up now</string>
+    <string name="settings__home__backup_reminder_later" comment="Reminder card action">Later</string>
 
     <string name="settings__localization__title" comment="Title of languages and Layout screen">Languages &amp; Layouts</string>
     <string name="settings__localization__display_language_names_in__label" comment="Label of Display language names in preference">Display language names in</string>
@@ -926,10 +929,35 @@
     <string name="correction__auto_correct_disabled_toast">Autocorrect disabled</string>
     <string name="pref__suggestion__learn_from_typing__label" comment="Preference title">Learn from typing</string>
     <string name="pref__suggestion__learn_from_typing__summary" comment="Preference summary">Learn new words and your personal next-word pairs on this device only. Never active in incognito mode</string>
+    <string name="pref__suggestion__arabic_dialect__label" comment="Preference title">Arabic dialect</string>
+    <string name="settings__typing_stats__title" comment="Screen title">Typing statistics</string>
+    <string name="settings__typing_stats__entry_summary" comment="Preference summary">Words typed, streaks and your most-used words — all on this device</string>
+    <string name="settings__typing_stats__total_words" comment="Stat label">Words typed</string>
+    <string name="settings__typing_stats__active_days" comment="Stat label">Active days</string>
+    <string name="settings__typing_stats__streak" comment="Stat label">Day streak</string>
+    <string name="settings__typing_stats__best_day" comment="Best day line">Best day: {date} with {count} words</string>
+    <string name="settings__typing_stats__last_days" comment="Chart card title">Last 14 days</string>
+    <string name="settings__typing_stats__last_days_hint" comment="Chart hint">Each bar is one day with typing activity, oldest to newest</string>
+    <string name="settings__typing_stats__top_words" comment="Card title">Your most-used words</string>
+    <string name="settings__typing_stats__empty" comment="Empty state">No statistics yet — start typing and check back later</string>
+    <string name="settings__typing_stats__clear" comment="Clear button">Clear statistics</string>
+    <string name="settings__typing_stats__clear_confirm" comment="Clear confirm text">Delete all typing statistics? Learned words and predictions are not affected.</string>
+    <string name="settings__typing_stats__privacy_note" comment="Privacy footnote">Statistics are computed and stored only on this device. Incognito sessions are never counted.</string>
+    <string name="enum__arabic_dialect__levantine" comment="Arabic dialect option">Levantine (Syrian)</string>
+    <string name="enum__arabic_dialect__egyptian" comment="Arabic dialect option">Egyptian</string>
+    <string name="enum__arabic_dialect__gulf" comment="Arabic dialect option">Gulf</string>
+    <string name="enum__arabic_dialect__iraqi" comment="Arabic dialect option">Iraqi</string>
+    <string name="enum__arabic_dialect__none" comment="Arabic dialect option">Fusha only (no dialect)</string>
     <string name="pref__correction__auto_correct_enabled__label" comment="Preference title">Autocorrect</string>
     <string name="pref__correction__auto_correct_enabled__summary" comment="Preference summary">Automatically replace a mistyped word with the closest suggestion on space or punctuation</string>
     <string name="settings__clipboard_history__title" comment="Screen title">Clipboard history</string>
     <string name="settings__clipboard_history__entry_summary" comment="Preference summary">Browse, pin, copy back or delete every stored clip</string>
+    <string name="pref__clipboard__history_screen_lock__label" comment="Preference title">Lock clipboard history</string>
+    <string name="pref__clipboard__history_screen_lock__summary" comment="Preference summary">Require your fingerprint or screen lock before showing the full history</string>
+    <string name="settings__clipboard_history__lock_prompt_title" comment="Device credential prompt title">Unlock clipboard history</string>
+    <string name="settings__clipboard_history__lock_prompt_summary" comment="Device credential prompt subtitle">Confirm your screen lock to view stored clips</string>
+    <string name="settings__clipboard_history__locked_message" comment="Message shown on the locked history screen">Your clipboard history is locked. Confirm your fingerprint or screen lock to view it.</string>
+    <string name="settings__clipboard_history__unlock_action" comment="Unlock button">Unlock</string>
     <string name="settings__clipboard_history__summary" comment="Header, count placeholder">{count} items stored on this device only</string>
     <string name="settings__clipboard_history__search_placeholder">Search clipboard…</string>
     <string name="settings__clipboard_history__empty">No clipboard items yet. Everything you copy will be kept here.</string>

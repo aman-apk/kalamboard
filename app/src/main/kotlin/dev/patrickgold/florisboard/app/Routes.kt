@@ -76,6 +76,7 @@ import dev.patrickgold.florisboard.app.settings.theme.ThemeManagerScreen
 import dev.patrickgold.florisboard.app.settings.theme.ThemeManagerScreenAction
 import dev.patrickgold.florisboard.app.settings.theme.ThemeScreen
 import dev.patrickgold.florisboard.app.settings.typing.TypingScreen
+import dev.patrickgold.florisboard.app.settings.typing.TypingStatsScreen
 import dev.patrickgold.florisboard.app.setup.OnboardingScreen
 import dev.patrickgold.florisboard.app.setup.SetupScreen
 import kotlinx.serialization.SerialName
@@ -176,6 +177,10 @@ object Routes {
         @Serializable
         @Deeplink("settings/clipboard/history")
         object ClipboardHistory
+
+        @Serializable
+        @Deeplink("settings/typing/stats")
+        object TypingStats
 
         @Serializable
         @Deeplink("settings/media")
@@ -311,6 +316,7 @@ object Routes {
             composableWithDeepLink(Settings.Smartbar::class) { SmartbarScreen() }
 
             composableWithDeepLink(Settings.Typing::class) { TypingScreen() }
+            composableWithDeepLink(Settings.TypingStats::class) { TypingStatsScreen() }
 
             composableWithDeepLink(Settings.Dictionary::class) { DictionaryScreen() }
             composableWithDeepLink(Settings.UserDictionary::class) { navBackStack ->

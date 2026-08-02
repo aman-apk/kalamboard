@@ -183,11 +183,11 @@ interface SuggestionProvider : NlpProvider {
      * @param subtype Information about the current subtype, primarily used for getting the primary and secondary
      *  language for correct dictionary selection.
      * @param word The word that has been committed to the editor.
-     * @param precedingWord The word immediately before [word] in the editor, or an empty string if there is none.
-     *  Useful for learning personal bigrams.
+     * @param precedingWords Up to the two words immediately before [word] in the editor, oldest
+     *  first (empty when [word] starts a sentence). Useful for learning personal bigrams/trigrams.
      * @param isPrivateSession If true, the provider MUST NOT persist anything derived from this event.
      */
-    suspend fun notifyWordCommitted(subtype: Subtype, word: String, precedingWord: String, isPrivateSession: Boolean) {}
+    suspend fun notifyWordCommitted(subtype: Subtype, word: String, precedingWords: List<String>, isPrivateSession: Boolean) {}
 
     /**
      * Interop method allowing the glide typing logic to perform its own magic.
