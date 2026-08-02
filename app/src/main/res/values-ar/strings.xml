@@ -1130,7 +1130,7 @@
     <string name="onboarding__privacy__title">كلامك ملكك وحدك</string>
     <string name="onboarding__privacy__body">بلا إنترنت. نهائياً. لا خوادم ولا تتبّع — كل ما تكتبه يبقى في جهازك.</string>
     <string name="onboarding__arabic__title">يحكي عربيّتك</string>
-    <string name="onboarding__arabic__body">اقتراحات ذكية بالفصحى والشامي، وتصحيح يعرف مكان الهمزة — ويتعلّم كلماتك وأنت تكتب.</string>
+    <string name="onboarding__arabic__body">اقتراحات ذكية بالفصحى والعامية، وتصحيح يعرف مكان الهمزة — ويتعلّم كلماتك وأنت تكتب.</string>
     <string name="onboarding__clipboard__title">حافظة لا تنسى</string>
     <string name="onboarding__clipboard__body">كل ما تنسخه محفوظ لك. ثبّت المهم، وارجع له متى شئت.</string>
     <string name="onboarding__themes__title">أسود بلمسة ذهب</string>

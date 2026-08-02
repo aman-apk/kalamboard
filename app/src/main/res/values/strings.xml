@@ -1202,7 +1202,7 @@
     <string name="onboarding__privacy__title">Your words are yours alone</string>
     <string name="onboarding__privacy__body">No internet access. Ever. No servers, no tracking — everything you type stays on this device.</string>
     <string name="onboarding__arabic__title">It speaks your Arabic</string>
-    <string name="onboarding__arabic__body">Smart suggestions in Fusha and Shami, autocorrect that gets the hamza right — and it learns your words as you type.</string>
+    <string name="onboarding__arabic__body">Smart suggestions in Fusha and dialect, autocorrect that gets the hamza right — and it learns your words as you type.</string>
     <string name="onboarding__clipboard__title">A clipboard that never forgets</string>
     <string name="onboarding__clipboard__body">Everything you copy is saved for you. Pin what matters, find it whenever you need it.</string>
     <string name="onboarding__themes__title">Black, kissed with gold</string>
