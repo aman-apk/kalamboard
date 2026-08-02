@@ -17,6 +17,7 @@
 import com.android.build.api.dsl.ApplicationExtension
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.agp.application)
@@ -102,6 +103,23 @@ configure<ApplicationExtension> {
         compose = true
     }
 
+    // KalamBoard release signing. The keystore lives OUTSIDE the repo (../keystore/) so it can
+    // never be committed; if it is absent the release build stays unsigned instead of failing,
+    // so CI/other machines can still compile.
+    val keystorePropsFile = rootProject.file("../keystore/keystore.properties")
+    if (keystorePropsFile.exists()) {
+        val keystoreProps = Properties()
+        keystorePropsFile.inputStream().use { stream -> keystoreProps.load(stream) }
+        signingConfigs.create("kalamboardRelease") {
+            storeFile = rootProject.file("../keystore/" + File(keystoreProps.getProperty("storeFile")).name)
+            storePassword = keystoreProps.getProperty("storePassword")
+            keyAlias = keystoreProps.getProperty("keyAlias")
+            keyPassword = keystoreProps.getProperty("keyPassword")
+        }
+    } else {
+        logger.warn("KalamBoard: ../keystore/keystore.properties not found — release APK will be UNSIGNED.")
+    }
+
     buildTypes {
         named("debug") {
             applicationIdSuffix = ".debug"
@@ -126,6 +144,7 @@ configure<ApplicationExtension> {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             isMinifyEnabled = true
             isShrinkResources = true
+            signingConfigs.findByName("kalamboardRelease")?.let { signingConfig = it }
         }
 
         create("benchmark") {
