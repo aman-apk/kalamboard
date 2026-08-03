@@ -68,11 +68,11 @@ configure<ApplicationExtension> {
     }
 
     defaultConfig {
-        // KalamBoard by Sitr Labs (org.sitr — the donation-based privacy-apps organization).
+        // KalamBoard by Aman Labs (أمان — the donation-based privacy-apps organization).
         // PERMANENT once published to a store. The Kotlin namespace stays
         // dev.patrickgold.florisboard (internal, never user-visible) so the fork remains
         // mergeable with upstream.
-        applicationId = "org.sitr.kalamboard"
+        applicationId = "org.amanlabs.kalamboard"
         minSdk = projectMinSdk.toInt()
         targetSdk = projectTargetSdk.toInt()
         versionCode = projectVersionCode.toInt()

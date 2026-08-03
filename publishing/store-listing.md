@@ -19,7 +19,7 @@
 **🔒 خصوصية يمكن إثباتها، لا وعود**
 • صفر أذونات شبكة — يستحيل تقنياً إرسال أي شيء
 • لا إعلانات، لا متتبعات، لا حسابات، لا تقارير خفية
-• مفتوح المصدر، من سِتر: تطبيقات بالتبرع لا بالربح
+• مفتوح المصدر، من «أمان»: تطبيقات بالتبرع لا بالربح
 
 **🧠 ذكاء حقيقي… على جهازك**
 • اقتراحات وتصحيح تلقائي بالعربية الفصحى + لهجتك: شامية، مصرية، خليجية، عراقية
@@ -63,7 +63,7 @@ KalamBoard is a smart keyboard built on one strict rule: **no internet, ever**. 
 **🔒 Provable privacy, not promises**
 • Zero network permissions — sending data is technically impossible
 • No ads, no trackers, no accounts, no hidden reporting
-• Open source, by Sitr Labs: donation-based, not-for-profit
+• Open source, by Aman Labs: donation-based, not-for-profit
 
 **🧠 Real intelligence… on your device**
 • Suggestions and autocorrect for Modern Standard Arabic + your dialect: Levantine, Egyptian, Gulf, Iraqi

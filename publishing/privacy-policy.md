@@ -1,5 +1,5 @@
 # سياسة الخصوصية — كلام بورد (KalamBoard)
-**الناشر:** Sitr Labs — سِتر: تطبيقات خصوصية قائمة على التبرع، لا على الربح.
+**الناشر:** Aman Labs — أمان: تطبيقات خصوصية قائمة على التبرع، لا على الربح.
 **آخر تحديث:** 2026-08-02
 
 ## الخلاصة بجملة واحدة
@@ -37,7 +37,7 @@
 ---
 
 # Privacy Policy — KalamBoard
-**Publisher:** Sitr Labs — donation-based privacy apps, not-for-profit.
+**Publisher:** Aman Labs (أمان) — donation-based privacy apps, not-for-profit.
 **Last updated:** 2026-08-02
 
 ## One-sentence summary

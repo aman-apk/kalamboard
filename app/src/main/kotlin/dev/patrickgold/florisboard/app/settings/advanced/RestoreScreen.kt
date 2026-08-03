@@ -85,7 +85,7 @@ object Restore {
     const val MIN_VERSION_CODE = 64
     // Accept archives from this fork's new id AND from the original FlorisBoard id, so users
     // migrating from an older install of this fork (or upstream) can still restore.
-    val COMPATIBLE_PACKAGE_PREFIXES = listOf("org.sitr", "org.kalamboard", "dev.patrickgold.florisboard")
+    val COMPATIBLE_PACKAGE_PREFIXES = listOf("org.amanlabs", "org.kalamboard", "dev.patrickgold.florisboard")
     const val BACKUP_ARCHIVE_FILE_NAME = "backup.zip"
 }
 
