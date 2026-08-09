@@ -1144,6 +1144,7 @@
     <!-- Onboarding (KalamBoard) -->
     <string name="onboarding__welcome__title">أهلاً بك في كلام بورد</string>
     <string name="onboarding__welcome__body">كيبورد عربي أولاً، صُنع ليفهمك.</string>
+    <string name="onboarding__language__label" comment="Label above the language picker on the first onboarding slide; controls the app+onboarding UI language">لغة التطبيق</string>
     <string name="onboarding__privacy__title">كلامك ملكك وحدك</string>
     <string name="onboarding__privacy__body">بلا إنترنت. نهائياً. لا خوادم ولا تتبّع — كل ما تكتبه يبقى في جهازك.</string>
     <string name="onboarding__arabic__title">يحكي عربيّتك</string>

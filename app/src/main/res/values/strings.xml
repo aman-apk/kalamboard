@@ -1218,6 +1218,7 @@
     <!-- Onboarding (KalamBoard) -->
     <string name="onboarding__welcome__title">Welcome to KalamBoard</string>
     <string name="onboarding__welcome__body">An Arabic-first keyboard, built to understand you.</string>
+    <string name="onboarding__language__label" comment="Label above the language picker on the first onboarding slide; controls the app+onboarding UI language">App language</string>
     <string name="onboarding__privacy__title">Your words are yours alone</string>
     <string name="onboarding__privacy__body">No internet access. Ever. No servers, no tracking — everything you type stays on this device.</string>
     <string name="onboarding__arabic__title">It speaks your Arabic</string>

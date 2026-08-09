@@ -58,15 +58,47 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.remember
 import dev.patrickgold.florisboard.R
 import dev.patrickgold.florisboard.app.FlorisPreferenceStore
 import dev.patrickgold.florisboard.app.LocalNavController
 import dev.patrickgold.florisboard.app.Routes
+import dev.patrickgold.florisboard.lib.FlorisLocale
+import dev.patrickgold.jetpref.datastore.model.collectAsState
 import kotlinx.coroutines.launch
 import org.florisboard.lib.compose.stringRes
 
 /** KalamBoard's champagne-gold brand accent, used sparingly for the onboarding highlights. */
 private val KalamGold = Color(0xFFD4AF37)
+
+/** Dark ink used for text sitting on the gold accent. */
+private val KalamInk = Color(0xFF191203)
+
+@Composable
+private fun LanguagePill(
+    label: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+) {
+    val containerColor by animateColorAsState(
+        if (selected) KalamGold else MaterialTheme.colorScheme.surfaceVariant,
+        label = "languagePillColor",
+    )
+    Button(
+        onClick = onClick,
+        modifier = Modifier.height(44.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = containerColor,
+            contentColor = if (selected) KalamInk else MaterialTheme.colorScheme.onSurfaceVariant,
+        ),
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.SemiBold,
+        )
+    }
+}
 
 private data class OnboardingPage(
     val icon: ImageVector?, // null = show the app icon instead
@@ -174,6 +206,38 @@ fun OnboardingScreen() {
                         textAlign = TextAlign.Center,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
+                    if (pageIndex == 0) {
+                        // Language choice for the settings app AND this onboarding itself:
+                        // setting the pref rebuilds the localized resources context, so the
+                        // whole UI (text + RTL direction) switches live.
+                        Spacer(modifier = Modifier.height(30.dp))
+                        Text(
+                            text = stringRes(R.string.onboarding__language__label),
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        Spacer(modifier = Modifier.height(10.dp))
+                        val settingsLanguage by prefs.other.settingsLanguage.collectAsState()
+                        val resolvedLanguage = remember(settingsLanguage) {
+                            if (settingsLanguage == "auto") {
+                                FlorisLocale.default().language
+                            } else {
+                                FlorisLocale.fromTag(settingsLanguage).language
+                            }
+                        }
+                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                            LanguagePill(
+                                label = "العربية",
+                                selected = resolvedLanguage == "ar",
+                                onClick = { scope.launch { prefs.other.settingsLanguage.set("ar") } },
+                            )
+                            LanguagePill(
+                                label = "English",
+                                selected = resolvedLanguage == "en",
+                                onClick = { scope.launch { prefs.other.settingsLanguage.set("en") } },
+                            )
+                        }
+                    }
                 }
             }
 
@@ -217,7 +281,7 @@ fun OnboardingScreen() {
                     .height(52.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = KalamGold,
-                    contentColor = Color(0xFF191203),
+                    contentColor = KalamInk,
                 ),
             ) {
                 Text(
