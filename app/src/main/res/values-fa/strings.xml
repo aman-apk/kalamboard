@@ -69,7 +69,6 @@
     <string name="settings__localization__display_language_names_in__label" comment="Label of Display language names in preference">نام زبان ها را به این صورت نمایش بده</string>
     <string name="settings__localization__group_subtypes__label" comment="Label of subtypes group">زیرنوع ها</string>
     <string name="settings__localization__subtype_add_title" comment="Title of subtype dialog when adding a new subtype">افزودن زیر-نوعی</string>
-    <string name="settings__localization__language_pack_title" comment="Title of the language pack manager screen for managing installed and custom language packs">مدیریت پک های نصب شده زبان</string>
     <string name="settings__localization__subtype_edit_title" comment="Title of subtype dialog when editing an existing subtype">ویرایش زیر-نوعی</string>
     <string name="settings__localization__subtype_locale" comment="Label for locale dropdown in subtype dialog">زبان اصلی</string>
     <string name="settings__localization__subtype_popup_mapping" comment="Label for popup mapping dropdown in subtype screen">چینش پاپ آپ ها</string>
@@ -227,10 +226,6 @@
     <string name="about__version__title" comment="Preference title">نسخه</string>
     <string name="about__version_copied__title" comment="Title of the toast for copying the version string">نسخه در کلیپ‌بورد کپی شد</string>
     <string name="about__version_copied__error" comment="Title of the error toast for copying the version string">اوه! مشکلی پیش آمد: {error_message}</string>
-    <string name="about__changelog__title" comment="Preference title">لیست تغییرات</string>
-    <string name="about__changelog__summary" comment="Preference summary">تغییرات جدید</string>
-    <string name="about__repository__title" comment="Preference title">رپو (گیت هاب)</string>
-    <string name="about__repository__summary" comment="Preference summary">کد منبع، مباحثه ها، مشکلات و اطلاعات</string>
     <string name="about__privacy_policy__title" comment="Preference title">سیاست حریم خصوصی</string>
     <string name="about__privacy_policy__summary" comment="Preference summary">سیاست حریم خصوصی برای این پروژه</string>
     <string name="about__project_license__title" comment="Preference title">گواهی های پروژه</string>
@@ -246,11 +241,9 @@
     <!-- Crash Dialog strings -->
     <string name="crash_dialog__title" comment="Title of crash dialog">گزارش خطای فلوریس بورد</string>
     <string name="crash_dialog__description" comment="Description of crash dialog">با عرض پوزش برای این مشکل به وجود آمده، اما فلوریس بورد به یک دلیل پیش‌بینی نشده، متوقف شد.</string>
-    <string name="crash_dialog__report_instructions" comment="Issue tracker report instructions for the crash dialog. The %s placeholder is the name of the crash report template and always in English/LTR.">اگر شما دوست دارید که این خطا را گزارش کنید، لطفا اول به صفحه ایرادات ردیابی شده را در گیت هاب ما سری بزنید و از اینکه این گزارش از قبل ارائه نشده مطمعن شوید.\nاگر که گزارشی نبود، لاگ تولید شده پس از متوقف شدن را کپی کنید و یک گزارش ایراد جدید را بسازید. از نمونه \"%s\" استفاده کنید و توضیحات، مراحل بازتولید، و لاگ تولید شده پس از متوقف شدن را در نهایت درج کنید. این به فلوریس بورد کمک شایانی در بهتر شدن و پایدار تر شدن آن برای همه می کند. بسیار از شما متشکریم!</string>
     <string name="crash_dialog__copy_to_clipboard" comment="Label of Copy to clipboard button in crash dialog">کپی به کلیپبورد سیستم</string>
     <string name="crash_dialog__copy_to_clipboard_success" comment="Label of Copy to clipboard success message in crash dialog">به کلیپبورد سیستم کپی شد</string>
     <string name="crash_dialog__copy_to_clipboard_failure" comment="Label of Copy to clipboard failure message in crash dialog">نمی توان به کلیپبورد سیستم کپی کرد: نمایه مدیرت کلیپبورد یافت نشد</string>
-    <string name="crash_dialog__open_issue_tracker" comment="Label of Open issue tracker button in crash dialog">بازکردن ایرادات ردیابی شده (github.com)</string>
     <string name="crash_dialog__close" comment="Label of Close button in crash dialog">بستن</string>
     <string name="crash_notification_channel__title" comment="Title of crash notification channel">گزارش های خطای فلوریس بورد</string>
     <string name="crash_once_notification__title" comment="Title of the notification for a single crash">فلوریس بورد کار خود را متوقف کرده است…</string>

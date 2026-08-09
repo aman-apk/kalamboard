@@ -111,6 +111,67 @@ class WordIndexTest : FunSpec({
         }
     }
 
+    context("fuzzy prefix completion (typo while still composing)") {
+        val index = ar(
+            "مرحبا" to 250,
+            "مبارك" to 220,
+            "نرجس" to 100,
+        )
+
+        test("wrong first letter mid-word still finds the intended word: نرح -> مرحبا") {
+            val results = index.suggest(ArabicNormalizer.normalize("نرح"), 8, true)
+            results.map { it.entry.word } shouldContain "مرحبا"
+        }
+
+        test("wrong first letter with 4 typed letters (word only one longer): نرحب -> مرحبا") {
+            val results = index.suggest(ArabicNormalizer.normalize("نرحب"), 8, true)
+            results.map { it.entry.word } shouldContain "مرحبا"
+        }
+
+        test("mid-prefix substitution: مبيرك -> مبارك stays reachable while composing") {
+            val results = index.suggest(ArabicNormalizer.normalize("مبير"), 8, true)
+            results.map { it.entry.word } shouldContain "مبارك"
+        }
+
+        test("a correction is reserved a slot when wrong-prefix completions would crowd it out") {
+            // Every filler starts with the typed (wrong) prefix «نرح», so plain ranking fills all
+            // three slots with completions; the reservation must still surface «مرحبا».
+            val crowded = ar(
+                "نرحل" to 250, "نرحب" to 249, "نرحلها" to 248, "نرحبكم" to 247,
+                "مرحبا" to 200,
+            )
+            val results = crowded.suggest(ArabicNormalizer.normalize("نرح"), 3, true)
+            results.map { it.entry.word } shouldContain "مرحبا"
+        }
+
+        test("prefix matches are flagged so they never auto-commit") {
+            val results = index.suggest(ArabicNormalizer.normalize("نرح"), 8, true)
+            results.first { it.entry.word == "مرحبا" }.isPrefixMatch.shouldBeTrue()
+        }
+
+        test("2-char queries do not fuzzy-prefix flood: words sharing only «ق» stay out") {
+            val index2 = ar("قمر" to 100, "قال" to 240, "قابل" to 238, "قليل" to 236)
+            val results = index2.suggest(ArabicNormalizer.normalize("قم"), 5, true)
+            // «قمر» is a genuine completion of the typed prefix. Before the gate, a 2-char
+            // prefix alignment could drop the second letter, so every high-frequency ق-word
+            // («قال»، «قابل»…) flooded the bar at distance 1.0. Only real whole-word 1-edit
+            // corrections may still appear.
+            results.map { it.entry.word } shouldContain "قمر"
+            results.map { it.entry.word } shouldNotContain "قابل"
+            results.map { it.entry.word } shouldNotContain "قليل"
+        }
+
+        test("double adjacent-key slip within the 2.0 budget is still found: jwllo -> hello") {
+            val index2 = WordIndex(
+                listOf(WordEntry("hello", "hello", 250)),
+                KeyProximity.QWERTY,
+            )
+            // j/h and w/e are same-row neighbors: cost 0.45 + 0.45 = 0.9 <= 2.0, and the lead
+            // window (maxCost + 1 = 3) must not prune it even though BOTH lead chars differ.
+            index2.suggest("jwllo", 8, true).map { it.entry.word } shouldContain "hello"
+        }
+    }
+
     context("offensive filtering") {
         val index = WordIndex(
             listOf(

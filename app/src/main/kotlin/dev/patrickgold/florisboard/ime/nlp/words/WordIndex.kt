@@ -38,6 +38,9 @@ data class RankedWord(
     val distance: Double,
     val isExactMatch: Boolean,
     val isCorrection: Boolean,
+    /** True when [distance] covers only a *prefix* of the entry (fuzzy-prefix completion):
+     *  the unmatched tail was never typed, so such a candidate must never auto-commit. */
+    val isPrefixMatch: Boolean = false,
 )
 
 /**
@@ -105,27 +108,81 @@ class WordIndex(entries: List<WordEntry>, private val proximity: KeyProximity) {
             merge(results, entry, score, distance = 0.0, isExact = false, isCorrection = false)
         }
 
-        // 3. Fuzzy corrections (only worth it once there is enough signal).
+        // 3. Fuzzy corrections and fuzzy-prefix completions.
         if (query.length >= MIN_FUZZY_QUERY_LENGTH) {
             val maxCost = if (query.length >= 5) 2.0 else 1.0
             val minLen = query.length - maxCost.toInt()
             val maxLen = query.length + maxCost.toInt()
+            // Lead-window prune: with at most `maxCost` edits, the alignment of the leading
+            // characters can shift by at most maxCost positions, so query and entry must share
+            // at least one character within their first (maxCost + 1) positions. This is sound
+            // for the whole budget (unlike a fixed two-char check, which would wrongly drop
+            // double adjacent-key slips like «jwllo» → «hello» on the 2.0 budget).
+            val leadWindow = maxCost.toInt() + 1
+            val queryLead = minOf(leadWindow, query.length)
             for (entry in sorted) {
-                val len = entry.norm.length
-                if (len < minLen || len > maxLen) continue
-                if (entry.norm.startsWith(query)) continue // already covered as completion
-                val dist = weightedEditDistance(query, entry.norm, maxCost)
-                if (dist > maxCost) continue
-                val score = entry.freq * (1.0 - dist / (maxCost + 0.75))
-                merge(results, entry, score, dist, isExact = false, isCorrection = true)
+                val norm = entry.norm
+                val len = norm.length
+                if (len < minLen) continue
+                if (norm.startsWith(query)) continue // already covered as completion
+                var sharesLead = false
+                val entryLead = minOf(leadWindow, len)
+                outer@ for (qi in 0 until queryLead) {
+                    val qc = query[qi]
+                    for (ei in 0 until entryLead) {
+                        if (norm[ei] == qc) {
+                            sharesLead = true
+                            break@outer
+                        }
+                    }
+                }
+                if (!sharesLead) continue
+                if (len <= maxLen) {
+                    // Whole-word correction: the query is a complete mistyped word.
+                    val dist = weightedEditDistance(query, norm, maxCost)
+                    if (dist <= maxCost) {
+                        val score = entry.freq * (1.0 - dist / (maxCost + CORRECTION_PENALTY_SLACK))
+                        merge(results, entry, score, dist, isExact = false, isCorrection = true)
+                    }
+                }
+                if (len > query.length && query.length >= MIN_FUZZY_PREFIX_QUERY_LENGTH) {
+                    // Fuzzy-prefix completion: the query is a mistyped PREFIX of a longer word
+                    // — the case a plain length band can never reach mid-word. Also tried for
+                    // entries inside the band (merge keeps the better score), so the completion
+                    // tail is never billed as edit errors. Gated on 3+ typed characters: on a
+                    // 2-char query the prefix alignment could stop after one matched character,
+                    // flooding the bar with every word sharing just the first letter.
+                    val dist = weightedPrefixDistance(query, norm, maxCost)
+                    if (dist <= maxCost) {
+                        val closeness = query.length.toDouble() / len
+                        val score = entry.freq * (0.55 + 0.45 * closeness) *
+                            (1.0 - dist / (maxCost + CORRECTION_PENALTY_SLACK))
+                        merge(
+                            results, entry, score, dist,
+                            isExact = false, isCorrection = true, isPrefixMatch = true,
+                        )
+                    }
+                }
             }
         }
 
-        return results.values.asSequence()
+        val ranked = results.values.asSequence()
             .filter { allowPossiblyOffensive || !it.entry.isPossiblyOffensive }
             .sortedWith(compareByDescending<RankedWord> { it.isExactMatch }.thenByDescending { it.score })
-            .take(maxCount)
             .toList()
+        val top = ranked.take(maxCount).toMutableList()
+        // The query isn't a known word: it's likely a typo, so never let completions of the
+        // wrong prefix crowd every correction out of the bar — reserve one slot.
+        if (query.length >= 3 && top.size >= maxCount &&
+            top.none { it.isExactMatch } && top.none { it.isCorrection }
+        ) {
+            val bestCorrection = ranked.firstOrNull { it.isCorrection }
+            if (bestCorrection != null) {
+                top.removeAt(top.lastIndex)
+                top.add(1.coerceAtMost(top.size), bestCorrection)
+            }
+        }
+        return top
     }
 
     private fun merge(
@@ -135,10 +192,11 @@ class WordIndex(entries: List<WordEntry>, private val proximity: KeyProximity) {
         distance: Double,
         isExact: Boolean,
         isCorrection: Boolean,
+        isPrefixMatch: Boolean = false,
     ) {
         val existing = results[entry.word]
         if (existing == null || existing.score < score) {
-            results[entry.word] = RankedWord(entry, score, distance, isExact, isCorrection)
+            results[entry.word] = RankedWord(entry, score, distance, isExact, isCorrection, isPrefixMatch)
         }
     }
 
@@ -209,11 +267,64 @@ class WordIndex(entries: List<WordEntry>, private val proximity: KeyProximity) {
         return prev[lb]
     }
 
+    /**
+     * Weighted edit distance between [a] and the best-matching *prefix* of [b]: same cost model
+     * as [weightedEditDistance], but the alignment may stop anywhere inside [b] (the unmatched
+     * tail is the completion, not an error). Only the first `a.length + maxCost + 1` characters
+     * of [b] are considered; early abandon applies unchanged.
+     */
+    internal fun weightedPrefixDistance(a: String, b: String, maxCost: Double): Double {
+        val la = a.length
+        val lb = minOf(b.length, la + maxCost.toInt() + 1)
+        var prevPrev: DoubleArray? = null
+        var prev = DoubleArray(lb + 1) { it.toDouble() }
+        var curr = DoubleArray(lb + 1)
+        for (i in 1..la) {
+            curr[0] = i.toDouble()
+            var rowMin = curr[0]
+            for (j in 1..lb) {
+                val chA = a[i - 1]
+                val chB = b[j - 1]
+                val substCost = when {
+                    chA == chB -> 0.0
+                    proximity.areAdjacent(chA, chB) -> ADJACENT_SUBSTITUTION_COST
+                    else -> 1.0
+                }
+                var cost = minOf(
+                    prev[j] + 1.0,           // deletion
+                    curr[j - 1] + 1.0,       // insertion
+                    prev[j - 1] + substCost, // substitution
+                )
+                val pp = prevPrev
+                if (pp != null && i > 1 && j > 1 && a[i - 1] == b[j - 2] && a[i - 2] == b[j - 1]) {
+                    cost = minOf(cost, pp[j - 2] + TRANSPOSITION_COST)
+                }
+                curr[j] = cost
+                if (cost < rowMin) rowMin = cost
+            }
+            if (rowMin > maxCost) return maxCost + 1.0 // early abandon
+            val recycled = prevPrev ?: DoubleArray(lb + 1)
+            prevPrev = prev
+            prev = curr
+            curr = recycled
+        }
+        var best = prev[0]
+        for (j in 1..lb) {
+            if (prev[j] < best) best = prev[j]
+        }
+        return best
+    }
+
     companion object {
         /** Exact matches always outrank completions/corrections (max regular score is 255). */
         const val EXACT_MATCH_BASE = 10_000.0
         const val ADJACENT_SUBSTITUTION_COST = 0.45
         const val TRANSPOSITION_COST = 0.6
-        const val MIN_FUZZY_QUERY_LENGTH = 3
+        const val MIN_FUZZY_QUERY_LENGTH = 2
+        /** Fuzzy-prefix completion needs one more character of signal than whole-word fuzzy. */
+        const val MIN_FUZZY_PREFIX_QUERY_LENGTH = 3
+        /** Higher slack = gentler score penalty per edit, letting corrections compete with
+         *  completions of a wrong prefix (was 0.75, which starved corrections structurally). */
+        const val CORRECTION_PENALTY_SLACK = 2.0
     }
 }

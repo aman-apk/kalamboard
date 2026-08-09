@@ -324,7 +324,7 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
         } else {
             content.textBeforeSelection
         }
-        nlpManager.notifyWordCommitted(word, PersonalLearning.extractLastWords(beforeWord, 2))
+        nlpManager.notifyWordCommitted(word, PersonalLearning.extractLastWords(beforeWord, 3))
     }
 
     /**

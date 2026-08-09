@@ -82,11 +82,6 @@ enum class ExtensionImportScreenType(
         id = "ext-theme",
         titleResId = R.string.ext__import__ext_theme,
         supportedFiles = listOf(FileRegistry.FlexExtension),
-    ),
-    EXT_LANGUAGEPACK(
-        id = "ext-languagepack",
-        titleResId = R.string.ext__import__ext_languagepack,
-        supportedFiles = listOf(FileRegistry.FlexExtension),
     );
 }
 
@@ -102,6 +97,11 @@ fun ExtensionImportScreen(type: ExtensionImportScreenType, initUuid: String?) = 
     fun getSkipReason(fileInfo: CacheManager.FileInfo): Int {
         return when {
             !FileRegistry.matchesFileFilter(fileInfo, type.supportedFiles) -> {
+                R.string.ext__import__file_skip_unsupported
+            }
+            // KalamBoard removed the (Chinese-only) language pack feature: without a list
+            // screen an imported pack would be installed invisibly and be undeletable.
+            fileInfo.ext is LanguagePackExtension -> {
                 R.string.ext__import__file_skip_unsupported
             }
             fileInfo.ext != null -> {
@@ -173,16 +173,13 @@ fun ExtensionImportScreen(type: ExtensionImportScreenType, initUuid: String?) = 
                         val ext = fileInfo.ext
                         when (type) {
                             ExtensionImportScreenType.EXT_ANY -> {
-                                ext?.let { extensionManager.import(it) }
+                                ext.takeIf { it !is LanguagePackExtension }?.let { extensionManager.import(it) }
                             }
                             ExtensionImportScreenType.EXT_KEYBOARD -> {
                                 ext.takeIf { it is KeyboardExtension }?.let { extensionManager.import(it) }
                             }
                             ExtensionImportScreenType.EXT_THEME -> {
                                 ext.takeIf { it is ThemeExtension }?.let { extensionManager.import(it) }
-                            }
-                            ExtensionImportScreenType.EXT_LANGUAGEPACK -> {
-                                ext.takeIf { it is LanguagePackExtension }?.let { extensionManager.import(it) }
                             }
                         }
                     }

@@ -227,7 +227,9 @@ class WordSuggestionProvider(context: Context) : SpellingProvider, SuggestionPro
 
         val staticRanked = dictionary?.index?.suggest(query, maxCandidateCount * 2, allowPossiblyOffensive)
             ?: emptyList()
-        val userRanked = userIndexFor(language).suggest(query, maxCandidateCount, allowPossiblyOffensive)
+        // Fetch user candidates as generously as static ones so fuzzy corrections of the user's
+        // own vocabulary are never truncated inside the mini index before the merge.
+        val userRanked = userIndexFor(language).suggest(query, maxCandidateCount * 2, allowPossiblyOffensive)
         val merged = PersonalLearning.mergeRanked(
             static = staticRanked,
             user = userRanked,
@@ -278,6 +280,9 @@ class WordSuggestionProvider(context: Context) : SpellingProvider, SuggestionPro
         val autoCommitTop = autoCorrectEnabled &&
             !hasExactMatch &&
             top.isCorrection &&
+            // A fuzzy-prefix match's distance covers only the typed prefix — auto-committing
+            // would append word tails the user never typed, so it stays tap-only.
+            !top.isPrefixMatch &&
             composing.length >= AUTO_CORRECT_MIN_COMPOSING_LENGTH &&
             top.distance <= AUTO_CORRECT_MAX_DISTANCE &&
             top.entry.freq >= AUTO_CORRECT_MIN_FREQ &&
@@ -299,7 +304,8 @@ class WordSuggestionProvider(context: Context) : SpellingProvider, SuggestionPro
     }
 
     /** Next-word prediction: static bigram/trigram tables merged with the user's personal
-     *  bigrams/trigrams; trigram-based predictions carry a freq advantage. */
+     *  bigrams/trigrams/quadgrams; the longer the matched context, the bigger the freq advantage —
+     *  this is what lets 5+ word formulas chain word after word. */
     private suspend fun suggestNextWords(
         language: String,
         dictionary: SqliteWordDictionary?,
@@ -307,39 +313,56 @@ class WordSuggestionProvider(context: Context) : SpellingProvider, SuggestionPro
         content: EditorContent,
         maxCandidateCount: Int,
     ): List<SuggestionCandidate> {
-        val previousWords = PersonalLearning.extractLastWords(content.textBeforeSelection, 2)
+        val previousWords = PersonalLearning.extractLastWords(content.textBeforeSelection, 3)
         val previousWord = previousWords.lastOrNull() ?: return emptyList()
         val prevNorm = normalizer.normalize(previousWord)
         val userIdx = userIndexFor(language)
 
-        /** Junk filter: only predict words that are known — statically or learned. */
+        /** Junk filter: only predict words that are known — statically or learned. A word the
+         *  user typed at least twice in this exact context counts as evidence on its own, so a
+         *  formula-final word like «وبركاته» keeps chaining even before it graduates into the
+         *  user dictionary. */
         fun isKnownWord(word: String): Boolean {
             val norm = normalizer.normalize(word)
             return dictionary?.index?.exact(norm)?.isNotEmpty() == true || userIdx.exact(norm).isNotEmpty()
         }
+        fun isTrustedPrediction(word: String, count: Int): Boolean {
+            return count >= PersonalLearning.PENDING_THRESHOLD || isKnownWord(word)
+        }
 
         val staticNext = dictionary?.nextWords(prevNorm, maxCandidateCount) ?: emptyList()
         val personalNext = learning.bigramsFor(language, prevNorm, maxCandidateCount)
-            .filter { (word, _) -> isKnownWord(word) }
+            .filter { (word, count) -> isTrustedPrediction(word, count) }
             .map { (word, count) -> word to PersonalLearning.userBigramFreq(count) }
 
         var staticNext2 = emptyList<Pair<String, Int>>()
         var personalNext2 = emptyList<Pair<String, Int>>()
-        if (previousWords.size == 2) {
-            val w12Norm = "${normalizer.normalize(previousWords[0])} $prevNorm"
+        if (previousWords.size >= 2) {
+            val w1 = previousWords[previousWords.size - 2]
+            val w12Norm = "${normalizer.normalize(w1)} $prevNorm"
             staticNext2 = PersonalLearning.boostTrigramPredictions(
                 dictionary?.nextWords2(w12Norm, maxCandidateCount) ?: emptyList(),
             )
             personalNext2 = PersonalLearning.boostTrigramPredictions(
                 learning.trigramsFor(language, w12Norm, maxCandidateCount)
-                    .filter { (word, _) -> isKnownWord(word) }
+                    .filter { (word, count) -> isTrustedPrediction(word, count) }
+                    .map { (word, count) -> word to PersonalLearning.userBigramFreq(count) },
+            )
+        }
+
+        var personalNext3 = emptyList<Pair<String, Int>>()
+        if (previousWords.size >= 3) {
+            val w123Norm = previousWords.takeLast(3).joinToString(" ") { normalizer.normalize(it) }
+            personalNext3 = PersonalLearning.boostQuadgramPredictions(
+                learning.quadgramsFor(language, w123Norm, maxCandidateCount)
+                    .filter { (word, count) -> isTrustedPrediction(word, count) }
                     .map { (word, count) -> word to PersonalLearning.userBigramFreq(count) },
             )
         }
 
         val merged = PersonalLearning.mergeNextWords(
             static = staticNext2 + staticNext,
-            personal = personalNext2 + personalNext,
+            personal = personalNext3 + personalNext2 + personalNext,
             blocked = learning.blockedWords(language),
             maxCount = maxCandidateCount,
         )
@@ -375,9 +398,14 @@ class WordSuggestionProvider(context: Context) : SpellingProvider, SuggestionPro
         ) {
             return SpellingResult.validWord()
         }
-        val corrections = dictionary.index.suggest(norm, maxSuggestionCount, allowPossiblyOffensive)
+        val staticCorrections = dictionary.index.suggest(norm, maxSuggestionCount, allowPossiblyOffensive)
+        val userCorrections = userIndexFor(language).suggest(norm, maxSuggestionCount, allowPossiblyOffensive)
+        val corrections = (userCorrections + staticCorrections)
             .filter { it.isCorrection || it.isExactMatch }
+            .sortedByDescending { it.score }
             .map { it.entry.word }
+            .distinct()
+            .take(maxSuggestionCount)
         return if (corrections.isEmpty()) {
             SpellingResult.validWord() // Unknown word, no plausible correction: don't mark as typo.
         } else {
@@ -432,7 +460,8 @@ class WordSuggestionProvider(context: Context) : SpellingProvider, SuggestionPro
             flogError { "unigram learning failed: $e" }
         }
 
-        // Personal bigram + trigram learning.
+        // Personal bigram + trigram + quadgram learning: a 5+ word formula typed in sequence
+        // deposits an n-gram at every position, so it can chain back word by word later.
         val prev = precedingWords.lastOrNull()?.trim().orEmpty()
         if (PersonalLearning.isLearnableWord(prev)) {
             learning.recordBigram(language, normalizer.normalize(prev), cleanWord)
@@ -443,6 +472,14 @@ class WordSuggestionProvider(context: Context) : SpellingProvider, SuggestionPro
                     "${normalizer.normalize(prev2)} ${normalizer.normalize(prev)}",
                     cleanWord,
                 )
+                val prev3 = precedingWords.getOrNull(precedingWords.size - 3)?.trim().orEmpty()
+                if (PersonalLearning.isLearnableWord(prev3)) {
+                    learning.recordQuadgram(
+                        language,
+                        "${normalizer.normalize(prev3)} ${normalizer.normalize(prev2)} ${normalizer.normalize(prev)}",
+                        cleanWord,
+                    )
+                }
             }
         }
     }

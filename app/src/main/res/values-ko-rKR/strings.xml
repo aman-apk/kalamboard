@@ -108,8 +108,6 @@
     <string name="settings__localization__display_language_names_in__label" comment="Label of Display language names in preference">언어 표시 방식</string>
     <string name="settings__localization__group_subtypes__label" comment="Label of subtypes group">하위 유형</string>
     <string name="settings__localization__subtype_add_title" comment="Title of subtype dialog when adding a new subtype">하위 유형 추가</string>
-    <string name="settings__localization__language_pack_title" comment="Title of the language pack manager screen for managing installed and custom language packs">설치한 언어 팩 관리</string>
-    <string name="settings__localization__language_pack_summary" comment="Summary of preference item for adding a new language pack">실험 기능: 특정 언어를 지원하기 위한 확장 기능 관리</string>
     <string name="settings__localization__subtype_edit_title" comment="Title of subtype dialog when editing an existing subtype">하위 유형 편집</string>
     <string name="settings__localization__subtype_locale" comment="Label for locale dropdown in subtype dialog">주 언어</string>
     <string name="settings__localization__subtype_popup_mapping" comment="Label for popup mapping dropdown in subtype screen">팝업 매핑</string>
@@ -298,10 +296,6 @@
     <string name="about__version__title" comment="Preference title">버전</string>
     <string name="about__version_copied__title" comment="Title of the toast for copying the version string">버전을 클립보드에 복사했습니다.</string>
     <string name="about__version_copied__error" comment="Title of the error toast for copying the version string">오류가 발생했습니다: {error_message}</string>
-    <string name="about__changelog__title" comment="Preference title">변경 내역</string>
-    <string name="about__changelog__summary" comment="Preference summary">새로운 기능</string>
-    <string name="about__repository__title" comment="Preference title">리포지터리 (GitHub)</string>
-    <string name="about__repository__summary" comment="Preference summary">소스 코드, 토론, 버그 신고 및 정보</string>
     <string name="about__privacy_policy__title" comment="Preference title">개인 정보 보호 정책</string>
     <string name="about__privacy_policy__summary" comment="Preference summary">이 프로젝트의 개인 정보 보호 정책</string>
     <string name="about__project_license__title" comment="Preference title">프로젝트 라이선스</string>
@@ -313,7 +307,6 @@
     <string name="setup__title" comment="Title of Setup">어서오세요!</string>
     <string name="setup__intro_message" comment="Short intro message welcoming new users">{app_name} 키보드를 사용해 주셔서 고마워요! {app_name} 키보드를 사용하기 위해서 필요한 단계를 설명해 드릴게요.</string>
     <string name="setup__footer__privacy_policy" comment="Privacy policy label for URL">개인 정보 보호 정책</string>
-    <string name="setup__footer__repository" comment="Repository label for URL">리포지터리</string>
     <string name="setup__enable_ime__title">{app_name} 켜기</string>
     <string name="setup__enable_ime__description">Android에서 다른 키보드를 사용하려면 먼저 설정에서 키보드를 켜야 해요. 시스템 설정의 <i>언어 및 키보드</i>에 들어가서, \"{app_name}\" 키보드를 켜 주세요.</string>
     <string name="setup__enable_ime__open_settings_btn">시스템 설정 열기</string>
@@ -393,7 +386,6 @@
     <string name="ext__home__title">애드온 및 확장 기능</string>
     <string name="ext__list__ext_theme">테마 확장 기능</string>
     <string name="ext__list__ext_keyboard">키보드 확장 기능</string>
-    <string name="ext__list__ext_languagepack">언어 팩 확장 기능</string>
     <string name="ext__meta__components_theme">포함된 테마</string>
     <string name="ext__meta__components_language_pack">포함된 언어 팩</string>
     <string name="ext__meta__description">설명</string>
@@ -422,7 +414,6 @@
     <string name="ext__import__ext_any" comment="Title of Importer screen for import of any supported KalamBoard extension">확장 기능 가져오기</string>
     <string name="ext__import__ext_keyboard" comment="Title of Importer screen for keyboard extension import">키보드 확장 기능 가져오기</string>
     <string name="ext__import__ext_theme" comment="Title of Importer screen for theme extension import">테마 확장 기능 가져오기</string>
-    <string name="ext__import__ext_languagepack" comment="Title of Importer screen for language pack extension import">언어 팩 확장 기능 가져오기</string>
     <string name="ext__import__file_skip" comment="Label when a file cannot be imported in the current context. The actual reason string is in a separate text view below this string.">파일을 가져올 수 없습니다. 사유:</string>
     <string name="ext__import__file_skip_unsupported" comment="Reason string when file is unsupported">지원하지 않거나 알 수 없는 파일 형식입니다.</string>
     <string name="ext__home__manage_extensions">설치한 확장 기능 관리</string>

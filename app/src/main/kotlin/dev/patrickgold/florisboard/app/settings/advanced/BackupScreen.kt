@@ -389,11 +389,6 @@ internal fun BackupFilesSelector(
             text = stringRes(R.string.backup_and_restore__back_up__files_ime_theme),
         )
         CheckboxListItem(
-            onClick = { filesSelector.imeLanguagePack = !filesSelector.imeLanguagePack },
-            checked = filesSelector.imeLanguagePack,
-            text = stringRes(R.string.backup_and_restore__back_up__files_ime_languagepack),
-        )
-        CheckboxListItem(
             onClick = { filesSelector.userDictionary = !filesSelector.userDictionary },
             checked = filesSelector.userDictionary,
             text = stringRes(R.string.backup_and_restore__back_up__files_user_dictionary),

@@ -86,7 +86,6 @@ import dev.patrickgold.florisboard.ime.theme.FlorisImeUi
 import dev.patrickgold.florisboard.ime.window.ImeWindowMode
 import dev.patrickgold.florisboard.keyboardManager
 import dev.patrickgold.florisboard.lib.NATIVE_NULLPTR
-import dev.patrickgold.florisboard.lib.compose.FlorisHyperlinkText
 import dev.patrickgold.florisboard.lib.util.InputMethodUtils
 import dev.patrickgold.jetpref.material.ui.JetPrefAlertDialog
 import dev.patrickgold.jetpref.material.ui.JetPrefDropdown
@@ -518,14 +517,6 @@ private fun EditCodeValueDialog(
                 Column(modifier = Modifier.padding(bottom = 16.dp)) {
                     Text(text = stringRes(R.string.settings__theme_editor__code_recording_help_text))
                     Text(text = stringRes(R.string.settings__theme_editor__code_help_text))
-                    FlorisHyperlinkText(
-                        text = "Characters (unicode-table.com)",
-                        url = stringRes(R.string.florisboard__character_key_codes_url),
-                    )
-                    FlorisHyperlinkText(
-                        text = "Internal (github.com)",
-                        url = stringRes(R.string.florisboard__internal_key_codes_url),
-                    )
                 }
             }
             TextKeyDataPreviewBox(

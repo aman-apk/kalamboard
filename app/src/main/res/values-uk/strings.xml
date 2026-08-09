@@ -115,8 +115,6 @@
     <string name="settings__localization__display_language_names_in__label" comment="Label of Display language names in preference">Показувати назви мов у</string>
     <string name="settings__localization__group_subtypes__label" comment="Label of subtypes group">Підтипи</string>
     <string name="settings__localization__subtype_add_title" comment="Title of subtype dialog when adding a new subtype">Додати підтип</string>
-    <string name="settings__localization__language_pack_title" comment="Title of the language pack manager screen for managing installed and custom language packs">Керування встановленими мовними пакетами</string>
-    <string name="settings__localization__language_pack_summary" comment="Summary of preference item for adding a new language pack">Експериментально: керуйте розширеннями, які додають підтримку певних мов (наразі введення китайської мови на основі форм)</string>
     <string name="settings__localization__subtype_edit_title" comment="Title of subtype dialog when editing an existing subtype">Редагувати підтип</string>
     <string name="settings__localization__subtype_locale" comment="Label for locale dropdown in subtype dialog">Основна мова</string>
     <string name="settings__localization__subtype_popup_mapping" comment="Label for popup mapping dropdown in subtype screen">Показ спливаючих вікон</string>
@@ -424,10 +422,6 @@
     <string name="about__version__title" comment="Preference title">Версія</string>
     <string name="about__version_copied__title" comment="Title of the toast for copying the version string">Версію скопійовано до буфера обміну</string>
     <string name="about__version_copied__error" comment="Title of the error toast for copying the version string">Щось пішло не так: {error_message}</string>
-    <string name="about__changelog__title" comment="Preference title">Журнал змін</string>
-    <string name="about__changelog__summary" comment="Preference summary">Що нового</string>
-    <string name="about__repository__title" comment="Preference title">Репозиторій (GitHub)</string>
-    <string name="about__repository__summary" comment="Preference summary">Вихідний код, обговорення, проблеми та інформація</string>
     <string name="about__privacy_policy__title" comment="Preference title">Політика конфіденційності</string>
     <string name="about__privacy_policy__summary" comment="Preference summary">Політика приватності для цього проєкту</string>
     <string name="about__project_license__title" comment="Preference title">Ліцензія проєкту</string>
@@ -440,7 +434,6 @@
     <string name="setup__title" comment="Title of Setup">Ласкаво просимо!</string>
     <string name="setup__intro_message" comment="Short intro message welcoming new users">Дякуємо за використання {app_name}! Це коротке налаштування допоможе вам виконати необхідні кроки для використання {app_name} на вашому пристрої.</string>
     <string name="setup__footer__privacy_policy" comment="Privacy policy label for URL">Політика конфіденційності</string>
-    <string name="setup__footer__repository" comment="Repository label for URL">Сховище</string>
     <string name="setup__enable_ime__title">Ввімкнути {app_name}</string>
     <string name="setup__enable_ime__description"><i> </i> {app_name}.</string>
     <string name="setup__enable_ime__open_settings_btn">Відкрити системні налаштування</string>
@@ -492,11 +485,9 @@
     <!-- Crash Dialog strings -->
     <string name="crash_dialog__title" comment="Title of crash dialog">Звіт про помилку KalamBoard</string>
     <string name="crash_dialog__description" comment="Description of crash dialog">Вибачте за незручності, але стався збій у KalamBoard через несподівану помилку.</string>
-    <string name="crash_dialog__report_instructions" comment="Issue tracker report instructions for the crash dialog. The %s placeholder is the name of the crash report template and always in English/LTR.">Якщо ви хочете повідомити про цю помилку, спочатку перевірте відстеження проблем на GitHub, якщо про ваш збій ще не повідомлялося.\nЯкщо ні, скопіюйте згенерований журнал збоїв і створіть нову проблему. Використовуйте шаблон «%s» і заповніть опис, кроки для відтворення, а в кінці вставте згенерований лог збоїв. Це допоможе зробити KalamBoard кращим і стабільнішим для всіх. Дякуємо!</string>
     <string name="crash_dialog__copy_to_clipboard" comment="Label of Copy to clipboard button in crash dialog">Зкопіювати в системний буфер обміну</string>
     <string name="crash_dialog__copy_to_clipboard_success" comment="Label of Copy to clipboard success message in crash dialog">Зкопійовано в системний буфер обміну</string>
     <string name="crash_dialog__copy_to_clipboard_failure" comment="Label of Copy to clipboard failure message in crash dialog">Не вдається скопіювати до системного буфера обміну: Не знайдено екземпляр диспетчера буфера обміну</string>
-    <string name="crash_dialog__open_issue_tracker" comment="Label of Open issue tracker button in crash dialog">Відкрити відстеження проблем (github.com)</string>
     <string name="crash_dialog__close" comment="Label of Close button in crash dialog">Закрити</string>
     <string name="crash_notification_channel__title" comment="Title of crash notification channel">Звіти про помилки KalamBoard</string>
     <string name="crash_once_notification__title" comment="Title of the notification for a single crash">KalamBoard перестав працювати…</string>
@@ -586,7 +577,6 @@
     <string name="ext__home__title">Доповнення та розширення</string>
     <string name="ext__list__ext_theme">Розширення теми</string>
     <string name="ext__list__ext_keyboard">Розширення клавіатури</string>
-    <string name="ext__list__ext_languagepack">Розширення мовних пакетів</string>
     <string name="ext__meta__authors">Автори</string>
     <string name="ext__meta__components">Вбудовані компоненти</string>
     <string name="ext__meta__components_theme">Вбудовані теми</string>
@@ -630,7 +620,6 @@
     <string name="ext__import__ext_any" comment="Title of Importer screen for import of any supported KalamBoard extension">Імпортування розширення</string>
     <string name="ext__import__ext_keyboard" comment="Title of Importer screen for keyboard extension import">Імпортування розширення клавіатури</string>
     <string name="ext__import__ext_theme" comment="Title of Importer screen for theme extension import">Імпортування розширення теми</string>
-    <string name="ext__import__ext_languagepack" comment="Title of Importer screen for language pack extension import">Імпортування розширення мовного пакету</string>
     <string name="ext__import__file_skip" comment="Label when a file cannot be imported in the current context. The actual reason string is in a separate text view below this string.">Файл не можна імпортувати. Причина:</string>
     <string name="ext__import__file_skip_unsupported" comment="Reason string when file is unsupported">Непідтримуваний або нерозпізнаний тип файлу.</string>
     <string name="ext__import__file_skip_ext_core" comment="Reason string when ext has core extension ID">Неможливо замінити або оновити стандартні пакети розширень, що постачаються з основними ресурсами застосунку. Подумайте про оновлення самого застосунку, якщо ви маєте намір використовувати новішу версію базового пакета розширень.</string>

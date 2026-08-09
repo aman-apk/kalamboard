@@ -195,10 +195,6 @@
     <string name="about__version__title" comment="Preference title">Έκδοση</string>
     <string name="about__version_copied__title" comment="Title of the toast for copying the version string">Η έκδοση αντιγράφηκε στο πρόχειρο</string>
     <string name="about__version_copied__error" comment="Title of the error toast for copying the version string">Κάτι πήγε στραβά: {error_message}</string>
-    <string name="about__changelog__title" comment="Preference title">Κατάλογος αλλαγών</string>
-    <string name="about__changelog__summary" comment="Preference summary">Τι νέο υπάρχει</string>
-    <string name="about__repository__title" comment="Preference title">Αποθετήριο (GitHub)</string>
-    <string name="about__repository__summary" comment="Preference summary">Πηγαίος κώδικας, συζητήσεις, θέματα και πληροφορίες</string>
     <string name="about__privacy_policy__title" comment="Preference title">Πολιτική απορρήτου</string>
     <string name="about__privacy_policy__summary" comment="Preference summary">Η πολιτική απορρήτου αυτού του πρότζεκτ</string>
     <string name="about__project_license__title" comment="Preference title">Άδεια πρότζεκτ</string>
@@ -210,7 +206,6 @@
     <string name="setup__title" comment="Title of Setup">Καλώς ήλθατε!</string>
     <string name="setup__intro_message" comment="Short intro message welcoming new users">Ευχαριστώ που χρησιμοποιείτε το {app_name}! Αυτή η σύντομη αρχική ρύθμιση θα σας καθοδηγήσει στα απαιτούμενα βήματα για να χρησιμοποιήσετε το {app_name} στη συσκευή σας.</string>
     <string name="setup__footer__privacy_policy" comment="Privacy policy label for URL">Πολιτική απορρήτου</string>
-    <string name="setup__footer__repository" comment="Repository label for URL">Αποθετήριο</string>
     <string name="setup__enable_ime__title">Ενεργοποίηση {app_name}</string>
     <string name="setup__enable_ime__description">Το Android απαιτεί κάθε ειδικό πληκτρολόγιο να ενεργοποιείται χειροκίνητα πριν τη χρήση. Ανοίξτε τις Ρυθμίσεις Συστήματος <i>Γλώσσα &amp; Εισαγωγή</i>, κι εκεί ενεργοποιήστε το \"{app_name}\".</string>
     <string name="setup__enable_ime__open_settings_btn">Άνοιγμα Ρυθμίσεων Συστήματος</string>
@@ -230,11 +225,9 @@
     <!-- Crash Dialog strings -->
     <string name="crash_dialog__title" comment="Title of crash dialog">Αναφορά σφάλματος KalamBoard</string>
     <string name="crash_dialog__description" comment="Description of crash dialog">Συγγνώμη για την ταλαιπωρία, αλλά το KalamBoard έχει τερματιστεί απροσδόκητα εξαιτίας ενός απρόσμενου σφάλματος.</string>
-    <string name="crash_dialog__report_instructions" comment="Issue tracker report instructions for the crash dialog. The %s placeholder is the name of the crash report template and always in English/LTR.">Εάν επιθυμείτε να αναφέρετε αυτό το σφάλμα, πρώτα ελέγξτε αν το πρόβλημά σας δεν έχει ακόμα αναφερθεί στην παρακολούθηση προβλημάτων στο GitHub.\nΕάν δεν έχει αναφερθεί, αντιγράψτε την καταγραφή του απροσδόκητου τερματισμού που έχει προκύψει και ανοίξτε ένα νέο θέμα. Χρησιμοποιήστε το πρότυπο \"%s\" και συμπληρώστε την περιγραφή, τα βήματα για αναπαραγωγή, και αντιγράψτε την καταγραφή του τερματισμού στο τέλος. Αυτό βοηθάει να γίνει το KalamBoard καλύτερο και πιο σταθερό για όλους. Ευχαριστώ!</string>
     <string name="crash_dialog__copy_to_clipboard" comment="Label of Copy to clipboard button in crash dialog">Αντιγραφή στο πρόχειρο συστήματος</string>
     <string name="crash_dialog__copy_to_clipboard_success" comment="Label of Copy to clipboard success message in crash dialog">Αντιγράφηκε στο πρόχειρο συστήματος</string>
     <string name="crash_dialog__copy_to_clipboard_failure" comment="Label of Copy to clipboard failure message in crash dialog">Αδυναμία αντιγραφής στο πρόχειρο συστήματος: Η πραγμάτωση διαχειριστή προχείρου δε βρέθηκε</string>
-    <string name="crash_dialog__open_issue_tracker" comment="Label of Open issue tracker button in crash dialog">Άνοιγμα παρακολούθησης θεμάτων (github.com)</string>
     <string name="crash_dialog__close" comment="Label of Close button in crash dialog">Κλείσιμο</string>
     <string name="crash_notification_channel__title" comment="Title of crash notification channel">Αναφορές σφάλματος KalamBoard</string>
     <string name="crash_once_notification__title" comment="Title of the notification for a single crash">Το KalamBoard έχει σταματήσει να λειτουργεί…</string>

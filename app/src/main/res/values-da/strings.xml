@@ -115,8 +115,6 @@
     <string name="settings__localization__display_keyboard_labels_in_subtype_language" comment="Label of Display keyboard labels in subtype language preference">Vis tastaturetiketter i undertypesprog</string>
     <string name="settings__localization__group_subtypes__label" comment="Label of subtypes group">Undertyper</string>
     <string name="settings__localization__subtype_add_title" comment="Title of subtype dialog when adding a new subtype">Tilføj undertype</string>
-    <string name="settings__localization__language_pack_title" comment="Title of the language pack manager screen for managing installed and custom language packs">Håndtér installerede sprogpakker</string>
-    <string name="settings__localization__language_pack_summary" comment="Summary of preference item for adding a new language pack">Eksperimentelt: Håndtér udvidelse, som tilføjer understøttelse af bestemte sprog (formbaseret kinesisk input p.t.)</string>
     <string name="settings__localization__subtype_edit_title" comment="Title of subtype dialog when editing an existing subtype">Redigér undertype</string>
     <string name="settings__localization__subtype_locale" comment="Label for locale dropdown in subtype dialog">Primært sprog</string>
     <string name="settings__localization__subtype_popup_mapping" comment="Label for popup mapping dropdown in subtype screen">Pop op-kortlægning</string>
@@ -400,17 +398,12 @@
     <string name="about__version__title" comment="Preference title">Version</string>
     <string name="about__version_copied__title" comment="Title of the toast for copying the version string">Version kopieret til udklipsholderen</string>
     <string name="about__version_copied__error" comment="Title of the error toast for copying the version string">Noget gik galt: {error_message}</string>
-    <string name="about__changelog__title" comment="Preference title">Ændringslog</string>
-    <string name="about__changelog__summary" comment="Preference summary">Nyheder</string>
-    <string name="about__repository__title" comment="Preference title">Projektarkiv (GitHub)</string>
-    <string name="about__repository__summary" comment="Preference summary">Kildekode, diskussioner, problemer og information</string>
     <string name="about__privacy_policy__title" comment="Preference title">Privatlivspolitik</string>
     <string name="about__privacy_policy__summary" comment="Preference summary">Privatlivspolitikken for dette projekt</string>
     <string name="about__project_license__title" comment="Preference title">Projektlicens</string>
     <!-- Setup UI strings -->
     <string name="setup__title" comment="Title of Setup">Velkommen!</string>
     <string name="setup__footer__privacy_policy" comment="Privacy policy label for URL">Privatlivspolitik</string>
-    <string name="setup__footer__repository" comment="Repository label for URL">Projektarkiv</string>
     <string name="setup__enable_ime__title">Aktivér {app_name}</string>
     <string name="setup__select_ime__title">Vælg {app_name}</string>
     <string name="setup__select_ime__switch_keyboard_btn">Skift tastatur</string>

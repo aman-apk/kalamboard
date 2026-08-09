@@ -294,7 +294,10 @@ class LayoutManager(context: Context) {
             }.getOrNull()?.mapping,
             extendedPopupMappingDefault = extendedPopupsDefault.await().onFailure {
                 flogWarning(LogTopic.LAYOUT_MANAGER) { it.toString() }
-            }.getOrNull()?.mapping
+            }.getOrNull()?.mapping,
+            // The user-enabled digits row on the characters layout renders half as tall.
+            hasHalfHeightNumberRow = keyboardMode == KeyboardMode.CHARACTERS &&
+                extensionLayout?.type == LayoutType.NUMERIC_ROW,
         )
     }
 

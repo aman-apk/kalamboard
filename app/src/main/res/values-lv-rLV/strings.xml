@@ -117,8 +117,6 @@
     <string name="settings__localization__display_keyboard_labels_in_subtype_language" comment="Label of Display keyboard labels in subtype language preference">Attēlot tastatūras iezīmes apakšveida valodā</string>
     <string name="settings__localization__group_subtypes__label" comment="Label of subtypes group">Apakšveidi</string>
     <string name="settings__localization__subtype_add_title" comment="Title of subtype dialog when adding a new subtype">Pievienot apakšveidu</string>
-    <string name="settings__localization__language_pack_title" comment="Title of the language pack manager screen for managing installed and custom language packs">Pārvaldīt uzstādītās valodas</string>
-    <string name="settings__localization__language_pack_summary" comment="Summary of preference item for adding a new language pack">Izmēģinājuma: pārvaldit paplašinājumus, kas nodrošina noteiktu valodu atbalstu (pagaidām ķīniešu valodas uz apveidu balstītā ievade)</string>
     <string name="settings__localization__subtype_edit_title" comment="Title of subtype dialog when editing an existing subtype">Labot apakšveidu</string>
     <string name="settings__localization__subtype_locale" comment="Label for locale dropdown in subtype dialog">Galvenā valoda</string>
     <string name="settings__localization__subtype_popup_mapping" comment="Label for popup mapping dropdown in subtype screen">Uznirstošo lodziņu kartēšana</string>
@@ -492,10 +490,6 @@
     <string name="about__version__title" comment="Preference title">Laidiens</string>
     <string name="about__version_copied__title" comment="Title of the toast for copying the version string">Laidiena numurs ir ievietots starpliktuvē</string>
     <string name="about__version_copied__error" comment="Title of the error toast for copying the version string">Kaut kas nogāja greizi: {error_message}</string>
-    <string name="about__changelog__title" comment="Preference title">Izmaiņu žurnāls</string>
-    <string name="about__changelog__summary" comment="Preference summary">Kas jauns?</string>
-    <string name="about__repository__title" comment="Preference title">Glabātava (GitHub)</string>
-    <string name="about__repository__summary" comment="Preference summary">Pirmkods, apspriedes, nepilnības un uzziņa</string>
     <string name="about__privacy_policy__title" comment="Preference title">Privātuma nosacījumi</string>
     <string name="about__privacy_policy__summary" comment="Preference summary">Šī projekta privātuma nosacījumi</string>
     <string name="about__project_license__title" comment="Preference title">Projekta licence</string>
@@ -508,7 +502,6 @@
     <string name="setup__title" comment="Title of Setup">Sveiciens!</string>
     <string name="setup__intro_message" comment="Short intro message welcoming new users">Paldies par {app_name} izmantošanu! Ātrā uzstādīšana virza caur nepieciešamajiem soļiem, lai ierīcē izmantotu {app_name}.</string>
     <string name="setup__footer__privacy_policy" comment="Privacy policy label for URL">Privātuma nosacījumi</string>
-    <string name="setup__footer__repository" comment="Repository label for URL">Glabātava</string>
     <string name="setup__enable_ime__title">Iespējot {app_name}</string>
     <string name="setup__enable_ime__description">Android ir nepieciešams pirms katras pielāgotās tastatūras izmantošanas to iespējot. Lai to izdarītu, jāatver sistēmas iestatījumi <i>Valoda un ievade</i> un tur jāiespējo \"{app_name}\".</string>
     <string name="setup__enable_ime__open_settings_btn">Atvērt sistēmas iestatījumus</string>
@@ -566,11 +559,9 @@
     <!-- Crash Dialog strings -->
     <string name="crash_dialog__title" comment="Title of crash dialog">KalamBoard kļūdu ziņojums</string>
     <string name="crash_dialog__description" comment="Description of crash dialog">Atvainojamies par neērtībām, bet FlorsBoard avarēja neparedzētas kļūdas dēļ.</string>
-    <string name="crash_dialog__report_instructions" comment="Issue tracker report instructions for the crash dialog. The %s placeholder is the name of the crash report template and always in English/LTR.">Ja ir vēlme ziņot par šo kļūdu, vispirms jāpārliecinās, vai GitHub pieteikumu ceļrādī par šādu avāriju jau ir ziņots.\nJa nē, starpliktuvē jāievieto izveidotais avārijas žurnāls un jāatver jauns pieteikums. Jāizmanto \"%s\" veidne un jānorāda apraksts, darbības atkārtošanai un beigās jāielīmē avārijas žurnāls. Tas palīdz padarīt KalamBoard labāku un noturīgāku ikvienam. Paldies!</string>
     <string name="crash_dialog__copy_to_clipboard" comment="Label of Copy to clipboard button in crash dialog">Ievietot sistēmas starpliktuvē</string>
     <string name="crash_dialog__copy_to_clipboard_success" comment="Label of Copy to clipboard success message in crash dialog">Ievietots sistēmas starpliktuvē</string>
     <string name="crash_dialog__copy_to_clipboard_failure" comment="Label of Copy to clipboard failure message in crash dialog">Nav iespējams ievietot sistēmas starpliktuvē: nav atrasts starpliktuves pārvaldnieks</string>
-    <string name="crash_dialog__open_issue_tracker" comment="Label of Open issue tracker button in crash dialog">Atvērt pieteikumu ceļrādi (GitHub.com)</string>
     <string name="crash_dialog__close" comment="Label of Close button in crash dialog">Aizvērt</string>
     <string name="crash_notification_channel__title" comment="Title of crash notification channel">KalamBoard kļūdu ziņojumi</string>
     <string name="crash_once_notification__title" comment="Title of the notification for a single crash">KalamBoard pārstāja darboties…</string>
@@ -670,7 +661,6 @@
     <string name="ext__home__title">Papildinājumi un paplašinājumi</string>
     <string name="ext__list__ext_theme">Izskata paplašinājumi</string>
     <string name="ext__list__ext_keyboard">Tastatūras paplašinājumi</string>
-    <string name="ext__list__ext_languagepack">Valodu paku paplašinājumi</string>
     <string name="ext__meta__authors">Autori</string>
     <string name="ext__meta__components">Iekļautās sastāvdaļas</string>
     <string name="ext__meta__components_theme">Iekļautie izskati</string>
@@ -716,7 +706,6 @@
     <string name="ext__import__ext_any" comment="Title of Importer screen for import of any supported KalamBoard extension">Iekļaut paplašinājumu</string>
     <string name="ext__import__ext_keyboard" comment="Title of Importer screen for keyboard extension import">Ievietot tastatūras paplašinājumu</string>
     <string name="ext__import__ext_theme" comment="Title of Importer screen for theme extension import">Ievietot izskata paplašinājumu</string>
-    <string name="ext__import__ext_languagepack" comment="Title of Importer screen for language pack extension import">Ievietot valodu paplašinājumu</string>
     <string name="ext__import__file_skip" comment="Label when a file cannot be imported in the current context. The actual reason string is in a separate text view below this string.">Datni nevar ievietot. Iemesls:</string>
     <string name="ext__import__file_skip_unsupported" comment="Reason string when file is unsupported">Neatbalstīts vai neatpazīts datnes veids.</string>
     <string name="ext__import__file_skip_ext_core" comment="Reason string when ext has core extension ID">Nav iespējams aizvietot vai atjaunināt noklusējuma paplašinājumu pakotnes ar lietotnes kodola līdzekļiem. Ieteicams apsvērt lietotnes atjaunināšanu, ja ir iecerēts izmantot jaunākas kodola paplašinājumu pakotnes laidienu.</string>

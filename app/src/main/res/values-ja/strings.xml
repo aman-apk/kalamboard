@@ -117,8 +117,6 @@
     <string name="settings__localization__display_keyboard_labels_in_subtype_language" comment="Label of Display keyboard labels in subtype language preference">サブタイプの言語でキーボードラベルを表示</string>
     <string name="settings__localization__group_subtypes__label" comment="Label of subtypes group">サブタイプ</string>
     <string name="settings__localization__subtype_add_title" comment="Title of subtype dialog when adding a new subtype">サブタイプを追加</string>
-    <string name="settings__localization__language_pack_title" comment="Title of the language pack manager screen for managing installed and custom language packs">インストール済み言語パックの管理</string>
-    <string name="settings__localization__language_pack_summary" comment="Summary of preference item for adding a new language pack">実験的：特定の言語（現在は形状ベースの中国語入力）のサポートを追加する拡張機能を管理します</string>
     <string name="settings__localization__subtype_edit_title" comment="Title of subtype dialog when editing an existing subtype">サブタイプを編集</string>
     <string name="settings__localization__subtype_locale" comment="Label for locale dropdown in subtype dialog">ロケール</string>
     <string name="settings__localization__subtype_popup_mapping" comment="Label for popup mapping dropdown in subtype screen">ポップアップマッピング</string>
@@ -510,10 +508,6 @@
     <string name="about__version__title" comment="Preference title">バージョン</string>
     <string name="about__version_copied__title" comment="Title of the toast for copying the version string">バージョンをクリップボードにコピーしました</string>
     <string name="about__version_copied__error" comment="Title of the error toast for copying the version string">問題が発生しました: {error_message}</string>
-    <string name="about__changelog__title" comment="Preference title">変更履歴</string>
-    <string name="about__changelog__summary" comment="Preference summary">新機能</string>
-    <string name="about__repository__title" comment="Preference title">リポジトリ (GitHub)</string>
-    <string name="about__repository__summary" comment="Preference summary">ソースコード、ディスカッション、課題、情報</string>
     <string name="about__privacy_policy__title" comment="Preference title">プライバシーポリシー</string>
     <string name="about__privacy_policy__summary" comment="Preference summary">このプロジェクトのプライバシーポリシー</string>
     <string name="about__project_license__title" comment="Preference title">プロジェクトライセンス</string>
@@ -526,7 +520,6 @@
     <string name="setup__title" comment="Title of Setup">ようこそ！</string>
     <string name="setup__intro_message" comment="Short intro message welcoming new users">{app_name}をご利用いただきありがとうございます！このクイックセットアップでは、お使いのデバイスで{app_name}を使用するために必要な手順を案内します。</string>
     <string name="setup__footer__privacy_policy" comment="Privacy policy label for URL">プライバシーポリシー</string>
-    <string name="setup__footer__repository" comment="Repository label for URL">リポジトリ</string>
     <string name="setup__enable_ime__title">{app_name}を有効にする</string>
     <string name="setup__enable_ime__description">Androidでは、使用する前にすべてのカスタムキーボードを個別に有効にする必要があります。システムの<i>「言語と入力」</i>設定を開き、「{app_name}」を有効にしてください。</string>
     <string name="setup__enable_ime__open_settings_btn">システム設定を開く</string>
@@ -575,11 +568,9 @@
     <!-- Crash Dialog strings -->
     <string name="crash_dialog__title" comment="Title of crash dialog">KalamBoardエラーレポート</string>
     <string name="crash_dialog__description" comment="Description of crash dialog">ご不便をおかけして申し訳ありませんが、予期しないエラーによりKalamBoardがクラッシュしました。</string>
-    <string name="crash_dialog__report_instructions" comment="Issue tracker report instructions for the crash dialog. The %s placeholder is the name of the crash report template and always in English/LTR.">このエラーを報告する場合、まずGitHubの課題トラッカーでクラッシュがまだ報告されていないか確認してください。\n報告されていない場合は、生成されたクラッシュログをコピーして新しい課題を開き、「%s」テンプレートを使用して説明と再現手順を入力し、最後に生成されたクラッシュログを貼り付けてください。これにより、KalamBoardをより良く、より安定させるのに役立ちます。ご協力ありがとうございます！</string>
     <string name="crash_dialog__copy_to_clipboard" comment="Label of Copy to clipboard button in crash dialog">システムクリップボードにコピー</string>
     <string name="crash_dialog__copy_to_clipboard_success" comment="Label of Copy to clipboard success message in crash dialog">システムクリップボードにコピーしました</string>
     <string name="crash_dialog__copy_to_clipboard_failure" comment="Label of Copy to clipboard failure message in crash dialog">システムクリップボードにコピーできません：クリップボードマネージャーのインスタンスが見つかりません</string>
-    <string name="crash_dialog__open_issue_tracker" comment="Label of Open issue tracker button in crash dialog">課題トラッカーを開く (github.com)</string>
     <string name="crash_dialog__close" comment="Label of Close button in crash dialog">閉じる</string>
     <string name="crash_notification_channel__title" comment="Title of crash notification channel">KalamBoardエラーレポート</string>
     <string name="crash_once_notification__title" comment="Title of the notification for a single crash">KalamBoardの動作が停止しました…</string>
@@ -672,7 +663,6 @@
     <string name="ext__home__title">アドオンと拡張機能</string>
     <string name="ext__list__ext_theme">テーマ拡張機能</string>
     <string name="ext__list__ext_keyboard">キーボード拡張機能</string>
-    <string name="ext__list__ext_languagepack">言語パック拡張機能</string>
     <string name="ext__meta__authors">作成者</string>
     <string name="ext__meta__components">バンドルコンポーネント</string>
     <string name="ext__meta__components_theme">バンドルテーマ</string>
@@ -718,7 +708,6 @@
     <string name="ext__import__ext_any" comment="Title of Importer screen for import of any supported KalamBoard extension">拡張機能を取り込む</string>
     <string name="ext__import__ext_keyboard" comment="Title of Importer screen for keyboard extension import">キーボード拡張機能を取り込む</string>
     <string name="ext__import__ext_theme" comment="Title of Importer screen for theme extension import">テーマ拡張機能を取り込む</string>
-    <string name="ext__import__ext_languagepack" comment="Title of Importer screen for language pack extension import">言語パック拡張機能を取り込む</string>
     <string name="ext__import__file_skip" comment="Label when a file cannot be imported in the current context. The actual reason string is in a separate text view below this string.">ファイルを取り込めません。理由:</string>
     <string name="ext__import__file_skip_unsupported" comment="Reason string when file is unsupported">サポートされていない、または認識されないファイルタイプです。</string>
     <string name="ext__import__file_skip_ext_core" comment="Reason string when ext has core extension ID">アプリのコアアセットで提供されるデフォルトの拡張機能パッケージを置換または更新できません。新しいバージョンのコア拡張機能パッケージを使用する場合は、アプリ自体を更新することを検討してください。</string>

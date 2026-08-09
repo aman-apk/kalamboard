@@ -120,8 +120,6 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="settings__localization__display_keyboard_labels_in_subtype_language" comment="Label of Display keyboard labels in subtype language preference">Tampilkan label keyboard dalam bahasa subtipe</string>
     <string name="settings__localization__group_subtypes__label" comment="Label of subtypes group">Subtipe</string>
     <string name="settings__localization__subtype_add_title" comment="Title of subtype dialog when adding a new subtype">Tambah subtipe</string>
-    <string name="settings__localization__language_pack_title" comment="Title of the language pack manager screen for managing installed and custom language packs">Atur paket bahasa yang terinstal</string>
-    <string name="settings__localization__language_pack_summary" comment="Summary of preference item for adding a new language pack">Eksperimental: kelola ekstensi yang menambahkan dukungan untuk bahasa tertentu (input Tionghoa berbasis bentuk untuk saat ini)</string>
     <string name="settings__localization__subtype_edit_title" comment="Title of subtype dialog when editing an existing subtype">Edit subtipe</string>
     <string name="settings__localization__subtype_locale" comment="Label for locale dropdown in subtype dialog">Bahasa utama</string>
     <string name="settings__localization__subtype_popup_mapping" comment="Label for popup mapping dropdown in subtype screen">Pemetaan munculan</string>
@@ -525,10 +523,6 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="about__version__title" comment="Preference title">Versi</string>
     <string name="about__version_copied__title" comment="Title of the toast for copying the version string">Versi disalin ke papan klip</string>
     <string name="about__version_copied__error" comment="Title of the error toast for copying the version string">Terjadi kesalahan: {error_message}</string>
-    <string name="about__changelog__title" comment="Preference title">Changelog</string>
-    <string name="about__changelog__summary" comment="Preference summary">Apa yang baru</string>
-    <string name="about__repository__title" comment="Preference title">Repositori (GitHub)</string>
-    <string name="about__repository__summary" comment="Preference summary">Sumber kode, diskusi, masalah dan info</string>
     <string name="about__privacy_policy__title" comment="Preference title">Kebijakan privasi</string>
     <string name="about__privacy_policy__summary" comment="Preference summary">Kebijakan privasi untuk proyek ini</string>
     <string name="about__project_license__title" comment="Preference title">Lisensi proyek</string>
@@ -541,7 +535,6 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="setup__title" comment="Title of Setup">Selamat datang!</string>
     <string name="setup__intro_message" comment="Short intro message welcoming new users">Terima kasih telah menggunakan {app_name}! Penyiapan cepat ini memandu Anda melalui langkah-langkah yang diperlukan untuk menggunakan {app_name} di perangkat Anda.</string>
     <string name="setup__footer__privacy_policy" comment="Privacy policy label for URL">Kebijakan privasi</string>
-    <string name="setup__footer__repository" comment="Repository label for URL">Repositori</string>
     <string name="setup__enable_ime__title">Aktifkan {app_name}</string>
     <string name="setup__enable_ime__description">Android mengharuskan setiap papan ketik kustom diaktifkan secara terpisah sebelum Anda dapat menggunakannya. Buka setelan <i>Bahasa &amp; masukan</i> sistem, dan di sana aktifkan \"{app_name}\".</string>
     <string name="setup__enable_ime__open_settings_btn">Buka Setelan Sistem</string>
@@ -596,11 +589,9 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <!-- Crash Dialog strings -->
     <string name="crash_dialog__title" comment="Title of crash dialog">Laporan kesalahan KalamBoard</string>
     <string name="crash_dialog__description" comment="Description of crash dialog">Maaf atas ketidaknyamanan ini, tetapi KalamBoard mogok karena kesalahan yang tidak terduga.</string>
-    <string name="crash_dialog__report_instructions" comment="Issue tracker report instructions for the crash dialog. The %s placeholder is the name of the crash report template and always in English/LTR.">Jika Anda ingin melaporkan kesalahan ini, periksa dulu pelacak masalah di GitHub jika crash Anda belum dilaporkan.\nJika belum, salin log crash yang dihasilkan dan buka masalah baru. Gunakan template \"%s\" dan isi deskripsi, langkah-langkah untuk mereproduksi, dan tempel log crash yang dihasilkan di bagian akhir. Ini membantu membuat KalamBoard lebih baik dan lebih stabil untuk semuanya. Terima kasih!</string>
     <string name="crash_dialog__copy_to_clipboard" comment="Label of Copy to clipboard button in crash dialog">Salin ke papan klip sistem</string>
     <string name="crash_dialog__copy_to_clipboard_success" comment="Label of Copy to clipboard success message in crash dialog">Disalin ke papan klip sistem</string>
     <string name="crash_dialog__copy_to_clipboard_failure" comment="Label of Copy to clipboard failure message in crash dialog">Tidak bisa salin ke papan klip sistem: Instansi pengelola papan klip tidak ditemukan</string>
-    <string name="crash_dialog__open_issue_tracker" comment="Label of Open issue tracker button in crash dialog">Buka pelacak masalah (github.com)</string>
     <string name="crash_dialog__close" comment="Label of Close button in crash dialog">Tutup</string>
     <string name="crash_notification_channel__title" comment="Title of crash notification channel">Laporan kesalahan KalamBoard</string>
     <string name="crash_once_notification__title" comment="Title of the notification for a single crash">KalamBoard berhenti bekerja…</string>
@@ -694,7 +685,6 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="ext__home__title">Addon &amp; Ekstensi</string>
     <string name="ext__list__ext_theme">Ekstensi tema</string>
     <string name="ext__list__ext_keyboard">Ekstensi keyboard</string>
-    <string name="ext__list__ext_languagepack">Ekstensi paket bahasa</string>
     <string name="ext__meta__authors">Pembuat</string>
     <string name="ext__meta__components">Komponen yang dibundel</string>
     <string name="ext__meta__components_theme">Tema terbundel</string>
@@ -740,7 +730,6 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="ext__import__ext_any" comment="Title of Importer screen for import of any supported KalamBoard extension">Impor ekstensi</string>
     <string name="ext__import__ext_keyboard" comment="Title of Importer screen for keyboard extension import">Impor ekstensi papan ketik</string>
     <string name="ext__import__ext_theme" comment="Title of Importer screen for theme extension import">Impor ekstensi tema</string>
-    <string name="ext__import__ext_languagepack" comment="Title of Importer screen for language pack extension import">Impor ekstensi paket bahasa</string>
     <string name="ext__import__file_skip" comment="Label when a file cannot be imported in the current context. The actual reason string is in a separate text view below this string.">File tidak dapat diimpor. Alasan:</string>
     <string name="ext__import__file_skip_unsupported" comment="Reason string when file is unsupported">Tipe file tidak didukung atau tidak diketahui.</string>
     <string name="ext__import__file_skip_ext_core" comment="Reason string when ext has core extension ID">Tidak dapat menggantikan atau memperbarui paket-paket ekstensi bawaan yang disediakan dengan aset inti aplikasi. Pertimbangkan untuk memperbarui aplikasinya sendiri jika Anda ingin memakai paket ekstensi inti dengan versi yang baru.</string>

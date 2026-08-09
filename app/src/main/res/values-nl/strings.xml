@@ -117,8 +117,6 @@
     <string name="settings__localization__display_keyboard_labels_in_subtype_language" comment="Label of Display keyboard labels in subtype language preference">Toetsenbordlabels weergeven in subtypetaal</string>
     <string name="settings__localization__group_subtypes__label" comment="Label of subtypes group">Indelingen</string>
     <string name="settings__localization__subtype_add_title" comment="Title of subtype dialog when adding a new subtype">Indeling toevoegen</string>
-    <string name="settings__localization__language_pack_title" comment="Title of the language pack manager screen for managing installed and custom language packs">Geïnstalleerde taalpakketten beheren</string>
-    <string name="settings__localization__language_pack_summary" comment="Summary of preference item for adding a new language pack">Experimenteel: extensies beheren die ondersteuning toevoegen voor specifieke talen (Chinese karakterinvoer voor nu)</string>
     <string name="settings__localization__subtype_edit_title" comment="Title of subtype dialog when editing an existing subtype">Indeling bewerken</string>
     <string name="settings__localization__subtype_locale" comment="Label for locale dropdown in subtype dialog">Voorkeurstaal</string>
     <string name="settings__localization__subtype_popup_mapping" comment="Label for popup mapping dropdown in subtype screen">Popup-indeling</string>
@@ -462,10 +460,6 @@
     <string name="about__version__title" comment="Preference title">Versie</string>
     <string name="about__version_copied__title" comment="Title of the toast for copying the version string">Appversie gekopieerd naar klembord</string>
     <string name="about__version_copied__error" comment="Title of the error toast for copying the version string">Er is iets misgegaan: {error_message}</string>
-    <string name="about__changelog__title" comment="Preference title">Wijzigingenlogboek</string>
-    <string name="about__changelog__summary" comment="Preference summary">Wat is er nieuw</string>
-    <string name="about__repository__title" comment="Preference title">Opslagplaats (GitHub)</string>
-    <string name="about__repository__summary" comment="Preference summary">Broncode, discussies, problemen en info</string>
     <string name="about__privacy_policy__title" comment="Preference title">Privacybeleid</string>
     <string name="about__privacy_policy__summary" comment="Preference summary">Het privacybeleid voor dit project</string>
     <string name="about__project_license__title" comment="Preference title">Projectlicentie</string>
@@ -478,7 +472,6 @@
     <string name="setup__title" comment="Title of Setup">Welkom!</string>
     <string name="setup__intro_message" comment="Short intro message welcoming new users">Bedankt voor het gebruik van {app_name}! Deze snelle installatie leidt u door de vereiste stappen om {app_name} op uw apparaat te gebruiken.</string>
     <string name="setup__footer__privacy_policy" comment="Privacy policy label for URL">Privacybeleid</string>
-    <string name="setup__footer__repository" comment="Repository label for URL">Opslagplaats</string>
     <string name="setup__enable_ime__title">{app_name} inschakelen</string>
     <string name="setup__enable_ime__description">Android vereist dat elk aangepast toetsenbord afzonderlijk is ingeschakeld voordat u het kunt gebruiken. Open het systeem<i> Taal</i> Instellingen, activeer daar \"{app_name}\".</string>
     <string name="setup__enable_ime__open_settings_btn">Systeeminstellingen openen</string>
@@ -533,11 +526,9 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <!-- Crash Dialog strings -->
     <string name="crash_dialog__title" comment="Title of crash dialog">KalamBoard-foutenrapportage</string>
     <string name="crash_dialog__description" comment="Description of crash dialog">Sorry voor het ongemak, maar KalamBoard is gecrashed omwille van een onverwachte fout.</string>
-    <string name="crash_dialog__report_instructions" comment="Issue tracker report instructions for the crash dialog. The %s placeholder is the name of the crash report template and always in English/LTR.">Als je deze fout wilt rapporteren, kijk dan eerst in de issuetracker op GitHub of de crash nog niet gerapporteerd is.\nAls dat niet het geval is, kopieer dan de gegenereerde crashlogboek en open een nieuwe issue. Gebruik het \"%s\"-sjabloon en vul de beschrijving in, de stappen om te reproduceren, en plak het gegenereerde crash log aan het eind. Dit helpt om KalamBoard beter en stabieler te maken voor iedereen. Bedankt!</string>
     <string name="crash_dialog__copy_to_clipboard" comment="Label of Copy to clipboard button in crash dialog">Kopieer naar systeemklembord</string>
     <string name="crash_dialog__copy_to_clipboard_success" comment="Label of Copy to clipboard success message in crash dialog">Gekopieerd naar systeemklembord</string>
     <string name="crash_dialog__copy_to_clipboard_failure" comment="Label of Copy to clipboard failure message in crash dialog">Kan niet kopiëren naar systeemklembord: Klembordbeheerinstantie niet gevonden</string>
-    <string name="crash_dialog__open_issue_tracker" comment="Label of Open issue tracker button in crash dialog">Probleemtracker openen (github.com)</string>
     <string name="crash_dialog__close" comment="Label of Close button in crash dialog">Sluiten</string>
     <string name="crash_notification_channel__title" comment="Title of crash notification channel">Foutenrapporten van KalamBoard</string>
     <string name="crash_once_notification__title" comment="Title of the notification for a single crash">KalamBoard is gestopt met werken…</string>
@@ -632,7 +623,6 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="ext__home__title">Add-ons &amp; extensies</string>
     <string name="ext__list__ext_theme">Thema-extensies</string>
     <string name="ext__list__ext_keyboard">Toetsenbordextensies</string>
-    <string name="ext__list__ext_languagepack">Taalpakket-uitbreidingen</string>
     <string name="ext__meta__authors">Auteurs</string>
     <string name="ext__meta__components">Gebundelde componenten</string>
     <string name="ext__meta__components_theme">Gebundelde thema\'s</string>
@@ -678,7 +668,6 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="ext__import__ext_any" comment="Title of Importer screen for import of any supported KalamBoard extension">Extensie importeren</string>
     <string name="ext__import__ext_keyboard" comment="Title of Importer screen for keyboard extension import">Toetsenbordextensie importeren</string>
     <string name="ext__import__ext_theme" comment="Title of Importer screen for theme extension import">Thema-extensie importeren</string>
-    <string name="ext__import__ext_languagepack" comment="Title of Importer screen for language pack extension import">Taalpakket-uitbreidingen importeren</string>
     <string name="ext__import__file_skip" comment="Label when a file cannot be imported in the current context. The actual reason string is in a separate text view below this string.">Bestand kan niet worden geïmporteerd. Reden:</string>
     <string name="ext__import__file_skip_unsupported" comment="Reason string when file is unsupported">Niet-ondersteund of niet-herkend bestandstype.</string>
     <string name="ext__import__file_skip_ext_core" comment="Reason string when ext has core extension ID">Kan standaarduitbreidingspakketten die bij de kernactiva van de app worden geleverd, niet vervangen of bijwerken. Overweeg de app zelf bij te werken als u van plan bent een nieuwere versie van een kernuitbreidingspakket te gebruiken.</string>

@@ -72,7 +72,6 @@ import dev.patrickgold.florisboard.ime.core.SubtypePreset
 import dev.patrickgold.florisboard.ime.keyboard.LayoutArrangementComponent
 import dev.patrickgold.florisboard.ime.keyboard.LayoutType
 import dev.patrickgold.florisboard.ime.keyboard.extCorePopupMapping
-import dev.patrickgold.florisboard.ime.nlp.han.HanShapeBasedLanguageProvider
 import dev.patrickgold.florisboard.ime.nlp.words.WordSuggestionProvider
 import dev.patrickgold.florisboard.keyboardManager
 import dev.patrickgold.florisboard.lib.FlorisLocale
@@ -397,8 +396,7 @@ fun SubtypeEditorScreen(id: Long?) = FlorisScreen {
                 // TODO: Put this map somewhere more formal (another KeyboardExtension field?)
                 //  optionally use a string resource below
                 val nlpProviderMappings = mapOf(
-                    WordSuggestionProvider.ProviderId to "Words (Arabic, English, ...)",
-                    HanShapeBasedLanguageProvider.ProviderId to "Chinese shape-based"
+                    WordSuggestionProvider.ProviderId to "Words (Arabic, English, French, Turkish)",
                 )
 
                 val nlpProviderMappingIds = remember(nlpProviderMappings) {

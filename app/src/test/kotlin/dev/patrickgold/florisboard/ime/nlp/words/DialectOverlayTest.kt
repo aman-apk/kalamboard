@@ -79,4 +79,32 @@ class DialectOverlayTest : FunSpec({
         merged.first { it.word == "هلق" }.freq shouldBe 240   // appended
         merged.size shouldBe 3
     }
+
+    test("mergedWith unions boosts and follower lists with max freq") {
+        val common = parse("وعليكم السلام ورحمة الله وبركاته\t250")
+        val dialect = parse("وعليكم السلام\t234", "هلق\t240")
+        val merged = common.mergedWith(dialect)
+        merged.wordBoosts["وعليكم"] shouldBe 250 // max of 250/234
+        merged.wordBoosts["هلق"] shouldBe 240
+        merged.bigrams[normalizer.normalize("وعليكم")]!!.first() shouldBe ("السلام" to 250)
+    }
+
+    test("GOLDEN: shipped ar_common.tsv chains the full salam formula word by word") {
+        val asset = java.io.File("src/main/assets/ime/dict/overlays/ar_common.tsv")
+        val overlay = DialectOverlay.parse(asset.readLines().asSequence(), normalizer)
+        // Walk «وعليكم السلام ورحمة الله وبركاته» through the trigram chain: every step after
+        // the first two words must be predicted by its two-word context.
+        val words = listOf("وعليكم", "السلام", "ورحمة", "الله", "وبركاته")
+        for (i in 2 until words.size) {
+            val ctx = "${normalizer.normalize(words[i - 2])} ${normalizer.normalize(words[i - 1])}"
+            val followers = overlay.trigrams[ctx].orEmpty().map { it.first }
+            followers shouldContain words[i]
+        }
+        // And «إنا لله وإنا إليه راجعون» must chain for every dialect since it lives in common.
+        val inna = listOf("إنا", "لله", "وإنا", "إليه", "راجعون")
+        for (i in 2 until inna.size) {
+            val ctx = "${normalizer.normalize(inna[i - 2])} ${normalizer.normalize(inna[i - 1])}"
+            overlay.trigrams[ctx].orEmpty().map { it.first } shouldContain inna[i]
+        }
+    }
 })

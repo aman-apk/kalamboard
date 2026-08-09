@@ -33,7 +33,18 @@ object PersonalLearning {
     const val FREQ_BUMP = 8
 
     /** Ranking boost applied to user-dictionary suggestions over equal-frequency static ones. */
-    const val USER_SCORE_BOOST = 1.3
+    const val USER_SCORE_BOOST = 2.0
+
+    /**
+     * Score floor added to user exact matches and clean completions (distance 0.0): 256.0 sits
+     * just above the highest possible static non-exact score (freq cap 255), so a word the user
+     * actually types outranks every static completion and correction — while staying far below
+     * [WordIndex.EXACT_MATCH_BASE], so a correctly typed word is never overridden by a learned
+     * one. Deliberately NOT applied to fuzzy corrections: a floored correction would sit on a
+     * 256+ scale that the relative autocommit margin gate compares against 0..255 static scores,
+     * letting a learned word silently auto-replace a correctly typed unknown word.
+     */
+    const val USER_PRIORITY_FLOOR = 256.0
 
     /** Auto-correcting to a word stops after the user reverted it this many times. */
     const val AUTOCORRECT_BLOCK_THRESHOLD = 2
@@ -50,9 +61,11 @@ object PersonalLearning {
 
     /**
      * Merges static-dictionary and user-dictionary rankings for one query:
-     * user scores are boosted by [USER_SCORE_BOOST], duplicates keep their best variant
-     * (an exact-match flavor always beats a non-exact one), blocked words are dropped,
-     * exact matches stay pinned before everything else.
+     * user scores are boosted by [USER_SCORE_BOOST], and close user matches (exact/completion/
+     * one-edit correction) are additionally lifted above [USER_PRIORITY_FLOOR] so the user's own
+     * vocabulary wins over static suggestions. Duplicates keep their best variant (an exact-match
+     * flavor always beats a non-exact one), blocked words are dropped, exact matches stay pinned
+     * before everything else.
      */
     fun mergeRanked(
         static: List<RankedWord>,
@@ -65,7 +78,11 @@ object PersonalLearning {
             merged[ranked.entry.word] = ranked
         }
         for (ranked in user) {
-            val boosted = ranked.copy(score = ranked.score * USER_SCORE_BOOST)
+            val base = ranked.score * USER_SCORE_BOOST
+            val score = if (ranked.isExactMatch || ranked.distance == 0.0) {
+                maxOf(base, USER_PRIORITY_FLOOR + ranked.score)
+            } else base
+            val boosted = ranked.copy(score = score)
             merged.merge(boosted.entry.word, boosted) { a, b ->
                 when {
                     a.isExactMatch != b.isExactMatch -> if (a.isExactMatch) a else b
@@ -74,11 +91,23 @@ object PersonalLearning {
                 }
             }
         }
-        return merged.values.asSequence()
+        val sorted = merged.values.asSequence()
             .filter { it.entry.word !in blocked }
             .sortedWith(compareByDescending<RankedWord> { it.isExactMatch }.thenByDescending { it.score })
-            .take(maxCount)
             .toList()
+        val top = sorted.take(maxCount).toMutableList()
+        // The query isn't a known word and completions of the (mistyped) prefix filled every
+        // slot: reserve one slot for the best correction so the intended word stays reachable.
+        // (WordIndex has the same reservation internally, but it is called with 2x maxCount
+        // here, so the re-sort above would otherwise drop the reserved candidate again.)
+        if (top.size >= maxCount && top.none { it.isExactMatch } && top.none { it.isCorrection }) {
+            val bestCorrection = sorted.firstOrNull { it.isCorrection }
+            if (bestCorrection != null) {
+                top.removeAt(top.lastIndex)
+                top.add(1.coerceAtMost(top.size), bestCorrection)
+            }
+        }
+        return top
     }
 
     /** Weight of the previous-word (bigram) signal when reranking corrections/completions. */
@@ -93,6 +122,17 @@ object PersonalLearning {
 
     /** Freq advantage of trigram-based next-word predictions over bigram-based ones. */
     const val TRIGRAM_PREDICTION_BOOST = 1.25
+
+    /** Freq advantage of quadgram-based (3-word context) predictions — the longer the matched
+     *  context, the more specific and trustworthy the continuation, so it outranks trigrams. */
+    const val QUADGRAM_PREDICTION_BOOST = 1.45
+
+    /** Scales quadgram next-word predictions by [QUADGRAM_PREDICTION_BOOST] (capped at 255). */
+    fun boostQuadgramPredictions(predictions: List<Pair<String, Int>>): List<Pair<String, Int>> {
+        return predictions.map { (word, freq) ->
+            word to (freq * QUADGRAM_PREDICTION_BOOST).toInt().coerceAtMost(255)
+        }
+    }
 
     /** Max-merges bigram followers with trigram followers, the latter scaled by
      *  [TRIGRAM_FOLLOWER_BOOST] (capped at 255). Both maps are norm -> freq. */

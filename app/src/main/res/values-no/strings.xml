@@ -89,8 +89,6 @@
     <string name="settings__localization__display_language_names_in__label" comment="Label of Display language names in preference">Vis målnavn på</string>
     <string name="settings__localization__group_subtypes__label" comment="Label of subtypes group">Undertyper</string>
     <string name="settings__localization__subtype_add_title" comment="Title of subtype dialog when adding a new subtype">Legg til undertype</string>
-    <string name="settings__localization__language_pack_title" comment="Title of the language pack manager screen for managing installed and custom language packs">Administrere installerte språkpakker</string>
-    <string name="settings__localization__language_pack_summary" comment="Summary of preference item for adding a new language pack">Eksperimentelt: administrere utvidelser som legger til støtte for spesifikke språk (formbasert kinesisk inndata foreløpig)</string>
     <string name="settings__localization__subtype_edit_title" comment="Title of subtype dialog when editing an existing subtype">Rediger undertype</string>
     <string name="settings__localization__subtype_locale" comment="Label for locale dropdown in subtype dialog">Primærspråk</string>
     <string name="settings__localization__subtype_characters_layout" comment="Label for layout dropdown in subtype dialog">Tegnoppsett</string>
@@ -294,10 +292,6 @@
     <string name="about__version__title" comment="Preference title">Versjon</string>
     <string name="about__version_copied__title" comment="Title of the toast for copying the version string">Versjon kopiert til utklippstavlen</string>
     <string name="about__version_copied__error" comment="Title of the error toast for copying the version string">Noe gikk galt: {error_message}</string>
-    <string name="about__changelog__title" comment="Preference title">Endringslogg</string>
-    <string name="about__changelog__summary" comment="Preference summary">Hva som er nytt</string>
-    <string name="about__repository__title" comment="Preference title">Oppbevaringssted (GitHub)</string>
-    <string name="about__repository__summary" comment="Preference summary">Kildekode, diskusjoner, saker og info</string>
     <string name="about__privacy_policy__title" comment="Preference title">Persovernerklæring</string>
     <string name="about__privacy_policy__summary" comment="Preference summary">Personvernærklæring for dette prosjektet</string>
     <string name="about__project_license__title" comment="Preference title">Prosjektlisens</string>
@@ -310,7 +304,6 @@
     <string name="setup__title" comment="Title of Setup">Velkommen!</string>
     <string name="setup__intro_message" comment="Short intro message welcoming new users">Takk for at du bruker {app_name}! Dette hurtigoppsettet leder deg gjennom de nødvendige trinnene for å bruke {app_name} på enheten din.</string>
     <string name="setup__footer__privacy_policy" comment="Privacy policy label for URL">Persovernerklæring</string>
-    <string name="setup__footer__repository" comment="Repository label for URL">Oppbevaringssted</string>
     <string name="setup__enable_ime__title">Aktiver {app_name}</string>
     <string name="setup__enable_ime__description">Android krever at alle egendefinerte tastatur er aktivert før du kan bruke de. Åpne System <i>Språk &amp; Inndata</i> Innstillingene, aktiver \"{app_name}\".</string>
     <string name="setup__enable_ime__open_settings_btn">Åpne Systeminnstillinger</string>
@@ -330,11 +323,9 @@
     <!-- Crash Dialog strings -->
     <string name="crash_dialog__title" comment="Title of crash dialog">KalamBoard feilmeldingsrapporter</string>
     <string name="crash_dialog__description" comment="Description of crash dialog">Beklager ulempen, men KalamBoard har krasjet på grunn av en uventet feil.</string>
-    <string name="crash_dialog__report_instructions" comment="Issue tracker report instructions for the crash dialog. The %s placeholder is the name of the crash report template and always in English/LTR.">Hvis du ønsker å rapportere denne feilen, sjekk først at krasjen ikke allerede er rapportert i sakssystemet GitHub.\nHvis den ikke er det, kopier den genererte krasjloggen og åpne en ny sak. Bruk \"%s\"-malen og fyll ut beskrivelsen, trinnene for å reprodusere, og lim inn den genererte krasjloggen på slutten. Dette er med på å gjøre KalamBoard bedre og mer stabilt for alle. Takk skal du ha!</string>
     <string name="crash_dialog__copy_to_clipboard" comment="Label of Copy to clipboard button in crash dialog">Kopier til systemutklippstavlen</string>
     <string name="crash_dialog__copy_to_clipboard_success" comment="Label of Copy to clipboard success message in crash dialog">Kopiert til systemutklippstavlen</string>
     <string name="crash_dialog__copy_to_clipboard_failure" comment="Label of Copy to clipboard failure message in crash dialog">Kan ikke kopiere til systemutklippstavlen: Utklippstavlebehandler ikke funnet</string>
-    <string name="crash_dialog__open_issue_tracker" comment="Label of Open issue tracker button in crash dialog">Åpne sakssystem (github.com)</string>
     <string name="crash_dialog__close" comment="Label of Close button in crash dialog">Lukk</string>
     <string name="crash_notification_channel__title" comment="Title of crash notification channel">KalamBoard feilmeldingsrapporter</string>
     <string name="crash_once_notification__title" comment="Title of the notification for a single crash">KalamBoard har sluttet å fungere…</string>
@@ -412,7 +403,6 @@
     <string name="ext__import__ext_any" comment="Title of Importer screen for import of any supported KalamBoard extension">Importer utvidelse</string>
     <string name="ext__import__ext_keyboard" comment="Title of Importer screen for keyboard extension import">Importer tastaturutvidelse</string>
     <string name="ext__import__ext_theme" comment="Title of Importer screen for theme extension import">Importer temautvidelse</string>
-    <string name="ext__import__ext_languagepack" comment="Title of Importer screen for language pack extension import">Importer språkpakkeutvidelse</string>
     <string name="ext__import__file_skip" comment="Label when a file cannot be imported in the current context. The actual reason string is in a separate text view below this string.">Filen kan ikke importeres. Årsak:</string>
     <string name="ext__import__file_skip_unsupported" comment="Reason string when file is unsupported">Mangler støtte for eller kjennskap til filtypen.</string>
     <string name="ext__import__file_skip_ext_core" comment="Reason string when ext has core extension ID">Kan ikke erstatte eller oppdatere standardutvidelsespakker som følger med appens kjerneressurser. Vurder å oppdatere selve appen dersom du vil bruke en nyere versjon av en kjerneutvidelsespakke.</string>

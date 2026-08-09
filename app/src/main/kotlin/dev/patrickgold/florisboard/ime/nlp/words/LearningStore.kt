@@ -30,7 +30,9 @@ import kotlinx.serialization.json.Json
  * - `pending_words`: unknown words the user typed, with a counter — once a word is seen
  *   [PersonalLearning.PENDING_THRESHOLD] times it graduates into the Floris user dictionary
  *   (where the user can see, edit, export and delete it);
- * - `user_bigrams`: the user's personal word-pair counts, merged into next-word prediction;
+ * - `user_bigrams` / `user_trigrams` / `user_quadgrams`: the user's personal n-gram counts
+ *   (1-, 2- and 3-word contexts), merged into next-word prediction so multi-word formulas
+ *   chain word after word, however long;
  * - `blocked_words`: suggestions the user removed via long-press — never suggested again;
  * - `autocorrect_reverts`: words whose auto-correction the user undid with backspace — after
  *   [PersonalLearning.AUTOCORRECT_BLOCK_THRESHOLD] reverts the engine stops auto-committing to
@@ -49,6 +51,7 @@ class LearningStore(context: Context) : SQLiteOpenHelper(context, DB_NAME, null,
         db.execSQL("CREATE TABLE pending_words (lang TEXT NOT NULL, word TEXT NOT NULL, count INTEGER NOT NULL, PRIMARY KEY (lang, word))")
         db.execSQL("CREATE TABLE user_bigrams (lang TEXT NOT NULL, w1_norm TEXT NOT NULL, w2 TEXT NOT NULL, count INTEGER NOT NULL, PRIMARY KEY (lang, w1_norm, w2))")
         db.execSQL("CREATE TABLE user_trigrams (lang TEXT NOT NULL, w12_norm TEXT NOT NULL, w3 TEXT NOT NULL, count INTEGER NOT NULL, PRIMARY KEY (lang, w12_norm, w3))")
+        db.execSQL("CREATE TABLE user_quadgrams (lang TEXT NOT NULL, w123_norm TEXT NOT NULL, w4 TEXT NOT NULL, count INTEGER NOT NULL, PRIMARY KEY (lang, w123_norm, w4))")
         db.execSQL("CREATE TABLE blocked_words (lang TEXT NOT NULL, word TEXT NOT NULL, PRIMARY KEY (lang, word))")
         db.execSQL("CREATE TABLE autocorrect_reverts (word TEXT NOT NULL PRIMARY KEY, count INTEGER NOT NULL)")
         db.execSQL("CREATE TABLE stats_daily (date TEXT NOT NULL PRIMARY KEY, words INTEGER NOT NULL, chars INTEGER NOT NULL)")
@@ -62,6 +65,10 @@ class LearningStore(context: Context) : SQLiteOpenHelper(context, DB_NAME, null,
             db.execSQL("CREATE TABLE IF NOT EXISTS user_trigrams (lang TEXT NOT NULL, w12_norm TEXT NOT NULL, w3 TEXT NOT NULL, count INTEGER NOT NULL, PRIMARY KEY (lang, w12_norm, w3))")
             db.execSQL("CREATE TABLE IF NOT EXISTS stats_daily (date TEXT NOT NULL PRIMARY KEY, words INTEGER NOT NULL, chars INTEGER NOT NULL)")
             db.execSQL("CREATE TABLE IF NOT EXISTS stats_words (lang TEXT NOT NULL, word TEXT NOT NULL, count INTEGER NOT NULL, PRIMARY KEY (lang, word))")
+        }
+        if (oldVersion < 3) {
+            // v3: personal quadgrams (three-word context) so long formulas chain past 4 words.
+            db.execSQL("CREATE TABLE IF NOT EXISTS user_quadgrams (lang TEXT NOT NULL, w123_norm TEXT NOT NULL, w4 TEXT NOT NULL, count INTEGER NOT NULL, PRIMARY KEY (lang, w123_norm, w4))")
         }
     }
 
@@ -144,6 +151,36 @@ class LearningStore(context: Context) : SQLiteOpenHelper(context, DB_NAME, null,
         readableDatabase.rawQuery(
             "SELECT w3, count FROM user_trigrams WHERE lang = ? AND w12_norm = ? ORDER BY count DESC LIMIT $maxCount",
             arrayOf(lang, w12Norm),
+        ).use { cursor ->
+            buildList {
+                while (cursor.moveToNext()) {
+                    add(cursor.getString(0) to cursor.getInt(1))
+                }
+            }
+        }
+    }
+
+    // --- personal quadgrams ----------------------------------------------------------------------
+
+    @Synchronized
+    fun recordQuadgram(lang: String, w123Norm: String, w4: String) = runSafely(Unit) {
+        val db = writableDatabase
+        db.execSQL(
+            "INSERT OR IGNORE INTO user_quadgrams (lang, w123_norm, w4, count) VALUES (?, ?, ?, 0)",
+            arrayOf(lang, w123Norm, w4),
+        )
+        db.execSQL(
+            "UPDATE user_quadgrams SET count = MIN(count + 1, 10000) WHERE lang = ? AND w123_norm = ? AND w4 = ?",
+            arrayOf(lang, w123Norm, w4),
+        )
+    }
+
+    /** Personal followers of the three-word context [w123Norm], best first, as (word, rawCount). */
+    @Synchronized
+    fun quadgramsFor(lang: String, w123Norm: String, maxCount: Int): List<Pair<String, Int>> = runSafely(emptyList()) {
+        readableDatabase.rawQuery(
+            "SELECT w4, count FROM user_quadgrams WHERE lang = ? AND w123_norm = ? ORDER BY count DESC LIMIT $maxCount",
+            arrayOf(lang, w123Norm),
         ).use { cursor ->
             buildList {
                 while (cursor.moveToNext()) {
@@ -277,15 +314,26 @@ class LearningStore(context: Context) : SQLiteOpenHelper(context, DB_NAME, null,
 
     /**
      * Gentle periodic forgetting so stale one-off entries don't accumulate forever:
-     * weekly for pending-word counters, monthly for personal bigrams (count * 3/4, dropped at 0).
-     * Graduated user-dictionary words are user-visible data and are never decayed automatically.
+     * weekly for pending-word counters, monthly for personal n-grams (count * 3/4, dropped at 0).
+     * Pending counters decay with a ceiling division so a word seen once is NOT wiped before the
+     * user had a chance to type it a second time — rarely-typed formula words like «وبركاته»
+     * must still be able to graduate. Graduated user-dictionary words are user-visible data and
+     * are never decayed automatically.
      */
     @Synchronized
     fun decayIfDue(nowMs: Long) = runSafely(Unit) {
         val db = writableDatabase
         if (nowMs - getMetaLong(db, "last_pending_decay") > PENDING_DECAY_INTERVAL_MS) {
-            db.execSQL("UPDATE pending_words SET count = (count * 3) / 4")
-            db.execSQL("DELETE FROM pending_words WHERE count <= 0")
+            db.execSQL("UPDATE pending_words SET count = (count * 3 + 3) / 4")
+            // Ceiling decay never zeroes a row (so rare formula words can still graduate), which
+            // would make the table append-only — bound it instead by evicting the oldest rows
+            // (rowid order ~ insertion order) beyond the cap.
+            db.execSQL(
+                """DELETE FROM pending_words WHERE rowid IN (
+                       SELECT rowid FROM pending_words ORDER BY count ASC, rowid ASC
+                       LIMIT (SELECT MAX(COUNT(*) - $PENDING_WORDS_CAP, 0) FROM pending_words)
+                   )""",
+            )
             setMetaLong(db, "last_pending_decay", nowMs)
         }
         if (nowMs - getMetaLong(db, "last_bigram_decay") > BIGRAM_DECAY_INTERVAL_MS) {
@@ -293,6 +341,8 @@ class LearningStore(context: Context) : SQLiteOpenHelper(context, DB_NAME, null,
             db.execSQL("DELETE FROM user_bigrams WHERE count <= 0")
             db.execSQL("UPDATE user_trigrams SET count = (count * 3) / 4")
             db.execSQL("DELETE FROM user_trigrams WHERE count <= 0")
+            db.execSQL("UPDATE user_quadgrams SET count = (count * 3) / 4")
+            db.execSQL("DELETE FROM user_quadgrams WHERE count <= 0")
             setMetaLong(db, "last_bigram_decay", nowMs)
         }
     }
@@ -311,10 +361,11 @@ class LearningStore(context: Context) : SQLiteOpenHelper(context, DB_NAME, null,
 
     @Serializable
     data class Snapshot(
-        val version: Int = 2,
+        val version: Int = 3,
         val pendingWords: List<PendingWordRow> = emptyList(),
         val userBigrams: List<UserBigramRow> = emptyList(),
         val userTrigrams: List<UserTrigramRow> = emptyList(),
+        val userQuadgrams: List<UserQuadgramRow> = emptyList(),
         val blockedWords: List<BlockedWordRow> = emptyList(),
         val autocorrectReverts: List<AutocorrectRevertRow> = emptyList(),
         val statsDaily: List<StatsDailyRow> = emptyList(),
@@ -323,6 +374,7 @@ class LearningStore(context: Context) : SQLiteOpenHelper(context, DB_NAME, null,
         @Serializable data class PendingWordRow(val lang: String, val word: String, val count: Int)
         @Serializable data class UserBigramRow(val lang: String, val w1Norm: String, val w2: String, val count: Int)
         @Serializable data class UserTrigramRow(val lang: String, val w12Norm: String, val w3: String, val count: Int)
+        @Serializable data class UserQuadgramRow(val lang: String, val w123Norm: String, val w4: String, val count: Int)
         @Serializable data class BlockedWordRow(val lang: String, val word: String)
         @Serializable data class AutocorrectRevertRow(val word: String, val count: Int)
         @Serializable data class StatsDailyRow(val date: String, val words: Int, val chars: Int)
@@ -344,6 +396,9 @@ class LearningStore(context: Context) : SQLiteOpenHelper(context, DB_NAME, null,
             },
             userTrigrams = rows("SELECT lang, w12_norm, w3, count FROM user_trigrams") {
                 Snapshot.UserTrigramRow(it.getString(0), it.getString(1), it.getString(2), it.getInt(3))
+            },
+            userQuadgrams = rows("SELECT lang, w123_norm, w4, count FROM user_quadgrams") {
+                Snapshot.UserQuadgramRow(it.getString(0), it.getString(1), it.getString(2), it.getInt(3))
             },
             blockedWords = rows("SELECT lang, word FROM blocked_words") {
                 Snapshot.BlockedWordRow(it.getString(0), it.getString(1))
@@ -376,6 +431,7 @@ class LearningStore(context: Context) : SQLiteOpenHelper(context, DB_NAME, null,
                 db.execSQL("DELETE FROM pending_words")
                 db.execSQL("DELETE FROM user_bigrams")
                 db.execSQL("DELETE FROM user_trigrams")
+                db.execSQL("DELETE FROM user_quadgrams")
                 db.execSQL("DELETE FROM blocked_words")
                 db.execSQL("DELETE FROM autocorrect_reverts")
                 db.execSQL("DELETE FROM stats_daily")
@@ -408,6 +464,16 @@ class LearningStore(context: Context) : SQLiteOpenHelper(context, DB_NAME, null,
                 db.execSQL(
                     "UPDATE user_trigrams SET count = MAX(count, ?) WHERE lang = ? AND w12_norm = ? AND w3 = ?",
                     arrayOf<Any>(row.count, row.lang, row.w12Norm, row.w3),
+                )
+            }
+            for (row in snapshot.userQuadgrams) {
+                db.execSQL(
+                    "INSERT OR IGNORE INTO user_quadgrams (lang, w123_norm, w4, count) VALUES (?, ?, ?, 0)",
+                    arrayOf(row.lang, row.w123Norm, row.w4),
+                )
+                db.execSQL(
+                    "UPDATE user_quadgrams SET count = MAX(count, ?) WHERE lang = ? AND w123_norm = ? AND w4 = ?",
+                    arrayOf<Any>(row.count, row.lang, row.w123Norm, row.w4),
                 )
             }
             for (row in snapshot.blockedWords) {
@@ -454,8 +520,10 @@ class LearningStore(context: Context) : SQLiteOpenHelper(context, DB_NAME, null,
 
     companion object {
         const val DB_NAME = "floris_learning"
-        private const val DB_VERSION = 2
+        private const val DB_VERSION = 3
         private const val PENDING_DECAY_INTERVAL_MS = 7L * 24 * 60 * 60 * 1000
         private const val BIGRAM_DECAY_INTERVAL_MS = 30L * 24 * 60 * 60 * 1000
+        /** Upper bound on pending (not yet graduated) unknown words kept per decay cycle. */
+        private const val PENDING_WORDS_CAP = 5000
     }
 }

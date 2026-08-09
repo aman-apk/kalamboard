@@ -51,6 +51,7 @@ import dev.patrickgold.florisboard.app.ext.ExtensionListScreenType
 import dev.patrickgold.florisboard.app.ext.ExtensionViewScreen
 import dev.patrickgold.florisboard.app.settings.HomeScreen
 import dev.patrickgold.florisboard.app.settings.about.AboutScreen
+import dev.patrickgold.florisboard.app.settings.about.PrivacyPolicyScreen
 import dev.patrickgold.florisboard.app.settings.about.ProjectLicenseScreen
 import dev.patrickgold.florisboard.app.settings.about.ThirdPartyLicensesScreen
 import dev.patrickgold.florisboard.app.settings.advanced.BackupScreen
@@ -65,8 +66,6 @@ import dev.patrickgold.florisboard.app.settings.dictionary.UserDictionaryType
 import dev.patrickgold.florisboard.app.settings.gestures.GesturesScreen
 import dev.patrickgold.florisboard.app.settings.keyboard.InputFeedbackScreen
 import dev.patrickgold.florisboard.app.settings.keyboard.KeyboardScreen
-import dev.patrickgold.florisboard.app.settings.localization.LanguagePackManagerScreen
-import dev.patrickgold.florisboard.app.settings.localization.LanguagePackManagerScreenAction
 import dev.patrickgold.florisboard.app.settings.localization.LocalizationScreen
 import dev.patrickgold.florisboard.app.settings.localization.SelectLocaleScreen
 import dev.patrickgold.florisboard.app.settings.localization.SubtypeEditorScreen
@@ -121,10 +120,6 @@ object Routes {
         @Serializable
         @Deeplink("settings/localization/select-locale")
         object SelectLocale
-
-        @Serializable
-        @Deeplink("settings/localization/language-pack-manage")
-        data class LanguagePackManager(val action: LanguagePackManagerScreenAction)
 
         @Serializable
         @Deeplink("settings/localization/subtype/add")
@@ -205,6 +200,10 @@ object Routes {
         @Serializable
         @Deeplink("settings/about")
         object About
+
+        @Serializable
+        @Deeplink("settings/about/privacy-policy")
+        object PrivacyPolicy
 
         @Serializable
         @Deeplink("settings/about/project-license")
@@ -294,10 +293,6 @@ object Routes {
 
             composableWithDeepLink(Settings.Localization::class) { LocalizationScreen() }
             composableWithDeepLink(Settings.SelectLocale::class) { SelectLocaleScreen() }
-            composableWithDeepLink(Settings.LanguagePackManager::class) { navBackStack ->
-                val payload = navBackStack.toRoute<Settings.LanguagePackManager>()
-                LanguagePackManagerScreen(payload.action)
-            }
             composableWithDeepLink(Settings.SubtypeAdd::class) { SubtypeEditorScreen(null) }
             composableWithDeepLink(Settings.SubtypeEdit::class) { navBackStack ->
                 val payload = navBackStack.toRoute<Settings.SubtypeEdit>()
@@ -338,6 +333,7 @@ object Routes {
             composableWithDeepLink(Settings.Restore::class) { RestoreScreen() }
 
             composableWithDeepLink(Settings.About::class) { AboutScreen() }
+            composableWithDeepLink(Settings.PrivacyPolicy::class) { PrivacyPolicyScreen() }
             composableWithDeepLink(Settings.ProjectLicense::class) { ProjectLicenseScreen() }
             composableWithDeepLink(Settings.ThirdPartyLicenses::class) { ThirdPartyLicensesScreen() }
 

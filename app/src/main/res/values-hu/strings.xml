@@ -124,8 +124,6 @@
     <string name="settings__localization__display_keyboard_labels_in_subtype_language" comment="Label of Display keyboard labels in subtype language preference">Billentyűzetcímkék megjelenítése altípusok nyelvén</string>
     <string name="settings__localization__group_subtypes__label" comment="Label of subtypes group">Altípusok</string>
     <string name="settings__localization__subtype_add_title" comment="Title of subtype dialog when adding a new subtype">Altípus hozzáadása</string>
-    <string name="settings__localization__language_pack_title" comment="Title of the language pack manager screen for managing installed and custom language packs">Telepített nyelvi csomagok kezelése</string>
-    <string name="settings__localization__language_pack_summary" comment="Summary of preference item for adding a new language pack">Kísérleti: olyan kiegészítők kezelése, amelyek egy bizonyos nyelvet támogatnak (egyelőre forma-alapú kínai bevitel)</string>
     <string name="settings__localization__subtype_edit_title" comment="Title of subtype dialog when editing an existing subtype">Altípus szerkesztése</string>
     <string name="settings__localization__subtype_locale" comment="Label for locale dropdown in subtype dialog">Elsődleges nyelv</string>
     <string name="settings__localization__subtype_popup_mapping" comment="Label for popup mapping dropdown in subtype screen">Felugró társítás</string>
@@ -539,10 +537,6 @@
     <string name="about__version__title" comment="Preference title">Verzió</string>
     <string name="about__version_copied__title" comment="Title of the toast for copying the version string">Verzió a vágólapra másolva</string>
     <string name="about__version_copied__error" comment="Title of the error toast for copying the version string">Valami rosszul sült el: {error_message}</string>
-    <string name="about__changelog__title" comment="Preference title">Változáslista</string>
-    <string name="about__changelog__summary" comment="Preference summary">Újdonságok</string>
-    <string name="about__repository__title" comment="Preference title">Tároló (GitHub)</string>
-    <string name="about__repository__summary" comment="Preference summary">Forráskód, megbeszélések, hibák és információ</string>
     <string name="about__privacy_policy__title" comment="Preference title">Adatvédelmi irányelvek</string>
     <string name="about__privacy_policy__summary" comment="Preference summary">A projekt adatvédelmi irányelvei</string>
     <string name="about__project_license__title" comment="Preference title">Projekt licence</string>
@@ -555,7 +549,6 @@
     <string name="setup__title" comment="Title of Setup">Üdvözöljük!</string>
     <string name="setup__intro_message" comment="Short intro message welcoming new users">Köszönjük, hogy a {app_name}ot használja. Ez a gyors beállítás végigvezeti a {app_name} eszközön való használatához szükséges lépéseken.</string>
     <string name="setup__footer__privacy_policy" comment="Privacy policy label for URL">Adatvédelmi irányelvek</string>
-    <string name="setup__footer__repository" comment="Repository label for URL">Tároló</string>
     <string name="setup__enable_ime__title">{app_name} engedélyezése</string>
     <string name="setup__enable_ime__description">Az Android megköveteli, hogy minden egyéni billentyűzet külön engedélyezve legyen, mielőtt használhatná. Nyissa meg a rendszerbeállítások <i>Nyelvek és bevitel</i> lapját, azon belül pedig engedélyezze ezt: „{app_name}”.</string>
     <string name="setup__enable_ime__open_settings_btn">Rendszerbeállítások megnyitása</string>
@@ -614,11 +607,9 @@
     <!-- Crash Dialog strings -->
     <string name="crash_dialog__title" comment="Title of crash dialog">KalamBoard hibajelentés</string>
     <string name="crash_dialog__description" comment="Description of crash dialog">Elnézést a kellemetlenségért, de a KalamBoard összeomlott egy váratlan hiba miatt.</string>
-    <string name="crash_dialog__report_instructions" comment="Issue tracker report instructions for the crash dialog. The %s placeholder is the name of the crash report template and always in English/LTR.">Ha szeretné jelenteni ezt a hibát, elsőnek nézze meg a hibakövetőt a GitHubon, hogy az összeomlása nem volt-e már jelentve.\nHa nem volt, másolja ki a generált összeomlásnaplót, és nyisson egy új hibajelentést. Használja a \"%s\" sablont, és töltse ki a leírást, írja le, hogy hogyan lehet előhozni a hibát, és illessze be az összeomlási naplót is a végére. Ez segít jobbá és stabilabbá tenni a KalamBoardot mindenki számára. Köszönöm!</string>
     <string name="crash_dialog__copy_to_clipboard" comment="Label of Copy to clipboard button in crash dialog">Rendszervágólapra másolás</string>
     <string name="crash_dialog__copy_to_clipboard_success" comment="Label of Copy to clipboard success message in crash dialog">Rendszervágólapra másolva</string>
     <string name="crash_dialog__copy_to_clipboard_failure" comment="Label of Copy to clipboard failure message in crash dialog">Nem lehet rendszervágólapra másolni: nem található vágólapkezelő</string>
-    <string name="crash_dialog__open_issue_tracker" comment="Label of Open issue tracker button in crash dialog">Hibakövető megnyitása (github.com)</string>
     <string name="crash_dialog__close" comment="Label of Close button in crash dialog">Bezárás</string>
     <string name="crash_notification_channel__title" comment="Title of crash notification channel">KalamBoard hibajelentések</string>
     <string name="crash_once_notification__title" comment="Title of the notification for a single crash">A KalamBoard leállt…</string>
@@ -720,7 +711,6 @@
     <string name="ext__home__title">Kiterjesztések</string>
     <string name="ext__list__ext_theme">Témakiterjesztések</string>
     <string name="ext__list__ext_keyboard">Billentyűzetkiterjesztések</string>
-    <string name="ext__list__ext_languagepack">Nyelvicsomag-kiterjesztések</string>
     <string name="ext__meta__authors">Szerzők</string>
     <string name="ext__meta__components">Csomagolt összetevők</string>
     <string name="ext__meta__components_theme">Csomagolt témák</string>
@@ -766,7 +756,6 @@
     <string name="ext__import__ext_any" comment="Title of Importer screen for import of any supported KalamBoard extension">Kiterjesztés importálása</string>
     <string name="ext__import__ext_keyboard" comment="Title of Importer screen for keyboard extension import">Billentyűzetkiterjesztés importálása</string>
     <string name="ext__import__ext_theme" comment="Title of Importer screen for theme extension import">Témakiterjesztés importálása</string>
-    <string name="ext__import__ext_languagepack" comment="Title of Importer screen for language pack extension import">Nyelvicsomag-kiterjesztés importálása</string>
     <string name="ext__import__file_skip" comment="Label when a file cannot be imported in the current context. The actual reason string is in a separate text view below this string.">A fájlt nem lehet importálni. Oka:</string>
     <string name="ext__import__file_skip_unsupported" comment="Reason string when file is unsupported">Nem támogatott vagy ismeretlen fájltípus.</string>
     <string name="ext__import__file_skip_ext_core" comment="Reason string when ext has core extension ID">Az alkalmazás alapértelmezett kiterjesztéscsomagjainak cseréje vagy frissítése nem lehetséges. Fontolja meg magának az alkalmazásnak a frissítését, ha egy alap kiterjesztéscsomag újabb verzióját kívánja használni.</string>

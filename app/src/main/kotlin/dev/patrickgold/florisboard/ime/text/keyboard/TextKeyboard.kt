@@ -27,12 +27,26 @@ class TextKeyboard(
     override val mode: KeyboardMode,
     val extendedPopupMapping: PopupMapping?,
     val extendedPopupMappingDefault: PopupMapping?,
+    /** When true, row 0 is the user-enabled number row, rendered at half the base row height. */
+    val hasHalfHeightNumberRow: Boolean = false,
 ) : Keyboard() {
     val rowCount: Int
         get() = arrangement.size
 
     val keyCount: Int
         get() = arrangement.sumOf { it.size }
+
+    /** Height of row [r] relative to the base row height. */
+    fun rowHeightFactor(r: Int): Float =
+        if (r == 0 && hasHalfHeightNumberRow) NUMBER_ROW_HEIGHT_FACTOR else 1.0f
+
+    /** Sum of all row height factors — equals [rowCount] unless the half number row is active. */
+    val heightFactorSum: Float
+        get() = rowCount - (if (hasHalfHeightNumberRow) 1.0f - NUMBER_ROW_HEIGHT_FACTOR else 0.0f)
+
+    companion object {
+        const val NUMBER_ROW_HEIGHT_FACTOR = 0.5f
+    }
 
     override fun getKeyForPos(pointerX: Float, pointerY: Float): TextKey? {
         for (key in keys()) {
@@ -56,10 +70,11 @@ class TextKeyboard(
         if (desiredTouchBounds.isEmpty() || desiredVisibleBounds.isEmpty()) return
         if (keyboardWidth.isNaN() || keyboardHeight.isNaN()) return
         val rowMarginH = abs(desiredTouchBounds.width - desiredVisibleBounds.width)
-        val rowMarginV = (keyboardHeight - desiredTouchBounds.height * rowCount.toFloat()) / (rowCount - 1).coerceAtLeast(1).toFloat()
+        val rowMarginV = (keyboardHeight - desiredTouchBounds.height * heightFactorSum) / (rowCount - 1).coerceAtLeast(1).toFloat()
 
+        var posY = 0.0f
         for ((r, row) in rows().withIndex()) {
-            val posY = (desiredTouchBounds.height + rowMarginV) * r
+            val rowHeight = desiredTouchBounds.height * rowHeightFactor(r)
             val availableWidth = (keyboardWidth - rowMarginH) / desiredTouchBounds.width
             var requestedWidth = 0.0f
             var shrinkSum = 0.0f
@@ -85,7 +100,7 @@ class TextKeyboard(
                         left = posX
                         top = posY
                         right = posX + keyWidth
-                        bottom = posY + desiredTouchBounds.height
+                        bottom = posY + rowHeight
                     }
                     key.visibleBounds.apply {
                         left = key.touchBounds.left + abs(desiredTouchBounds.left - desiredVisibleBounds.left) + when {
@@ -126,7 +141,7 @@ class TextKeyboard(
                         left = posX
                         top = posY
                         right = posX + keyWidth
-                        bottom = posY + desiredTouchBounds.height
+                        bottom = posY + rowHeight
                     }
                     key.visibleBounds.apply {
                         left = key.touchBounds.left + abs(desiredTouchBounds.left - desiredVisibleBounds.left)
@@ -148,6 +163,7 @@ class TextKeyboard(
                     }
                 }
             }
+            posY += rowHeight + rowMarginV
         }
     }
 

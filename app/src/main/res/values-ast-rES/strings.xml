@@ -58,8 +58,6 @@
     <string name="settings__localization__display_language_names_in__label" comment="Label of Display language names in preference">Amosar los nomes de les llingües na</string>
     <string name="settings__localization__group_subtypes__label" comment="Label of subtypes group">Sotipos</string>
     <string name="settings__localization__subtype_add_title" comment="Title of subtype dialog when adding a new subtype">Amestar un sotipu</string>
-    <string name="settings__localization__language_pack_title" comment="Title of the language pack manager screen for managing installed and custom language packs">Xestionar los paquetes de llingua instalaos</string>
-    <string name="settings__localization__language_pack_summary" comment="Summary of preference item for adding a new language pack">Opción esperimental: xestiona les estensiones qu\'amiesten compatibilidá pa llingües específiques (pel momentu, entrada china basada en formes)</string>
     <string name="settings__localization__subtype_locale" comment="Label for locale dropdown in subtype dialog">Llingua primaria</string>
     <string name="settings__localization__subtype_popup_mapping" comment="Label for popup mapping dropdown in subtype screen">Mapéu de los indicadores emerxentes</string>
     <string name="settings__localization__subtype_characters_layout" comment="Label for layout dropdown in subtype dialog">Distribución de los caráuteres</string>
@@ -156,10 +154,6 @@
     <string name="about__version__title" comment="Preference title">Versión</string>
     <string name="about__version_copied__title" comment="Title of the toast for copying the version string">La versión copióse al cartafueyu</string>
     <string name="about__version_copied__error" comment="Title of the error toast for copying the version string">Prodúxose daqué malo: {error_message}</string>
-    <string name="about__changelog__title" comment="Preference title">Rexistru de cambeos</string>
-    <string name="about__changelog__summary" comment="Preference summary">Contién les novedaes</string>
-    <string name="about__repository__title" comment="Preference title">Depósitu (GitHub)</string>
-    <string name="about__repository__summary" comment="Preference summary">El códigu fonte, los discutinios, los problemes y más información</string>
     <string name="about__privacy_policy__title" comment="Preference title">Política de privacidá</string>
     <string name="about__privacy_policy__summary" comment="Preference summary">La política de privacidá d\'esti proyeutu</string>
     <string name="about__project_license__title" comment="Preference title">Llicencia del proyeutu</string>
@@ -170,7 +164,6 @@
     <string name="setup__title" comment="Title of Setup">¡Afáyate!</string>
     <string name="setup__intro_message" comment="Short intro message welcoming new users">¡Gracies por usar {app_name}! Esta configuración rápida va guiate pelos pasos necesarios pa usar {app_name} nel preséu.</string>
     <string name="setup__footer__privacy_policy" comment="Privacy policy label for URL">Política de privacidá</string>
-    <string name="setup__footer__repository" comment="Repository label for URL">Depósitu</string>
     <string name="setup__enable_ime__title">Activación de {app_name}</string>
     <string name="setup__enable_ime__description">Android rique que tolos teclaos personalizaos s\'activen per separtao enantes de poder usalos. Vete a la configuración de <i>Llingua y entrada</i> p\'activar «{app_name}» ellí.</string>
     <string name="setup__enable_ime__open_settings_btn">Abrir la configuración del sistema</string>

@@ -70,20 +70,9 @@ class CrashDialogActivity : ComponentActivity() {
         setActionBar(toolbar)
 
         stacktraces = CrashUtility.getUnhandledStacktraces(this)
-        val versionName = buildString {
-            append("[")
-            append(BuildConfig.VERSION_NAME)
-            append("](")
-            if (BuildConfig.DEBUG) {
-                append(stringRes(R.string.florisboard__commit_by_hash_url, "hash" to BuildConfig.BUILD_COMMIT_HASH))
-            } else {
-                append(stringRes(R.string.florisboard__changelog_url, "version" to BuildConfig.VERSION_NAME))
-            }
-            append(")")
-        }
         errorReport.apply {
             appendLine("#### Environment information")
-            appendLine("- FlorisBoard $versionName (${BuildConfig.VERSION_CODE})")
+            appendLine("- ${resources.getString(R.string.app_name)} ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})")
             appendLine("- Device: ${Devtools.getDeviceName()}")
             appendLine("- Android: ${Devtools.getAndroidVersion()}")
             appendLine()
@@ -122,18 +111,17 @@ class CrashDialogActivity : ComponentActivity() {
             Toast.makeText(this, toastMessage, Toast.LENGTH_SHORT).show()
         }
 
-        // OFFLINE BUILD: this used to hand the issue tracker URL to an external browser via
-        // Intent.ACTION_VIEW. Like Context.launchUrl, it now only copies the address, so reporting
-        // a crash never makes this app initiate a hand-off to a networked app.
+        // OFFLINE BUILD: reporting happens by email — the button copies the Aman Labs contact
+        // address so the user can paste it into their mail app along with the copied report.
         openBugReportForm.setOnClickListener {
-            val issueTrackerUrl = resources.getString(R.string.florisboard__issue_tracker_url)
+            val contactEmail = resources.getString(R.string.aman_labs__contact_email)
             val clipboardManager = getSystemService(Context.CLIPBOARD_SERVICE)
             if (clipboardManager is ClipboardManager) {
-                clipboardManager.setPrimaryClip(ClipData.newPlainText(issueTrackerUrl, issueTrackerUrl))
+                clipboardManager.setPrimaryClip(ClipData.newPlainText(contactEmail, contactEmail))
             }
             Toast.makeText(
                 this,
-                stringRes(R.string.general__url_copied_to_clipboard, "url" to issueTrackerUrl),
+                stringRes(R.string.general__url_copied_to_clipboard, "url" to contactEmail),
                 Toast.LENGTH_LONG,
             ).show()
         }

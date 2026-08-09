@@ -78,12 +78,6 @@ enum class ExtensionListScreenType(
         titleResId = R.string.ext__list__ext_keyboard,
         getExtensionIndex = { it.keyboardExtensions },
         launchExtensionCreate = null,//{ it.navigate(Routes.Ext.Edit("null", KeyboardExtension.SERIAL_TYPE)) },
-    ),
-    EXT_LANGUAGEPACK(
-        id = "ext-languagepack",
-        titleResId = R.string.ext__list__ext_languagepack,
-        getExtensionIndex = { it.languagePacks },
-        launchExtensionCreate = null,//{ it.navigate(Routes.Ext.Edit("null", LanguagePackExtension.SERIAL_TYPE)) },
     );
 }
 

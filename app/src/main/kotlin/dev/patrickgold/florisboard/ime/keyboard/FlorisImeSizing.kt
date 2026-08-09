@@ -60,14 +60,16 @@ object FlorisImeSizing {
         val keyboardManager by context.keyboardManager()
         val evaluator by keyboardManager.activeEvaluator.collectAsState()
         val lastCharactersEvaluator by keyboardManager.lastCharactersEvaluator.collectAsState()
-        val rowCount = when (evaluator.keyboard.mode) {
+        // heightFactorSum counts the user-enabled number row as half a row, so enabling it only
+        // adds half a base row height to the keyboard instead of a full one.
+        val rowHeightSum = when (evaluator.keyboard.mode) {
             KeyboardMode.CHARACTERS,
             KeyboardMode.NUMERIC_ADVANCED,
             KeyboardMode.SYMBOLS,
             KeyboardMode.SYMBOLS2 -> lastCharactersEvaluator.keyboard as TextKeyboard
             else -> evaluator.keyboard as TextKeyboard
-        }.rowCount.coerceAtLeast(4)
-        return (keyboardRowBaseHeight * rowCount)
+        }.heightFactorSum.coerceAtLeast(4.0f)
+        return (keyboardRowBaseHeight * rowHeightSum)
     }
 
     @Composable

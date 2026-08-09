@@ -18,7 +18,6 @@ package dev.patrickgold.florisboard.app.ext
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Keyboard
-import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.runtime.Composable
 import dev.patrickgold.florisboard.R
@@ -52,13 +51,6 @@ fun ExtensionHomeScreen() = FlorisScreen {
             title = stringRes(R.string.ext__list__ext_keyboard),
             onClick = {
                 navController.navigate(Routes.Ext.List(ExtensionListScreenType.EXT_KEYBOARD, false))
-            },
-        )
-        Preference(
-            icon = Icons.Default.Language,
-            title = stringRes(R.string.ext__list__ext_languagepack),
-            onClick = {
-                navController.navigate(Routes.Ext.List(ExtensionListScreenType.EXT_LANGUAGEPACK, false))
             },
         )
     }

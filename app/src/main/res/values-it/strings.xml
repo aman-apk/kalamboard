@@ -117,8 +117,6 @@
     <string name="settings__localization__display_keyboard_labels_in_subtype_language" comment="Label of Display keyboard labels in subtype language preference">Visualizza le etichette della tastiera nella lingua secondaria</string>
     <string name="settings__localization__group_subtypes__label" comment="Label of subtypes group">Stili di input</string>
     <string name="settings__localization__subtype_add_title" comment="Title of subtype dialog when adding a new subtype">Aggiungi stile input</string>
-    <string name="settings__localization__language_pack_title" comment="Title of the language pack manager screen for managing installed and custom language packs">Gestisci pacchetti di lingua installati</string>
-    <string name="settings__localization__language_pack_summary" comment="Summary of preference item for adding a new language pack">Sperimentale: gestisci le estensioni che aggiungono il supporto a lingue specifiche (per ora input cinese basato sulla forma)</string>
     <string name="settings__localization__subtype_edit_title" comment="Title of subtype dialog when editing an existing subtype">Modifica stile di input</string>
     <string name="settings__localization__subtype_locale" comment="Label for locale dropdown in subtype dialog">Lingua principale</string>
     <string name="settings__localization__subtype_popup_mapping" comment="Label for popup mapping dropdown in subtype screen">Mappatura popup</string>
@@ -439,10 +437,6 @@
     <string name="about__version__title" comment="Preference title">Versione</string>
     <string name="about__version_copied__title" comment="Title of the toast for copying the version string">Versione copiata negli appunti</string>
     <string name="about__version_copied__error" comment="Title of the error toast for copying the version string">Qualcosa è andato storto: {error_message}</string>
-    <string name="about__changelog__title" comment="Preference title">Registro delle modifiche</string>
-    <string name="about__changelog__summary" comment="Preference summary">Cosa c\'è di nuovo</string>
-    <string name="about__repository__title" comment="Preference title">Repository (GitHub)</string>
-    <string name="about__repository__summary" comment="Preference summary">Codice sorgente, discussioni, problemi e informazioni</string>
     <string name="about__privacy_policy__title" comment="Preference title">Informativa sulla privacy</string>
     <string name="about__privacy_policy__summary" comment="Preference summary">L\'informativa sulla privacy per questo progetto</string>
     <string name="about__project_license__title" comment="Preference title">Licenza del progetto</string>
@@ -455,7 +449,6 @@
     <string name="setup__title" comment="Title of Setup">Benvenuto!</string>
     <string name="setup__intro_message" comment="Short intro message welcoming new users">Grazie per aver utilizzato {app_name}! Questa veloce guida potrebbe aiutarti a configurare la nostra tastiera {app_name} sul tuo dispositivo.</string>
     <string name="setup__footer__privacy_policy" comment="Privacy policy label for URL">Informativa sulla privacy</string>
-    <string name="setup__footer__repository" comment="Repository label for URL">Repository</string>
     <string name="setup__enable_ime__title">Abilita {app_name}</string>
     <string name="setup__enable_ime__description">Android richiede che ogni tastiera esterna sia separatamente abilitata prima di utilizzarla. Apri le impostazioni di Sistema <i> Lingue &amp; Impostazioni Immissione</i>, Impostazioni della tastiera. Abilita {app_name}.</string>
     <string name="setup__enable_ime__open_settings_btn">Apri le impostazioni di sistema</string>
@@ -497,11 +490,9 @@
     <!-- Crash Dialog strings -->
     <string name="crash_dialog__title" comment="Title of crash dialog">Segnalazione errore</string>
     <string name="crash_dialog__description" comment="Description of crash dialog">Ci dispiace per l\'inconveniente, ma KalamBoard si è chiuso a causa di un errore inaspettato.</string>
-    <string name="crash_dialog__report_instructions" comment="Issue tracker report instructions for the crash dialog. The %s placeholder is the name of the crash report template and always in English/LTR.">Se desideri segnalare questo errore, prima controlla se è già stato segnalato nel centro problemi su GitHub.\nSe non lo è, copia il registro di \'interruzione generato e apri un nuovo problema. Usa il modello \"%s\" e compila la descrizione, i passi per riprodurre il problema, e incolla il registro di interruzione generato alla fine. Questo aiuta a migliorare KalamBoard e a renderlo più stabile per tutti. Grazie!</string>
     <string name="crash_dialog__copy_to_clipboard" comment="Label of Copy to clipboard button in crash dialog">Copia negli appunti di sistema</string>
     <string name="crash_dialog__copy_to_clipboard_success" comment="Label of Copy to clipboard success message in crash dialog">Copiato negli appunti di sistema</string>
     <string name="crash_dialog__copy_to_clipboard_failure" comment="Label of Copy to clipboard failure message in crash dialog">Impossibile copiare sugli appunti di sistema: l\'istanza del gestore appunti non è stata trovata</string>
-    <string name="crash_dialog__open_issue_tracker" comment="Label of Open issue tracker button in crash dialog">Apri il centro problemi (github.com)</string>
     <string name="crash_dialog__close" comment="Label of Close button in crash dialog">Chiudi</string>
     <string name="crash_notification_channel__title" comment="Title of crash notification channel">Segnalazioni di errore di KalamBoard</string>
     <string name="crash_once_notification__title" comment="Title of the notification for a single crash">KalamBoard ha smesso di funzionare…</string>
@@ -578,7 +569,6 @@
     <!-- Extension strings -->
     <string name="ext__list__ext_theme">Temi</string>
     <string name="ext__list__ext_keyboard">Skins tastiera</string>
-    <string name="ext__list__ext_languagepack">Lingue (addons)</string>
     <string name="ext__meta__authors">Autori</string>
     <string name="ext__meta__components">Componenti integrati</string>
     <string name="ext__meta__components_theme">Temi integrati</string>
@@ -622,7 +612,6 @@
     <string name="ext__import__ext_any" comment="Title of Importer screen for import of any supported KalamBoard extension">Importa estensione</string>
     <string name="ext__import__ext_keyboard" comment="Title of Importer screen for keyboard extension import">Importa estensione della tastiera</string>
     <string name="ext__import__ext_theme" comment="Title of Importer screen for theme extension import">Importa estensione del tema</string>
-    <string name="ext__import__ext_languagepack" comment="Title of Importer screen for language pack extension import">Importazio estensione del pacchetto linguistico</string>
     <string name="ext__import__file_skip" comment="Label when a file cannot be imported in the current context. The actual reason string is in a separate text view below this string.">Il file non può essere importato. Ragione:</string>
     <string name="ext__import__file_skip_unsupported" comment="Reason string when file is unsupported">File non supportato o riconosciuto.</string>
     <string name="ext__import__file_skip_ext_core" comment="Reason string when ext has core extension ID">Impossibile sostituire o aggiornare i pacchetti di estensione predefiniti forniti con le risorse principali dell\'app. Considera l\'aggiornamento dell\'app se intendi utilizzare una versione più recente di un pacchetto di estensione principale.</string>

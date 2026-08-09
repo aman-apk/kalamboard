@@ -124,8 +124,6 @@
     <string name="settings__localization__display_keyboard_labels_in_subtype_language" comment="Label of Display keyboard labels in subtype language preference">Wyświetlaj etykiety klawiatury w języku podtypu</string>
     <string name="settings__localization__group_subtypes__label" comment="Label of subtypes group">Podtypy</string>
     <string name="settings__localization__subtype_add_title" comment="Title of subtype dialog when adding a new subtype">Dodaj układ</string>
-    <string name="settings__localization__language_pack_title" comment="Title of the language pack manager screen for managing installed and custom language packs">Zarządzaj zainstalowanymi pakietami językowymi</string>
-    <string name="settings__localization__language_pack_summary" comment="Summary of preference item for adding a new language pack">Eksperymentalnie: zarządzaj rozszerzeniami, które dodają wsparcie dla konkretnych języków (na razie chiński, oparty na kształcie)</string>
     <string name="settings__localization__subtype_edit_title" comment="Title of subtype dialog when editing an existing subtype">Edytuj układ</string>
     <string name="settings__localization__subtype_locale" comment="Label for locale dropdown in subtype dialog">Język podstawowy</string>
     <string name="settings__localization__subtype_popup_mapping" comment="Label for popup mapping dropdown in subtype screen">Mapowanie wyskakującego okienka</string>
@@ -541,10 +539,6 @@
     <string name="about__version__title" comment="Preference title">Wersja</string>
     <string name="about__version_copied__title" comment="Title of the toast for copying the version string">Wersję skopiowano do schowka</string>
     <string name="about__version_copied__error" comment="Title of the error toast for copying the version string">Coś poszło nie tak: {error_message}</string>
-    <string name="about__changelog__title" comment="Preference title">Lista zmian</string>
-    <string name="about__changelog__summary" comment="Preference summary">Nowości</string>
-    <string name="about__repository__title" comment="Preference title">Repozytorium (GitHub)</string>
-    <string name="about__repository__summary" comment="Preference summary">Kod źródłowy, dyskusje, problemy i informacje</string>
     <string name="about__privacy_policy__title" comment="Preference title">Polityka prywatności</string>
     <string name="about__privacy_policy__summary" comment="Preference summary">Polityka prywatności tego projektu</string>
     <string name="about__project_license__title" comment="Preference title">Licencja Projektu</string>
@@ -557,7 +551,6 @@
     <string name="setup__title" comment="Title of Setup">Witaj!</string>
     <string name="setup__intro_message" comment="Short intro message welcoming new users">Dziękujemy za korzystanie z aplikacji {app_name}! Ta szybka konfiguracja przeprowadzi Cię przez czynności wymagane do korzystania z aplikacji {app_name} na Twoim urządzeniu.</string>
     <string name="setup__footer__privacy_policy" comment="Privacy policy label for URL">Polityka prywatności</string>
-    <string name="setup__footer__repository" comment="Repository label for URL">Repozytorium</string>
     <string name="setup__enable_ime__title">Wlącz {app_name}</string>
     <string name="setup__enable_ime__description">Android wymaga, aby każda niestandardowa klawiatura była osobno włączona, zanim będzie można z niej korzystać. Otwórz System <i>Język &amp; Wprowadzanie</i> Ustawienia, tam włącz \"{app_name}\".</string>
     <string name="setup__enable_ime__open_settings_btn">Otwórz ustawienia systemowe</string>
@@ -615,11 +608,9 @@
     <!-- Crash Dialog strings -->
     <string name="crash_dialog__title" comment="Title of crash dialog">Pobierz raport o błędach</string>
     <string name="crash_dialog__description" comment="Description of crash dialog">Przepraszamy za niedogodności, ale KalamBoard uległ awarii z powodu nieoczekiwanego błędu.</string>
-    <string name="crash_dialog__report_instructions" comment="Issue tracker report instructions for the crash dialog. The %s placeholder is the name of the crash report template and always in English/LTR.">Jeśli chcesz zgłosić ten błąd, najpierw sprawdź system do śledzenia zgłoszeń na GitHub, czy Twoja awaria nie została już zgłoszona.\nJeśli nie, skopiuj wygenerowany dziennik awarii i otwórz nowy \"issue\". Użyj szablonu „%s” i wypełnij opis, kroki do odtworzenia, a na końcu wklej wygenerowany dziennik awarii. Pomaga to uczynić KalamBoard lepszym i bardziej stabilnym dla wszystkich. Dziękuję Ci!</string>
     <string name="crash_dialog__copy_to_clipboard" comment="Label of Copy to clipboard button in crash dialog">Skopiuj do schowka systemowego</string>
     <string name="crash_dialog__copy_to_clipboard_success" comment="Label of Copy to clipboard success message in crash dialog">Skopiowano do schowka systemowego</string>
     <string name="crash_dialog__copy_to_clipboard_failure" comment="Label of Copy to clipboard failure message in crash dialog">Nie można skopiować do schowka systemowego: Nie znaleziono instancji menedżera schowka</string>
-    <string name="crash_dialog__open_issue_tracker" comment="Label of Open issue tracker button in crash dialog">Otwórz system do śledzenia zgłoszeń (github.com)</string>
     <string name="crash_dialog__close" comment="Label of Close button in crash dialog">Zamknij</string>
     <string name="crash_notification_channel__title" comment="Title of crash notification channel">Raporty o błędach KalamBoard</string>
     <string name="crash_once_notification__title" comment="Title of the notification for a single crash">KalamBoard przestał działać…</string>
@@ -726,7 +717,6 @@
     <string name="ext__home__title">Dodatki i rozszerzenia</string>
     <string name="ext__list__ext_theme">Rozszerzenia motywów</string>
     <string name="ext__list__ext_keyboard">Rozszerzenia klawiatury</string>
-    <string name="ext__list__ext_languagepack">Rozszerzenia pakietów językowych</string>
     <string name="ext__meta__authors">Autorzy</string>
     <string name="ext__meta__components">Dołączone komponenty</string>
     <string name="ext__meta__components_theme">Dołączone motywy</string>
@@ -772,7 +762,6 @@
     <string name="ext__import__ext_any" comment="Title of Importer screen for import of any supported KalamBoard extension">Import rozszerzenia</string>
     <string name="ext__import__ext_keyboard" comment="Title of Importer screen for keyboard extension import">Import rozszerzenie klawiatury</string>
     <string name="ext__import__ext_theme" comment="Title of Importer screen for theme extension import">Import rozszerzenia motywu</string>
-    <string name="ext__import__ext_languagepack" comment="Title of Importer screen for language pack extension import">Importuj rozszerzenie pakietu językowego</string>
     <string name="ext__import__file_skip" comment="Label when a file cannot be imported in the current context. The actual reason string is in a separate text view below this string.">Pliki nie mogły zostać za importowane. Powód:</string>
     <string name="ext__import__file_skip_unsupported" comment="Reason string when file is unsupported">Niewspierane lub nierozpoznany typ pliku.</string>
     <string name="ext__import__file_skip_ext_core" comment="Reason string when ext has core extension ID">Nie można zastąpić lub zaktualizować domyślnych pakietów rozszerzeń dostarczonych z podstawowymi zasobami aplikacji. Rozważ aktualizację samej aplikacji, jeśli zamierzasz korzystać z nowszej wersji podstawowego pakietu rozszerzeń.</string>

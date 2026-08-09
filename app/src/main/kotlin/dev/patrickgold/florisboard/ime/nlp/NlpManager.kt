@@ -26,7 +26,6 @@ import dev.patrickgold.florisboard.ime.core.Subtype
 import dev.patrickgold.florisboard.ime.editor.EditorContent
 import dev.patrickgold.florisboard.ime.editor.EditorRange
 import dev.patrickgold.florisboard.ime.media.emoji.EmojiSuggestionProvider
-import dev.patrickgold.florisboard.ime.nlp.han.HanShapeBasedLanguageProvider
 import dev.patrickgold.florisboard.ime.nlp.words.WordSuggestionProvider
 import dev.patrickgold.florisboard.keyboardManager
 import dev.patrickgold.florisboard.subtypeManager
@@ -60,8 +59,10 @@ class NlpManager(context: Context) {
     private val emojiSuggestionProvider = EmojiSuggestionProvider(context)
     private val providers = guardedByLock {
         mapOf(
+            // KalamBoard ships only the unified word provider; a subtype referencing any other
+            // provider id (e.g. the removed Chinese shape-based one) falls back gracefully to
+            // FallbackNlpProvider in getSuggestionProvider/getSpellingProvider.
             WordSuggestionProvider.ProviderId to ProviderInstanceWrapper(WordSuggestionProvider(context)),
-            HanShapeBasedLanguageProvider.ProviderId to ProviderInstanceWrapper(HanShapeBasedLanguageProvider(context)),
         )
     }
     // lock unnecessary because values constant

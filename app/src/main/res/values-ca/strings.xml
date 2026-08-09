@@ -117,8 +117,6 @@
     <string name="settings__localization__display_keyboard_labels_in_subtype_language" comment="Label of Display keyboard labels in subtype language preference">Mostra les etiquetes del teclat en l\'idioma del subtipus</string>
     <string name="settings__localization__group_subtypes__label" comment="Label of subtypes group">Subtipus</string>
     <string name="settings__localization__subtype_add_title" comment="Title of subtype dialog when adding a new subtype">Afegeix un subtipus</string>
-    <string name="settings__localization__language_pack_title" comment="Title of the language pack manager screen for managing installed and custom language packs">Gestiona els paquets de llengua instal·lats</string>
-    <string name="settings__localization__language_pack_summary" comment="Summary of preference item for adding a new language pack">Experimental: gestiona les extensions que afegeixin compatibilitat amb llengües específiques (de moment, introducció basada en el xinès)</string>
     <string name="settings__localization__subtype_edit_title" comment="Title of subtype dialog when editing an existing subtype">Edita el subtipus</string>
     <string name="settings__localization__subtype_locale" comment="Label for locale dropdown in subtype dialog">Llengua principal</string>
     <string name="settings__localization__subtype_popup_mapping" comment="Label for popup mapping dropdown in subtype screen">Mapatge emergent</string>
@@ -443,10 +441,6 @@
     <string name="about__version__title" comment="Preference title">Versió</string>
     <string name="about__version_copied__title" comment="Title of the toast for copying the version string">Versió copiada al porta-retalls</string>
     <string name="about__version_copied__error" comment="Title of the error toast for copying the version string">Alguna cosa ha anat malament: {error_message}</string>
-    <string name="about__changelog__title" comment="Preference title">Registre de canvis</string>
-    <string name="about__changelog__summary" comment="Preference summary">Novetats</string>
-    <string name="about__repository__title" comment="Preference title">Repositori (GitHub)</string>
-    <string name="about__repository__summary" comment="Preference summary">Codi font, debats, incidències i informació</string>
     <string name="about__privacy_policy__title" comment="Preference title">Política de privacitat</string>
     <string name="about__privacy_policy__summary" comment="Preference summary">La política de privacitat per a aquest projecte</string>
     <string name="about__project_license__title" comment="Preference title">Llicència del projecte</string>
@@ -459,7 +453,6 @@
     <string name="setup__title" comment="Title of Setup">Benvinguts!</string>
     <string name="setup__intro_message" comment="Short intro message welcoming new users">Gràcies per usar {app_name}! Aquesta configuració ràpida t\'acompanyarà en els passos necessaris per poder usar {app_name} al teu dispositiu.</string>
     <string name="setup__footer__privacy_policy" comment="Privacy policy label for URL">Política de privacitat</string>
-    <string name="setup__footer__repository" comment="Repository label for URL">Repositori</string>
     <string name="setup__enable_ime__title">Habilita {app_name}</string>
     <string name="setup__enable_ime__description">Android requereix que cada teclat personalitzat s\'habiliti per separat abans de poder usar-lo. Obre els paràmetres de <i>Idioma i entrada</i> a Sistema i allà habilita \"{app_name}\".</string>
     <string name="setup__enable_ime__open_settings_btn">Obre els paràmetres del sistema</string>
@@ -511,11 +504,9 @@
     <!-- Crash Dialog strings -->
     <string name="crash_dialog__title" comment="Title of crash dialog">Informe d\'errors de KalamBoard</string>
     <string name="crash_dialog__description" comment="Description of crash dialog">Disculpa les molèsties, però KalamBoard ha fallat a conseqüència d\'un error inesperat.</string>
-    <string name="crash_dialog__report_instructions" comment="Issue tracker report instructions for the crash dialog. The %s placeholder is the name of the crash report template and always in English/LTR.">Si vols informar d\'aquest error, mira\'t primer si ja s\'ha informat al rastrejador d\'incidències de GitHub.\nSi no, copia el registre de l\'error i obre una incidència nova. Usa la plantilla %s i emplena-la amb la descripció, els passos per reproduir-lo i enganxa el registre d\'error generat al final. Això ens ajuda a millorar KalamBoard i fer-lo més estable per a tothom. Gràcies!</string>
     <string name="crash_dialog__copy_to_clipboard" comment="Label of Copy to clipboard button in crash dialog">Copia al porta-retalls del sistema</string>
     <string name="crash_dialog__copy_to_clipboard_success" comment="Label of Copy to clipboard success message in crash dialog">S\'ha copiat al porta-retalls del sistema</string>
     <string name="crash_dialog__copy_to_clipboard_failure" comment="Label of Copy to clipboard failure message in crash dialog">No es pot copiar al porta-retalls del sistema: No s\'ha trobat la instància d\'administració del porta-retalls</string>
-    <string name="crash_dialog__open_issue_tracker" comment="Label of Open issue tracker button in crash dialog">Obre el rastrejador d\'incidències (github.com)</string>
     <string name="crash_dialog__close" comment="Label of Close button in crash dialog">Tanca</string>
     <string name="crash_notification_channel__title" comment="Title of crash notification channel">Informes d\'error de KalamBoard</string>
     <string name="crash_once_notification__title" comment="Title of the notification for a single crash">KalamBoard ha deixat de funcionar…</string>
@@ -609,7 +600,6 @@
     <string name="ext__home__title">Complements &amp; Extensions</string>
     <string name="ext__list__ext_theme">Extensions del tema</string>
     <string name="ext__list__ext_keyboard">Extensions del teclat</string>
-    <string name="ext__list__ext_languagepack">Extensions del paquet d\'idiomes</string>
     <string name="ext__meta__authors">Autors</string>
     <string name="ext__meta__components">Components agrupats</string>
     <string name="ext__meta__components_theme">Temes agrupats</string>
@@ -655,7 +645,6 @@
     <string name="ext__import__ext_any" comment="Title of Importer screen for import of any supported KalamBoard extension">Importa l\'extensió</string>
     <string name="ext__import__ext_keyboard" comment="Title of Importer screen for keyboard extension import">Importa l\'extensió de teclat</string>
     <string name="ext__import__ext_theme" comment="Title of Importer screen for theme extension import">Importa l\'extensió de tema</string>
-    <string name="ext__import__ext_languagepack" comment="Title of Importer screen for language pack extension import">Importa l\'extensió de paquet d\'idioma</string>
     <string name="ext__import__file_skip" comment="Label when a file cannot be imported in the current context. The actual reason string is in a separate text view below this string.">No es pot importar el fitxer. Motiu:</string>
     <string name="ext__import__file_skip_unsupported" comment="Reason string when file is unsupported">Tipus de fitxer incompatible o no reconegut.</string>
     <string name="ext__import__file_skip_ext_core" comment="Reason string when ext has core extension ID">Impossible substituir o actualitzar els paquets d\'extensió per defecte proveïts amb els recursos base de l\'aplicació. Planteja\'t d\'actualitzar l\'aplicació mateixa si vols usar una versió nova d\'un paquet d\'extensió base.</string>

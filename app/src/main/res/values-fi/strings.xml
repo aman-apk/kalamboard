@@ -255,10 +255,6 @@
     <string name="about__version__title" comment="Preference title">Versio</string>
     <string name="about__version_copied__title" comment="Title of the toast for copying the version string">Versio kopioitu leikepöydälle</string>
     <string name="about__version_copied__error" comment="Title of the error toast for copying the version string">Tapahtui virhe: {error_message}</string>
-    <string name="about__changelog__title" comment="Preference title">Muutosloki</string>
-    <string name="about__changelog__summary" comment="Preference summary">Mitä uutta</string>
-    <string name="about__repository__title" comment="Preference title">Tietovarasto (GitHub)</string>
-    <string name="about__repository__summary" comment="Preference summary">Lähdekoodi, keskustelut, virheraportit sekä tietoa</string>
     <string name="about__privacy_policy__title" comment="Preference title">Tietosuojakäytäntö</string>
     <string name="about__privacy_policy__summary" comment="Preference summary">Projektin tietosuojakäytäntö</string>
     <string name="about__project_license__title" comment="Preference title">Projektin lisenssi</string>
@@ -270,7 +266,6 @@
     <string name="setup__title" comment="Title of Setup">Tervetuloa!</string>
     <string name="setup__intro_message" comment="Short intro message welcoming new users">Kiitos kun käytät sovellusta {app_name}! Tämä pika-asennus ohjaa sinut ottamaan sovelluksen {app_name} käyttöön laitteellasi.</string>
     <string name="setup__footer__privacy_policy" comment="Privacy policy label for URL">Tietosuojakäytäntö</string>
-    <string name="setup__footer__repository" comment="Repository label for URL">Tietovarasto</string>
     <string name="setup__enable_ime__title">Ota käyttöön {app_name}</string>
     <string name="setup__enable_ime__description">Android vaatii, että jokainen näppäimistö on otettu erikseen käyttöön järjestelmäasetuksissa. Avaa Järjestelmän <i>Kielet ja syöttötapa</i>-asetukset ja ota käyttöön \"{app_name}\".</string>
     <string name="setup__enable_ime__open_settings_btn">Avaa järjestelmän asetukset</string>
@@ -283,7 +278,6 @@
     <string name="crash_dialog__description" comment="Description of crash dialog">Pahoittelut, KalamBoard kaatui odottamattoman virheen vuoksi.</string>
     <string name="crash_dialog__copy_to_clipboard" comment="Label of Copy to clipboard button in crash dialog">Kopioi järjestelmän leikepöydälle</string>
     <string name="crash_dialog__copy_to_clipboard_success" comment="Label of Copy to clipboard success message in crash dialog">Kopioitu järjestelmän leikepöydälle</string>
-    <string name="crash_dialog__open_issue_tracker" comment="Label of Open issue tracker button in crash dialog">Avaa ongelmien seuranta (github.com)</string>
     <string name="crash_dialog__close" comment="Label of Close button in crash dialog">Sulje</string>
     <string name="crash_notification_channel__title" comment="Title of crash notification channel">KalamBoard-virheraportit</string>
     <string name="crash_once_notification__title" comment="Title of the notification for a single crash">KalamBoard on lopettanut toimintansa…</string>

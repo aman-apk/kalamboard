@@ -124,8 +124,6 @@
     <string name="settings__localization__display_keyboard_labels_in_subtype_language" comment="Label of Display keyboard labels in subtype language preference">Етикети на клавиатурата на езика на подредбата</string>
     <string name="settings__localization__group_subtypes__label" comment="Label of subtypes group">Подредби</string>
     <string name="settings__localization__subtype_add_title" comment="Title of subtype dialog when adding a new subtype">Добавяне на подредба</string>
-    <string name="settings__localization__language_pack_title" comment="Title of the language pack manager screen for managing installed and custom language packs">Управление на инсталираните езикови пакети</string>
-    <string name="settings__localization__language_pack_summary" comment="Summary of preference item for adding a new language pack">Експериментално: управление на добавки за поддръжка на определени езици (въвеждане чрез фигури на китайски език)</string>
     <string name="settings__localization__subtype_edit_title" comment="Title of subtype dialog when editing an existing subtype">Променяне на подредба</string>
     <string name="settings__localization__subtype_locale" comment="Label for locale dropdown in subtype dialog">Основен език</string>
     <string name="settings__localization__subtype_popup_mapping" comment="Label for popup mapping dropdown in subtype screen">Подсказки</string>
@@ -539,10 +537,6 @@
     <string name="about__version__title" comment="Preference title">Издание</string>
     <string name="about__version_copied__title" comment="Title of the toast for copying the version string">Номера на изданието е копирано в междинната памет</string>
     <string name="about__version_copied__error" comment="Title of the error toast for copying the version string">Нещо се обърка: {error_message}</string>
-    <string name="about__changelog__title" comment="Preference title">Дневник на промените</string>
-    <string name="about__changelog__summary" comment="Preference summary">Какво е новото</string>
-    <string name="about__repository__title" comment="Preference title">Хранилище (GitHub)</string>
-    <string name="about__repository__summary" comment="Preference summary">Изходен код, обсъждане, дефекти и помощ</string>
     <string name="about__privacy_policy__title" comment="Preference title">Политика за личните данни</string>
     <string name="about__privacy_policy__summary" comment="Preference summary">Политиката за личните данни на проекта</string>
     <string name="about__project_license__title" comment="Preference title">Лиценз на проекта</string>
@@ -555,7 +549,6 @@
     <string name="setup__title" comment="Title of Setup">Добре дошли!</string>
     <string name="setup__intro_message" comment="Short intro message welcoming new users">Благодарим ви, че използвате {app_name}! Този помощник ще ви преведе през задължителните стъпки, които трябва да предприемете, за да използвате {app_name}.</string>
     <string name="setup__footer__privacy_policy" comment="Privacy policy label for URL">Политика за личните данни</string>
-    <string name="setup__footer__repository" comment="Repository label for URL">Хранилище</string>
     <string name="setup__enable_ime__title">Включване на {app_name}</string>
     <string name="setup__enable_ime__description">Android изисква всяка потребителска клавиатура да бъде включена отделно, преди да можете да я използвате. Отворете <i>Езици и въвеждане</i> от Системни настройки и включете „{app_name}“.</string>
     <string name="setup__enable_ime__open_settings_btn">Системни настройки</string>
@@ -611,11 +604,9 @@
     <!-- Crash Dialog strings -->
     <string name="crash_dialog__title" comment="Title of crash dialog">Отчет за грешка на KalamBoard</string>
     <string name="crash_dialog__description" comment="Description of crash dialog">Извинявайте за неудобството, но поради непредвидена грешка KalamBoard се срина.</string>
-    <string name="crash_dialog__report_instructions" comment="Issue tracker report instructions for the crash dialog. The %s placeholder is the name of the crash report template and always in English/LTR.">При желание от ваша страна да съобщите за възникналата грешка първо проверете системата за дефекти в GitHub дали подобна вече не е докладвана.\nАко не е, копирайте генерирания журнал на грешката и направете нов долкад за нея, използвайки шаблона \"%s\". Попълнете описанието, стъпките за възпроизвеждане и накрая поставете копирания журнал.\nПо този начин помагате да направим приложението KalamBoard по-стабилно за всички. Благодарим ви!</string>
     <string name="crash_dialog__copy_to_clipboard" comment="Label of Copy to clipboard button in crash dialog">Копиране в системната междинна памет</string>
     <string name="crash_dialog__copy_to_clipboard_success" comment="Label of Copy to clipboard success message in crash dialog">Копирано в системната междинна памет</string>
     <string name="crash_dialog__copy_to_clipboard_failure" comment="Label of Copy to clipboard failure message in crash dialog">Грешка при копиране в системната междинна памет</string>
-    <string name="crash_dialog__open_issue_tracker" comment="Label of Open issue tracker button in crash dialog">Система за дефекти (github)</string>
     <string name="crash_dialog__close" comment="Label of Close button in crash dialog">Затваряне</string>
     <string name="crash_notification_channel__title" comment="Title of crash notification channel">Доклади за грешки на KalamBoard</string>
     <string name="crash_once_notification__title" comment="Title of the notification for a single crash">KalamBoard спря да работи…</string>
@@ -722,7 +713,6 @@
     <string name="ext__home__title">Добавки и разширения</string>
     <string name="ext__list__ext_theme">Добавки за теми</string>
     <string name="ext__list__ext_keyboard">Добавки за клавиатури</string>
-    <string name="ext__list__ext_languagepack">Езикови пакети</string>
     <string name="ext__meta__authors">Автори</string>
     <string name="ext__meta__components">Придружаващи компоненти</string>
     <string name="ext__meta__components_theme">Придружаващи теми</string>
@@ -768,7 +758,6 @@
     <string name="ext__import__ext_any" comment="Title of Importer screen for import of any supported KalamBoard extension">Внасяне на добавка</string>
     <string name="ext__import__ext_keyboard" comment="Title of Importer screen for keyboard extension import">Внасяне на добавка с клавиатура</string>
     <string name="ext__import__ext_theme" comment="Title of Importer screen for theme extension import">Внасяне на добавка с тема</string>
-    <string name="ext__import__ext_languagepack" comment="Title of Importer screen for language pack extension import">Внасяне на разширение-езиков пакет</string>
     <string name="ext__import__file_skip" comment="Label when a file cannot be imported in the current context. The actual reason string is in a separate text view below this string.">Файлът не може да бъде внесен. Причина:</string>
     <string name="ext__import__file_skip_unsupported" comment="Reason string when file is unsupported">Неподдържан или непознат вид на файла.</string>
     <string name="ext__import__file_skip_ext_core" comment="Reason string when ext has core extension ID">Не е възможно да замените или обновите основните разширения, предоставени с приложението. Ако искате да използвате по-нова версия на основните разширения, обновете приложението.</string>

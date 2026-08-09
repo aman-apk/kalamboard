@@ -117,8 +117,6 @@
     <string name="settings__localization__display_keyboard_labels_in_subtype_language" comment="Label of Display keyboard labels in subtype language preference">Montri klavarajn etikedojn en la subspeca lingvo</string>
     <string name="settings__localization__group_subtypes__label" comment="Label of subtypes group">Subspecoj</string>
     <string name="settings__localization__subtype_add_title" comment="Title of subtype dialog when adding a new subtype">Aldoni subspecon</string>
-    <string name="settings__localization__language_pack_title" comment="Title of the language pack manager screen for managing installed and custom language packs">Mastrumi instalitajn lingvajn pakojn</string>
-    <string name="settings__localization__language_pack_summary" comment="Summary of preference item for adding a new language pack">Eksperimente: mastrumi etendaĵojn kio aldonas subtenon por specifaj lingvoj (ĉina formobazita enigo dume)</string>
     <string name="settings__localization__subtype_edit_title" comment="Title of subtype dialog when editing an existing subtype">Redakti subspecon</string>
     <string name="settings__localization__subtype_locale" comment="Label for locale dropdown in subtype dialog">Ĉefa lingvo</string>
     <string name="settings__localization__subtype_popup_mapping" comment="Label for popup mapping dropdown in subtype screen">Ŝprucsignojn aranĝo</string>
@@ -363,10 +361,6 @@
     <string name="about__version__title" comment="Preference title">Versio</string>
     <string name="about__version_copied__title" comment="Title of the toast for copying the version string">Versio kopiita al tondujo</string>
     <string name="about__version_copied__error" comment="Title of the error toast for copying the version string">Io misis: {error_message}</string>
-    <string name="about__changelog__title" comment="Preference title">Ŝanĝojn registro</string>
-    <string name="about__changelog__summary" comment="Preference summary">Kio estas nova</string>
-    <string name="about__repository__title" comment="Preference title">Deponejo (GitHub)</string>
-    <string name="about__repository__summary" comment="Preference summary">Fontkodo, diskutoj, problemoj kaj informoj</string>
     <string name="about__privacy_policy__title" comment="Preference title">Privateca politiko</string>
     <string name="about__privacy_policy__summary" comment="Preference summary">La privateca politiko de tiu ĉi projekto</string>
     <string name="about__project_license__title" comment="Preference title">Projekton permesilo</string>
@@ -376,7 +370,6 @@
     <!-- Setup UI strings -->
     <string name="setup__title" comment="Title of Setup">Bonvenon!</string>
     <string name="setup__footer__privacy_policy" comment="Privacy policy label for URL">Privateca politiko</string>
-    <string name="setup__footer__repository" comment="Repository label for URL">Deponejo</string>
     <string name="setup__enable_ime__open_settings_btn">Malfermi sistemajn agordojn</string>
     <string name="setup__select_ime__switch_keyboard_btn">Ŝanĝi klavaron</string>
     <string name="setup__grant_notification_permission__title">Permesi kraŝajn raportajn sciigojn</string>
@@ -484,7 +477,6 @@
     <string name="ext__home__title">Aldonaĵoj &amp; Etendaĵoj</string>
     <string name="ext__list__ext_theme">Etosaj etendaĵoj</string>
     <string name="ext__list__ext_keyboard">Klavaraj etendaĵoj</string>
-    <string name="ext__list__ext_languagepack">Lingvaj pakaj etendaĵoj</string>
     <string name="ext__meta__authors">Aŭtoroj</string>
     <string name="ext__meta__components">Kunligataj komponentoj</string>
     <string name="ext__meta__components_theme">Kunligataj etosoj</string>
@@ -526,7 +518,6 @@
     <string name="ext__import__ext_any" comment="Title of Importer screen for import of any supported KalamBoard extension">Importi etendaĵon</string>
     <string name="ext__import__ext_keyboard" comment="Title of Importer screen for keyboard extension import">Importi klavaran etendaĵon</string>
     <string name="ext__import__ext_theme" comment="Title of Importer screen for theme extension import">Importi etosan etendaĵon</string>
-    <string name="ext__import__ext_languagepack" comment="Title of Importer screen for language pack extension import">Importi lingvajn pakajn etendaĵojn</string>
     <string name="ext__import__file_skip" comment="Label when a file cannot be imported in the current context. The actual reason string is in a separate text view below this string.">Dosiero ne povas esti importata. Kialo:</string>
     <string name="ext__import__file_skip_unsupported" comment="Reason string when file is unsupported">Nesubtenata aŭ nerekonata dosiera tipo.</string>
     <string name="ext__import__file_skip_ext_not_supported" comment="Reason string when file is loaded in incorrect context">Atendis aŭdiovidaĵan dosieron (bildon, sonaĵon, tiparon, ktp) sed trovis etendaĵan arkivon.</string>

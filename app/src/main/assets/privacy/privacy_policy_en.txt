@@ -1,0 +1,37 @@
+Privacy Policy — KalamBoard
+Publisher: Aman Labs (أمان) — donation-based privacy apps, not-for-profit.
+Last updated: 2026-08-09
+
+■ The one-sentence summary
+KalamBoard has no Internet permission at all, so it is technically incapable — not merely unwilling — of sending anything you type, or any data about you, to anyone. Including us.
+
+■ What data do we collect?
+Nothing. At all.
+• No accounts, no identifiers, no usage analytics, no crash reporting, no ads, no trackers.
+• The app manifest contains no INTERNET permission and no other network permission. Anyone can verify this by inspecting the package — and an automated build check fails the build if any network permission ever sneaks in.
+
+■ What about what I type and the words it learns?
+Everything the keyboard learns (your new words, personal predictions, clipboard history, typing statistics) is stored on your device only, inside the app's private storage:
+• It never leaves your device and is explicitly excluded from Android cloud backup and device-to-device transfer.
+• Incognito mode stops all learning, and you can disable learning or wipe its data anytime in Settings.
+• Backups are strictly manual: you export a local file yourself and fully control it.
+
+■ Permissions the app requests
+• Vibration: haptic feedback while typing.
+• Notifications (optional): local notifications such as clipboard features.
+Nothing else. No location, no contacts, no microphone, no external storage.
+
+■ Third parties
+There is no third-party component that collects data: no analytics libraries, no ad networks, no cloud services.
+
+■ Children
+The app is suitable for all ages; since it collects no data, no children's data is ever processed.
+
+■ Changes to this policy
+Any future change will be published here. The core of the policy — zero data collection and zero Internet access — is the reason this app exists and will not change.
+
+■ Contact
+Email: mohhey1988@gmail.com
+
+■ Acknowledgement
+KalamBoard is based on the open-source FlorisBoard project (Apache 2.0 license), heavily modified for full offline isolation and Arabic support.

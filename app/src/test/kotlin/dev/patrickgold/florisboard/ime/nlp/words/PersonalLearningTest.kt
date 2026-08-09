@@ -67,7 +67,39 @@ class PersonalLearningTest : FunSpec({
             val static = listOf(ranked("كتير", 200, score = 200.0))
             val user = listOf(ranked("كرمال", 200, score = 200.0))
             val merged = PersonalLearning.mergeRanked(static, user, emptySet(), 8)
-            merged.first().entry.word shouldBe "كرمال" // 200 * 1.3 > 200
+            merged.first().entry.word shouldBe "كرمال"
+        }
+
+        test("user completions get the priority floor over any static non-exact score") {
+            // A word the user actually typed, completing the current prefix, must beat even a
+            // max-frequency static completion — «اقترح من قاموسي الذي تعلمته أولاً».
+            val static = listOf(ranked("كتير", 255, score = 255.0))
+            val user = listOf(ranked("كرمالك", 112, score = 60.0))
+            val merged = PersonalLearning.mergeRanked(static, user, emptySet(), 8)
+            merged.first().entry.word shouldBe "كرمالك"
+            merged.first().score shouldBe PersonalLearning.USER_PRIORITY_FLOOR + 60.0
+        }
+
+        test("user CORRECTIONS are never floored — the autocommit margin gate must stay honest") {
+            // If a one-edit user correction were floored to 256+, the relative margin gate in the
+            // provider would compare 256+ against 0..255 static scores and auto-replace correctly
+            // typed unknown words (e.g. «rani» → learned «Rami»). Boost yes, floor no.
+            val static = listOf(ranked("كتير", 255, score = 255.0))
+            val user = listOf(ranked("كرمالك", 112, score = 60.0, correction = true))
+            val merged = PersonalLearning.mergeRanked(static, user, emptySet(), 8)
+            merged.first().entry.word shouldBe "كتير" // user: 60 * 2.0 = 120 < 255
+            merged.first { it.entry.word == "كرمالك" }.score shouldBe 60.0 * PersonalLearning.USER_SCORE_BOOST
+        }
+
+        test("a correction survives the merge even when completions fill every slot") {
+            val static = listOf(
+                ranked("نرحل", 250, score = 250.0),
+                ranked("نرحب", 249, score = 249.0),
+                ranked("نرحلها", 248, score = 248.0),
+                ranked("مرحبا", 200, score = 100.0, correction = true),
+            )
+            val merged = PersonalLearning.mergeRanked(static, emptyList(), emptySet(), 3)
+            merged.map { it.entry.word } shouldContain "مرحبا"
         }
 
         test("duplicate keeps the better variant") {
@@ -75,7 +107,8 @@ class PersonalLearningTest : FunSpec({
             val user = listOf(ranked("منيح", 130, score = 130.0))
             val merged = PersonalLearning.mergeRanked(static, user, emptySet(), 8)
             merged.size shouldBe 1
-            merged.first().score shouldBe 240.0
+            // The user's own copy now carries the priority floor, so it is the better variant.
+            merged.first().score shouldBe PersonalLearning.USER_PRIORITY_FLOOR + 130.0
         }
 
         test("exact match stays pinned above boosted user completions") {
@@ -124,6 +157,19 @@ class PersonalLearningTest : FunSpec({
                 ranked("كلام", 90, score = 90.0),
             )
             PersonalLearning.rerankByContext(ranked, emptyMap(), ArabicNormalizer) shouldBe ranked
+        }
+    }
+
+    context("n-gram prediction boosts") {
+        test("longer context wins: quadgram > trigram > raw bigram freq") {
+            val raw = listOf("وبركاته" to 180)
+            val tri = PersonalLearning.boostTrigramPredictions(raw).first().second
+            val quad = PersonalLearning.boostQuadgramPredictions(raw).first().second
+            (quad > tri).shouldBeTrue()
+            (tri > 180).shouldBeTrue()
+        }
+        test("boosts cap at 255") {
+            PersonalLearning.boostQuadgramPredictions(listOf("الله" to 250)).first().second shouldBe 255
         }
     }
 

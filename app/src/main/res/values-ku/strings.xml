@@ -208,10 +208,6 @@
     <string name="about__version__title" comment="Preference title">Guherto</string>
     <string name="about__version_copied__title" comment="Title of the toast for copying the version string">Hejmara guhertoya ji bo panoyê hatiye kopîkirin</string>
     <string name="about__version_copied__error" comment="Title of the error toast for copying the version string">ھەڵەیەک ڕوویدا: {error_message}</string>
-    <string name="about__changelog__title" comment="Preference title">Lîsteya guhertinan</string>
-    <string name="about__changelog__summary" comment="Preference summary">Çi nû ye</string>
-    <string name="about__repository__title" comment="Preference title">Depo (GitHub)</string>
-    <string name="about__repository__summary" comment="Preference summary">Koda çavkanî, nîqaş, mijar û agahî</string>
     <string name="about__privacy_policy__title" comment="Preference title">Polîtîqa Taybetîyê</string>
     <string name="about__privacy_policy__summary" comment="Preference summary">Polîtîkaya nepenîtiyê ya ji bo vê projeyê</string>
     <string name="about__project_license__title" comment="Preference title">Lîsansa projeyê</string>
@@ -222,7 +218,6 @@
     <string name="setup__title" comment="Title of Setup">Hûn bi xêr hatin!</string>
     <string name="setup__intro_message" comment="Short intro message welcoming new users">Spas ji bo bikaranîna {app_name}! Ev sazkirina bilez, ji bo bikarînana {app_name} di cîhaza xwe da gavên pêwîst rê dide we.</string>
     <string name="setup__footer__privacy_policy" comment="Privacy policy label for URL">Polîtîkaya nepenîtiyê</string>
-    <string name="setup__footer__repository" comment="Repository label for URL">Depo</string>
     <string name="setup__enable_ime__title">Çalak kirin {app_name}</string>
     <string name="setup__enable_ime__description">Android berîya ku hûn bikarin wê bi kar bînin, hewce dike ku her klavyeya taybet cuda çalak bibe. Pergala <i>Ziman û Têketin</i> Mîhengan veke, çalak bike \"{app_name}\".</string>
     <string name="setup__enable_ime__open_settings_btn">Mîhengên pergalê vekin</string>
@@ -249,7 +244,6 @@
     <!-- Crash Dialog strings -->
     <string name="crash_dialog__title" comment="Title of crash dialog">Raporta xeletiya KalamBoard</string>
     <string name="crash_dialog__description" comment="Description of crash dialog">Ji ber nelirêtîyê xemgîn im, lê KalamBoard ji ber xeletîyeka nelibendê têk çû.</string>
-    <string name="crash_dialog__report_instructions" comment="Issue tracker report instructions for the crash dialog. The %s placeholder is the name of the crash report template and always in English/LTR.">Heke hûn bixwazin vê çewtiyê ragihînin, pêşî li ser GitHubê temaşekerê pirsgirêkê kontrol bikin heke qezaya we jixwe nehatibe ragihandin. nIf ew nehatibe ragihandin, qeyda têkçûnê ya hilberandî kopî bikin û pirsgirêkeke nû vekin. Şablona \"%s\" bi kar bîne û danasînê, gavên ji nû ve hilberînê dagire û di dawîyê da rojnivîska têkçûnê ya çêkirî pê ve bike. Ev, dibe alîkar ku KalamBoard ji bo her kesî baştir û aramtir bibe. Sax bî!</string>
     <string name="crash_dialog__close" comment="Label of Close button in crash dialog">Bigire</string>
     <string name="crash_notification_channel__title" comment="Title of crash notification channel">Raportên xeletiya KalamBoard</string>
     <string name="crash_once_notification__title" comment="Title of the notification for a single crash">FlorîsBoardê dest ji kar berda…</string>

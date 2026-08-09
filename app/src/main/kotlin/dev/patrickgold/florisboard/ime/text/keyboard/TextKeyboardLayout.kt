@@ -50,6 +50,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
@@ -246,7 +247,10 @@ fun TextKeyboardLayout(
                         KeyboardMode.NUMERIC_ADVANCED,
                         KeyboardMode.SYMBOLS,
                         KeyboardMode.SYMBOLS2 -> {
-                            (keyboardHeight / keyboard.rowCount)
+                            // heightFactorSum == rowCount unless the half-height number row is
+                            // active, in which case full rows keep the base height and the number
+                            // row takes its 0.5 share inside layout().
+                            (keyboardHeight / keyboard.heightFactorSum)
                                 .coerceAtMost(keyboardRowBaseHeight.toPx() * 1.12f)
                         }
                         else -> keyboardRowBaseHeight.toPx()
@@ -381,10 +385,20 @@ private fun TextKeyButton(
                     customLabel = "\u2039  $customLabel  \u203a"
                 }
             }
+            // Keys of the half-height number row scale their label down so the digit glyphs
+            // fit the reduced key height (theme font sizes are height-independent).
+            val isHalfHeightKey = key.touchBounds.height < desiredKey.touchBounds.height * 0.75f
             SnyggText(
                 modifier = Modifier
                     .wrapContentSize()
-                    .align(if (isTelPadKey) BiasAlignment(-0.5f, 0f) else Alignment.Center),
+                    .align(if (isTelPadKey) BiasAlignment(-0.5f, 0f) else Alignment.Center)
+                    .then(
+                        if (isHalfHeightKey) {
+                            Modifier.graphicsLayer(scaleX = 0.75f, scaleY = 0.75f)
+                        } else {
+                            Modifier
+                        }
+                    ),
                 text = customLabel,
             )
         }

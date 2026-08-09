@@ -115,8 +115,6 @@
     <string name="settings__localization__display_language_names_in__label" comment="Label of Display language names in preference">Sprachnamen anzeigen in</string>
     <string name="settings__localization__group_subtypes__label" comment="Label of subtypes group">Untertypen</string>
     <string name="settings__localization__subtype_add_title" comment="Title of subtype dialog when adding a new subtype">Stil hinzufügen</string>
-    <string name="settings__localization__language_pack_title" comment="Title of the language pack manager screen for managing installed and custom language packs">Installierte Sprachpakete verwalten</string>
-    <string name="settings__localization__language_pack_summary" comment="Summary of preference item for adding a new language pack">Experimentell: Verwaltung von Erweiterungen, die Unterstützung für bestimmte Sprachen hinzufügen (vorerst formgebundene chinesische Eingabe)</string>
     <string name="settings__localization__subtype_edit_title" comment="Title of subtype dialog when editing an existing subtype">Benutzerdefinierten Eingabestil bearbeiten</string>
     <string name="settings__localization__subtype_locale" comment="Label for locale dropdown in subtype dialog">Primäre Sprache</string>
     <string name="settings__localization__subtype_popup_mapping" comment="Label for popup mapping dropdown in subtype screen">Pop-up-Anordnung</string>
@@ -449,10 +447,6 @@
     <string name="about__version__title" comment="Preference title">Version</string>
     <string name="about__version_copied__title" comment="Title of the toast for copying the version string">Version in die Zwischenablage kopiert</string>
     <string name="about__version_copied__error" comment="Title of the error toast for copying the version string">Etwas ist schief gelaufen: {error_message}</string>
-    <string name="about__changelog__title" comment="Preference title">Änderungsprotokoll</string>
-    <string name="about__changelog__summary" comment="Preference summary">Was ist neu</string>
-    <string name="about__repository__title" comment="Preference title">Repository (GitHub)</string>
-    <string name="about__repository__summary" comment="Preference summary">Quellcode, Diskussionen, Probleme und Info</string>
     <string name="about__privacy_policy__title" comment="Preference title">Datenschutzrichtlinie</string>
     <string name="about__privacy_policy__summary" comment="Preference summary">Datenschutzrichtlinie für dieses Projekt</string>
     <string name="about__project_license__title" comment="Preference title">Projekt-Lizenz</string>
@@ -465,7 +459,6 @@
     <string name="setup__title" comment="Title of Setup">Herzlich willkommen!</string>
     <string name="setup__intro_message" comment="Short intro message welcoming new users">Vielen Dank für die Nutzung von {app_name}! Dieses Quick Setup leitet dich durch die erforderlichen Schritte {app_name} auf deinem Gerät zu nutzen.</string>
     <string name="setup__footer__privacy_policy" comment="Privacy policy label for URL">Datenschutzrichtlinie</string>
-    <string name="setup__footer__repository" comment="Repository label for URL">Quellcode</string>
     <string name="setup__enable_ime__title">{app_name} aktivieren</string>
     <string name="setup__enable_ime__description">Android erfordert, dass jede nachinstallierte Tastatur vor der Nutzung aktiviert (eingeschaltet) wird. Öffne <i> Sprachen und Eingabe</i> in den Systemeinstellungen und aktiviere dort {app_name}.</string>
     <string name="setup__enable_ime__open_settings_btn">Systemeinstellungen öffnen</string>
@@ -514,11 +507,9 @@
     <!-- Crash Dialog strings -->
     <string name="crash_dialog__title" comment="Title of crash dialog">KalamBoard Fehlermeldung</string>
     <string name="crash_dialog__description" comment="Description of crash dialog">Entschuldigung für die Unannehmlichkeiten, aber KalamBoard ist aufgrund eines unerwarteten Fehlers abgestürzt.</string>
-    <string name="crash_dialog__report_instructions" comment="Issue tracker report instructions for the crash dialog. The %s placeholder is the name of the crash report template and always in English/LTR.">Wenn du diesen Fehler melden möchtest, prüfe zuerst im Issue Tracker auf Github, ob der Absturz bereits gemeldet worden ist.\nFalls nicht, kopiere den erzeugten Absturzbericht und erstelle ein neues Problem. Benutze die \"%s\"-Vorlage, gib die Beschreibung und die Schritte zum Reproduzieren des Fehlers an und füge am Ende den erzeugten Absturzbericht hinzu. Dies hilft, KalamBoard für alle besser und stabiler zu machen. Vielen Dank!</string>
     <string name="crash_dialog__copy_to_clipboard" comment="Label of Copy to clipboard button in crash dialog">In die System-Zwischenablage kopieren</string>
     <string name="crash_dialog__copy_to_clipboard_success" comment="Label of Copy to clipboard success message in crash dialog">In die System-Zwischenablage kopiert</string>
     <string name="crash_dialog__copy_to_clipboard_failure" comment="Label of Copy to clipboard failure message in crash dialog">Kopieren zur System-Zwischenablage nicht möglich: Zwischenablagen-Manager-Instanz nicht gefunden</string>
-    <string name="crash_dialog__open_issue_tracker" comment="Label of Open issue tracker button in crash dialog">Öffne \"Issue Tracker\" (github.com)</string>
     <string name="crash_dialog__close" comment="Label of Close button in crash dialog">Schließen</string>
     <string name="crash_notification_channel__title" comment="Title of crash notification channel">KalamBoard Fehlermeldungen</string>
     <string name="crash_once_notification__title" comment="Title of the notification for a single crash">KalamBoard funktioniert nicht mehr …</string>
@@ -611,7 +602,6 @@
     <string name="ext__home__title">Add-ons &amp; Erweiterungen</string>
     <string name="ext__list__ext_theme">Design-Erweiterungen</string>
     <string name="ext__list__ext_keyboard">Tastatur-Erweiterungen</string>
-    <string name="ext__list__ext_languagepack">Sprachpaket-Erweiterungen</string>
     <string name="ext__meta__authors">Ersteller</string>
     <string name="ext__meta__components">Gebündelte Komponenten</string>
     <string name="ext__meta__components_theme">Enthaltene Designs</string>
@@ -657,7 +647,6 @@
     <string name="ext__import__ext_any" comment="Title of Importer screen for import of any supported KalamBoard extension">Importiere Erweiterung</string>
     <string name="ext__import__ext_keyboard" comment="Title of Importer screen for keyboard extension import">Importiere Tastatur-Erweiterung</string>
     <string name="ext__import__ext_theme" comment="Title of Importer screen for theme extension import">Importiere Design-Erweiterung</string>
-    <string name="ext__import__ext_languagepack" comment="Title of Importer screen for language pack extension import">Importiere Sprachpaket-Erweiterung</string>
     <string name="ext__import__file_skip" comment="Label when a file cannot be imported in the current context. The actual reason string is in a separate text view below this string.">Datei kann nicht importiert werden. Grund:</string>
     <string name="ext__import__file_skip_unsupported" comment="Reason string when file is unsupported">Nicht unterstützter oder nicht erkannter Datei-Typ.</string>
     <string name="ext__import__file_skip_ext_core" comment="Reason string when ext has core extension ID">Das Standarderweiterungspaket, das mit der App mitgeliefert wird, konnte nicht ersetzt oder aktualisiert werden. Aktualisiere die App, wenn du eine neuere Version des Standarderweiterungspakets nutzen möchtest.</string>

@@ -53,6 +53,31 @@ class DialectOverlay private constructor(
 ) {
     fun isEmpty(): Boolean = wordBoosts.isEmpty() && bigrams.isEmpty() && trigrams.isEmpty()
 
+    /** Merges [other] on top of this overlay: word boosts keep the max freq, follower lists are
+     *  unioned per context with max freq and re-sorted best first. */
+    fun mergedWith(other: DialectOverlay): DialectOverlay {
+        if (other.isEmpty()) return this
+        if (this.isEmpty()) return other
+        val boosts = HashMap(wordBoosts)
+        for ((word, freq) in other.wordBoosts) boosts.merge(word, freq, ::maxOf)
+        fun mergeFollowers(
+            a: Map<String, List<Pair<String, Int>>>,
+            b: Map<String, List<Pair<String, Int>>>,
+        ): Map<String, List<Pair<String, Int>>> {
+            val out = HashMap<String, HashMap<String, Int>>(a.size + b.size)
+            for (source in arrayOf(a, b)) {
+                for ((context, followers) in source) {
+                    val target = out.getOrPut(context) { HashMap() }
+                    for ((word, freq) in followers) target.merge(word, freq, ::maxOf)
+                }
+            }
+            return out.mapValues { (_, followers) ->
+                followers.entries.sortedByDescending { it.value }.map { it.key to it.value }
+            }
+        }
+        return DialectOverlay(boosts, mergeFollowers(bigrams, other.bigrams), mergeFollowers(trigrams, other.trigrams))
+    }
+
     companion object {
         val EMPTY = DialectOverlay(emptyMap(), emptyMap(), emptyMap())
 
@@ -93,11 +118,20 @@ class DialectOverlay private constructor(
             return DialectOverlay(boosts, sortFollowers(bigrams), sortFollowers(trigrams))
         }
 
-        /** Loads the overlay asset for [dialect], or [EMPTY] when none applies/exists. */
+        /**
+         * Loads the overlay for [dialect]: the pan-Arabic `ar_common.tsv` formulas (applied for
+         * EVERY dialect setting, including فصحى/NONE — religious/greeting formulas are not
+         * dialectal) merged with the selected dialect's own lexicon, if any.
+         */
         fun loadFromAssets(context: Context, language: String, dialect: ArabicDialect): DialectOverlay {
             if (language != "ar") return EMPTY
-            val key = dialect.overlayKey ?: return EMPTY
-            val assetPath = "ime/dict/overlays/${language}_$key.tsv"
+            val common = loadOne(context, "ime/dict/overlays/${language}_common.tsv", language)
+            val key = dialect.overlayKey ?: return common
+            val dialectOverlay = loadOne(context, "ime/dict/overlays/${language}_$key.tsv", language)
+            return common.mergedWith(dialectOverlay)
+        }
+
+        private fun loadOne(context: Context, assetPath: String, language: String): DialectOverlay {
             return try {
                 val overlay = context.assets.open(assetPath).bufferedReader().useLines { lines ->
                     parse(lines, WordNormalizer.forLanguage(language))
