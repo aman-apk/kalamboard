@@ -51,6 +51,7 @@ import dev.patrickgold.florisboard.app.ext.ExtensionListScreenType
 import dev.patrickgold.florisboard.app.ext.ExtensionViewScreen
 import dev.patrickgold.florisboard.app.settings.HomeScreen
 import dev.patrickgold.florisboard.app.settings.about.AboutScreen
+import dev.patrickgold.florisboard.app.settings.about.AmanSupportScreen
 import dev.patrickgold.florisboard.app.settings.about.PrivacyPolicyScreen
 import dev.patrickgold.florisboard.app.settings.about.ProjectLicenseScreen
 import dev.patrickgold.florisboard.app.settings.about.ThirdPartyLicensesScreen
@@ -212,6 +213,10 @@ object Routes {
         @Serializable
         @Deeplink("settings/about/third-party-licenses")
         object ThirdPartyLicenses
+
+        @Serializable
+        @Deeplink("settings/about/aman-support")
+        object AmanSupport
     }
 
     object Devtools {
@@ -336,6 +341,7 @@ object Routes {
             composableWithDeepLink(Settings.PrivacyPolicy::class) { PrivacyPolicyScreen() }
             composableWithDeepLink(Settings.ProjectLicense::class) { ProjectLicenseScreen() }
             composableWithDeepLink(Settings.ThirdPartyLicenses::class) { ThirdPartyLicensesScreen() }
+            composableWithDeepLink(Settings.AmanSupport::class) { AmanSupportScreen() }
 
             composableWithDeepLink(Devtools.Home::class) { DevtoolsScreen() }
             composableWithDeepLink(Devtools.AndroidLocales::class) { AndroidLocalesScreen() }

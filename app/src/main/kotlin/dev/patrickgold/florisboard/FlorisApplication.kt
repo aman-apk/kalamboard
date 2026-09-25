@@ -65,6 +65,7 @@ class FlorisApplication : Application() {
     // it. If a native NLP engine is ever needed, re-include `:lib:native` in settings.gradle.kts
     // and restore the dependency in app/build.gradle.kts.
 
+    private val prefs by FlorisPreferenceStore
     private val mainHandler by lazy { Handler(mainLooper) }
     private val scope = CoroutineScope(Dispatchers.Default)
     val preferenceStoreLoaded = MutableStateFlow(false)
@@ -115,6 +116,11 @@ class FlorisApplication : Application() {
                 datastoreName = FlorisPreferenceModel.NAME,
             )
             Log.i("PREFS", result.toString())
+            // فرضُ صف الأرقام لمرّةٍ واحدة — تفصيلُه عند [AppPrefs.Internal.kalamNumberRowForced].
+            if (result.isSuccess && !prefs.internal.kalamNumberRowForced.get()) {
+                prefs.keyboard.numberRow.set(true)
+                prefs.internal.kalamNumberRowForced.set(true)
+            }
             preferenceStoreLoaded.value = true
         }
         extensionManager.value.init()

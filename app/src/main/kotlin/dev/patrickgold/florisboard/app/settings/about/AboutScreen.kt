@@ -24,14 +24,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Description
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Policy
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.patrickgold.florisboard.BuildConfig
@@ -74,6 +77,24 @@ fun AboutScreen() = FlorisScreen {
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.padding(top = 16.dp),
             )
+            // Aman family unified identity (§1/§4): fixed Arabic lines, shown in every language.
+            Text(
+                text = stringRes(R.string.aman__family_line),
+                fontSize = 14.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .padding(top = 12.dp)
+                    .padding(horizontal = 16.dp),
+            )
+            Text(
+                text = stringRes(R.string.aman__attribution),
+                fontSize = 12.sp,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier
+                    .padding(top = 4.dp)
+                    .padding(horizontal = 16.dp),
+            )
         }
         Preference(
             icon = Icons.Outlined.Info,
@@ -109,6 +130,13 @@ fun AboutScreen() = FlorisScreen {
             title = stringRes(id = R.string.about__third_party_licenses__title),
             summary = stringRes(id = R.string.about__third_party_licenses__summary),
             onClick = { navController.navigate(Routes.Settings.ThirdPartyLicenses) },
+        )
+        // Aman family standards §5: quiet support entry point.
+        Preference(
+            icon = Icons.Outlined.FavoriteBorder,
+            title = stringRes(R.string.aman__support_title),
+            summary = stringRes(R.string.aman__nonprofit_line),
+            onClick = { navController.navigate(Routes.Settings.AmanSupport) },
         )
     }
 }

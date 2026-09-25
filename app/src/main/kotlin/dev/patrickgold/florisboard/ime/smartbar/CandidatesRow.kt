@@ -101,25 +101,27 @@ fun CandidatesRow(modifier: Modifier = Modifier) {
         },
     ) {
         if (candidates.isNotEmpty()) {
-            val candidateModifier = if (candidates.size == 1) {
-                Modifier
-                    .fillMaxHeight()
-                    .weight(1f, fill = false)
-            } else {
-                Modifier
-                    .fillMaxHeight()
-                    .conditional(displayMode == CandidatesDisplayMode.CLASSIC) {
-                        weight(1f)
-                    }
-                    .conditional(displayMode != CandidatesDisplayMode.CLASSIC) {
-                        wrapContentWidth().widthIn(max = 160.dp)
-                    }
-            }
             val list = when (displayMode) {
                 CandidatesDisplayMode.CLASSIC -> candidates.subList(0, 3.coerceAtMost(candidates.size))
                 else -> candidates
             }
             for ((n, candidate) in list.withIndex()) {
+                // مرشَّح العبارة (سلسلة حتى خمس كلمات) يأخذ سقف عرضٍ أوسع من مرشح الكلمة الواحدة.
+                val isPhrase = candidate.text.contains(' ')
+                val candidateModifier = if (candidates.size == 1) {
+                    Modifier
+                        .fillMaxHeight()
+                        .weight(1f, fill = false)
+                } else {
+                    Modifier
+                        .fillMaxHeight()
+                        .conditional(displayMode == CandidatesDisplayMode.CLASSIC) {
+                            weight(if (isPhrase) 1.6f else 1f)
+                        }
+                        .conditional(displayMode != CandidatesDisplayMode.CLASSIC) {
+                            wrapContentWidth().widthIn(max = if (isPhrase) 260.dp else 160.dp)
+                        }
+                }
                 if (n > 0) {
                     SnyggSpacer(
                         elementName = FlorisImeUi.SmartbarCandidateSpacer.elementName,

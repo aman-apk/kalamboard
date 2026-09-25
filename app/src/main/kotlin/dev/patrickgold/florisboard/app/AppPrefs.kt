@@ -485,6 +485,14 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
             key = "internal__is_ime_set_up",
             default = false,
         )
+        // كلام بورد (2026-09-08): صار صف الأرقام افتراضياً في 1.3.7، لكن `default` لا يبلغ
+        // تركيباً سبق أن ثبّت `false` في مخزنه — فبقي الصف غائباً عن أصحاب النسخ القديمة.
+        // هذه علامةٌ تُرفع **مرّةً واحدة** لكل تركيب: نُحضِر الصف عند أول إقلاع بعد التحديث
+        // ثم لا نمسّ التفضيل بعدها أبداً، فيبقى إطفاؤه بيد المستخدم إن شاء.
+        val kalamNumberRowForced = boolean(
+            key = "internal__kalam_number_row_forced_v2",
+            default = false,
+        )
         val versionOnInstall = string(
             key = "internal__version_on_install",
             default = VersionName.DEFAULT_RAW,
@@ -503,6 +511,20 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
         )
     }
 
+    val amanSupport = AmanSupport()
+    inner class AmanSupport {
+        // Aman family standards §5: bookkeeping for the quiet monthly donation reminder
+        // (see AmanSupportReminder for the binding dignity rules). All values stay on-device.
+        val firstUseTimestamp = long(
+            key = "aman_support__first_use_timestamp",
+            default = 0L,
+        )
+        val lastReminderTimestamp = long(
+            key = "aman_support__last_reminder_timestamp",
+            default = 0L,
+        )
+    }
+
     val keyboard = Keyboard()
     inner class Keyboard {
         val windowConfig = custom(
@@ -512,7 +534,8 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
         )
         val numberRow = boolean(
             key = "keyboard__number_row",
-            default = false,
+            // افتراضي كلام بورد (بأمر المالك 2026-08-26): صف الأرقام حاضر من أول تشغيل.
+            default = true,
         )
         val hintedNumberRowEnabled = boolean(
             key = "keyboard__hinted_number_row_enabled",
@@ -777,16 +800,16 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
             key = "theme__mode",
             default = ThemeMode.FOLLOW_SYSTEM,
         )
-        // KalamBoard: Kalam Black (pure black, whisper of gold) is the default for BOTH day and
-        // night; every other bundled theme stays selectable in the theme manager.
+        // KalamBoard: Kalam Dark («كلام داكن», dark gray with amber accents) is the default for
+        // BOTH day and night; every other bundled theme stays selectable in the theme manager.
         val dayThemeId = custom(
             key = "theme__day_theme_id",
-            default = ExtensionComponentName("org.kalamboard.themes", "kalam_black"),
+            default = ExtensionComponentName("org.kalamboard.themes", "kalam_dark"),
             serializer = ExtensionComponentName.Serializer,
         )
         val nightThemeId = custom(
             key = "theme__night_theme_id",
-            default = ExtensionComponentName("org.kalamboard.themes", "kalam_black"),
+            default = ExtensionComponentName("org.kalamboard.themes", "kalam_dark"),
             serializer = ExtensionComponentName.Serializer,
         )
         val accentColor = custom(

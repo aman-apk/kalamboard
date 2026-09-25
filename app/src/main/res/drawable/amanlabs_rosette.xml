@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- وردة أمان المثمنة — توقيع «مختبرات أمان» الموحّد (زُرعت عائليًا 2026-08-24). المصدر: متجر أمان. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <path android:fillColor="#E0A32E" android:pathData="M54,41L63,29L54,14L45,29Z" />
+    <path android:fillColor="#F0CD7A" android:pathData="M54,41L59,34L54,26L49,34Z" />
+    <group android:pivotX="54" android:pivotY="54" android:rotation="45">
+        <path android:fillColor="#3FC0C4" android:pathData="M54,41L63,29L54,14L45,29Z" />
+        <path android:fillColor="#9FE3E5" android:pathData="M54,41L59,34L54,26L49,34Z" />
+    </group>
+    <group android:pivotX="54" android:pivotY="54" android:rotation="90">
+        <path android:fillColor="#D97C93" android:pathData="M54,41L63,29L54,14L45,29Z" />
+        <path android:fillColor="#EBB3C1" android:pathData="M54,41L59,34L54,26L49,34Z" />
+    </group>
+    <group android:pivotX="54" android:pivotY="54" android:rotation="135">
+        <path android:fillColor="#94A356" android:pathData="M54,41L63,29L54,14L45,29Z" />
+        <path android:fillColor="#C6D19A" android:pathData="M54,41L59,34L54,26L49,34Z" />
+    </group>
+    <group android:pivotX="54" android:pivotY="54" android:rotation="180">
+        <path android:fillColor="#7C89CF" android:pathData="M54,41L63,29L54,14L45,29Z" />
+        <path android:fillColor="#D5DBF0" android:pathData="M54,41L59,34L54,26L49,34Z" />
+    </group>
+    <group android:pivotX="54" android:pivotY="54" android:rotation="225">
+        <path android:fillColor="#C4764E" android:pathData="M54,41L63,29L54,14L45,29Z" />
+        <path android:fillColor="#E5A98A" android:pathData="M54,41L59,34L54,26L49,34Z" />
+    </group>
+    <group android:pivotX="54" android:pivotY="54" android:rotation="270">
+        <path android:fillColor="#97C98B" android:pathData="M54,41L63,29L54,14L45,29Z" />
+        <path android:fillColor="#C6E7BE" android:pathData="M54,41L59,34L54,26L49,34Z" />
+    </group>
+    <group android:pivotX="54" android:pivotY="54" android:rotation="315">
+        <path android:fillColor="#9D85C4" android:pathData="M54,41L63,29L54,14L45,29Z" />
+        <path android:fillColor="#C9BCE4" android:pathData="M54,41L59,34L54,26L49,34Z" />
+    </group>
+    <path android:fillColor="#FDF3D8" android:pathData="M45,54a9,9 0 1 0 18,0a9,9 0 1 0 -18,0" />
+</vector>

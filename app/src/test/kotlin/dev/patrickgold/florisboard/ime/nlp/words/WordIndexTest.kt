@@ -111,6 +111,32 @@ class WordIndexTest : FunSpec({
         }
     }
 
+    context("edit distance budget (Damerau-Levenshtein bounds)") {
+        test("transposition counts as a single edit and fits the one-edit budget") {
+            val index = ar("مرحبا" to 250)
+            val dist = index.weightedEditDistance(
+                ArabicNormalizer.normalize("مرحاب"),
+                ArabicNormalizer.normalize("مرحبا"),
+                1.0,
+            )
+            dist shouldBe WordIndex.TRANSPOSITION_COST
+        }
+
+        test("a 4-letter word allows at most one edit: two distant slips stay out") {
+            val index = ar("كتاب" to 250)
+            // كماد = كتاب with ت→م and ب→د, both non-adjacent keys: distance 2.0 > budget 1.0.
+            index.suggest(ArabicNormalizer.normalize("كماد"), 8, true)
+                .map { it.entry.word } shouldNotContain "كتاب"
+        }
+
+        test("a 5+ letter word allows two edits: the intended word is recovered") {
+            val index = ar("مبارك" to 250)
+            // مضاجك = مبارك with ب→ض and ر→ج, both non-adjacent keys: distance 2.0 <= budget 2.0.
+            index.suggest(ArabicNormalizer.normalize("مضاجك"), 8, true)
+                .map { it.entry.word } shouldContain "مبارك"
+        }
+    }
+
     context("fuzzy prefix completion (typo while still composing)") {
         val index = ar(
             "مرحبا" to 250,

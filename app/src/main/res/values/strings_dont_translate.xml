@@ -2,6 +2,22 @@
 
     <string name="aman_labs__contact_email" translatable="false">mohhey1988@gmail.com</string>
 
+    <!-- Aman family unified identity (المعايير الموحدة لعائلة أمان §1/§4/§5) — fixed Arabic
+         brand strings, shown as-is in every app language. -->
+    <string name="aman__family_line" translatable="false">من عائلة أمان — خصوصيتك أولًا: لا إعلانات، ولا جمع للبيانات.</string>
+    <string name="aman__nonprofit_line" translatable="false">مشروعٌ مستقل لا يقصد الربح؛ يُصنع بعناية، ويستمر بأهله.</string>
+    <string name="aman__attribution" translatable="false">من أمان — متوفر عبر متجر أمان</string>
+    <string name="aman__support_title" translatable="false">ادعم أمان</string>
+    <string name="aman__support_primary" translatable="false">كلام بورد مجانيٌّ كاملٌ للجميع، ودعمك الاختياري يُبقيه كذلك.</string>
+    <string name="aman__support_open_store" translatable="false">افتح متجر أمان</string>
+    <string name="aman__support_store_missing" translatable="false">متجر أمان غير مثبّت على هذا الجهاز.</string>
+    <!-- PLACEHOLDER (TODO): fill in the real Aman Labs website address before release. As long
+         as the value still contains "TODO" the support screen never opens a browser. -->
+    <string name="aman_website_url" translatable="false">https://TODO-amanlabs</string>
+    <string name="aman__reminder_channel_name" translatable="false">دعم أمان</string>
+    <string name="aman__reminder_action_support" translatable="false">ادعم</string>
+    <string name="aman__reminder_action_later" translatable="false">لاحقًا</string>
+
     <string name="general__system_string_placeholder" translatable="false">%s</string>
     <string name="general__empty_string" translatable="false"/>
     <string name="general__invalid_fatal" translatable="false">!! invalid !!</string>

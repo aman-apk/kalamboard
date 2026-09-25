@@ -35,10 +35,11 @@ class KeyProximity private constructor(private val neighbors: Map<Char, Set<Char
 
     companion object {
         // Keep in sync with app/src/main/assets/ime/keyboard/org.florisboard.layouts/layouts/characters/arabic.json
+        // (ترتيب سويفت كي المعتمد 2026-08-12: د آخر الصف الأول، ذ آخر الثاني، ط وظ في الثالث)
         private val ARABIC_ROWS = listOf(
-            "ضصثقفغعهخحج",
-            "شسيبلاتنمكط",
-            "ذءؤرىةوزظد",
+            "ضصثقفغعهخحجد",
+            "شسيبلاتنمكذ",
+            "ئءؤرىةوزطظ",
         )
 
         // Keep in sync with .../layouts/characters/qwerty.json

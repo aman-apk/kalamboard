@@ -313,8 +313,8 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
     }
 
     /**
-     * Forwards a finalized [word] plus up to two preceding words to
-     * [NlpManager.notifyWordCommitted] for on-device learning (bigrams + trigrams).
+     * Forwards a finalized [word] plus up to four preceding words to
+     * [NlpManager.notifyWordCommitted] for on-device learning (bigrams through pentagrams).
      * Reads the editor content BEFORE the commit mutates it.
      */
     private fun captureWordCommitForLearning(word: String) {
@@ -324,7 +324,7 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
         } else {
             content.textBeforeSelection
         }
-        nlpManager.notifyWordCommitted(word, PersonalLearning.extractLastWords(beforeWord, 3))
+        nlpManager.notifyWordCommitted(word, PersonalLearning.extractLastWords(beforeWord, 4))
     }
 
     /**

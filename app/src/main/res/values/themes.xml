@@ -22,15 +22,26 @@
         <item name="android:colorBackground">@color/florisApp_windowBackground</item>
 
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+
+        <!-- Almarai for any plain View text hosted by the app window. The settings UI itself is
+             Compose and gets its family from apptheme/Type.kt; this is the matching default for
+             the View world so nothing falls back to the system font. Font resources in themes
+             need API 26, which is our minSdk. -->
+        <item name="android:fontFamily">@font/almarai</item>
     </style>
 
-    <style name="CrashDialogTheme" parent="android:style/Theme.Material.NoActionBar"/>
+    <style name="CrashDialogTheme" parent="android:style/Theme.Material.NoActionBar">
+        <!-- The crash dialog is plain Views, so the family has to be set on the theme. -->
+        <item name="android:fontFamily">@font/almarai</item>
+    </style>
 
     <style name="FlorisImeTheme" parent="android:Theme.Material.InputMethod">
         <!-- Need this to prevent Xiaomi devices from messing with our beautiful UI -->
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
         <!-- FFS -->
         <item name="android:navigationBarColor">@android:color/transparent</item>
+        <!-- Deliberately NO android:fontFamily here: key label rendering is performance- and
+             layout-critical and stays on the system font / the Snygg stylesheet's own choice. -->
     </style>
 
     <style name="FlorisAppTheme.Transparent" parent="android:style/Theme.Material.NoActionBar">
@@ -41,6 +52,9 @@
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:colorBackground">@android:color/transparent</item>
         <item name="android:windowIsTranslucent">true</item>
+
+        <!-- Explicit parent means this does not inherit FlorisAppTheme, so repeat the family. -->
+        <item name="android:fontFamily">@font/almarai</item>
     </style>
 
 </resources>

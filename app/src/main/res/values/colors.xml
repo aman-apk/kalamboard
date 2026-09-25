@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#4CAF50</color><!-- Green 500 -->
-    <color name="colorPrimaryDark">#388E3C</color><!-- Green 700 -->
-    <color name="colorAccent">#FF9800</color><!-- Orange 500 -->
-    <color name="colorAccentDark">#F57C00</color><!-- Orange 700 -->
+    <color name="colorPrimary">#E0A32E</color><!-- Kahraman amber -->
+    <color name="colorPrimaryDark">#865E12</color><!-- Kahraman amber, deep -->
+    <color name="colorAccent">#E0A32E</color><!-- Kahraman amber -->
+    <color name="colorAccentDark">#B38225</color><!-- Kahraman amber, dark -->
 
-    <color name="colorSuccess">@color/colorPrimary</color><!-- Green 500 -->
+    <color name="colorSuccess">#4CAF50</color><!-- Green 500 (semantic, not brand) -->
     <color name="textColorSuccess">#FFFFFF</color><!-- White -->
     <color name="colorWarning">#FFFF00</color><!-- Yellow A200 -->
     <color name="textColorWarning">#000000</color><!-- Black -->
     <color name="colorError">#B00020</color><!-- Red 1000? -->
     <color name="textColorError">#FFFFFF</color><!-- White -->
 
-    <!-- Offline-Arabic fork identity: near-black icon background, gold foreground -->
-    <color name="ic_app_icon_background">#000000</color>
+    <!-- Splash icon backdrop (windowSplashScreenIconBackgroundColor accepts a flat color only):
+         mid stop of the adopted golden-sky gradient in ic_app_icon_background.xml -->
+    <color name="ic_app_icon_background">#AE7E23</color>
 
     <color name="cardViewBackgroundColor">#FFFFFF</color><!-- White -->
     <color name="navigationBarColor">#000000</color><!-- Black -->

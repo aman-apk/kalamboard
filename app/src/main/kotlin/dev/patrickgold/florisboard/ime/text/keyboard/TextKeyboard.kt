@@ -27,8 +27,8 @@ class TextKeyboard(
     override val mode: KeyboardMode,
     val extendedPopupMapping: PopupMapping?,
     val extendedPopupMappingDefault: PopupMapping?,
-    /** When true, row 0 is the user-enabled number row, rendered at half the base row height. */
-    val hasHalfHeightNumberRow: Boolean = false,
+    /** When true, row 0 is the user-enabled number row, rendered at [NUMBER_ROW_HEIGHT_FACTOR] of the base row height. */
+    val hasShortNumberRow: Boolean = false,
 ) : Keyboard() {
     val rowCount: Int
         get() = arrangement.size
@@ -38,14 +38,19 @@ class TextKeyboard(
 
     /** Height of row [r] relative to the base row height. */
     fun rowHeightFactor(r: Int): Float =
-        if (r == 0 && hasHalfHeightNumberRow) NUMBER_ROW_HEIGHT_FACTOR else 1.0f
+        if (r == 0 && hasShortNumberRow) NUMBER_ROW_HEIGHT_FACTOR else 1.0f
 
-    /** Sum of all row height factors — equals [rowCount] unless the half number row is active. */
+    /** Sum of all row height factors — equals [rowCount] unless the short number row is active. */
     val heightFactorSum: Float
-        get() = rowCount - (if (hasHalfHeightNumberRow) 1.0f - NUMBER_ROW_HEIGHT_FACTOR else 0.0f)
+        get() = rowCount - (if (hasShortNumberRow) 1.0f - NUMBER_ROW_HEIGHT_FACTOR else 0.0f)
 
     companion object {
-        const val NUMBER_ROW_HEIGHT_FACTOR = 0.5f
+        /**
+         * ارتفاع صف الأرقام نسبةً إلى الصف الأساسي — **متوسّط** لا نصفيّ
+         * (أمر المالك 2026-09-08): النصف كان يضغط الرقم فيُصغَّر عنوانه ليتّسع،
+         * وثلاثة الأرباع تُبقيه بحجمه الكامل ولا تضيف صفاً كاملاً إلى ارتفاع الكيبورد.
+         */
+        const val NUMBER_ROW_HEIGHT_FACTOR = 0.75f
     }
 
     override fun getKeyForPos(pointerX: Float, pointerY: Float): TextKey? {

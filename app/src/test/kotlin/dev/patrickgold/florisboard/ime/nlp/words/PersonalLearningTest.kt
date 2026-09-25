@@ -70,6 +70,17 @@ class PersonalLearningTest : FunSpec({
             merged.first().entry.word shouldBe "كرمال"
         }
 
+        test("a user-learned correction beats a static correction at equal edit distance") {
+            // Both are one-edit corrections with the same frequency and base score: the word
+            // learned from the user's own typing must recover first — the typo goes back to the
+            // nearest word of the USER'S dictionary, not just the static lexicon.
+            val static = listOf(ranked("كتير", 200, score = 150.0, correction = true))
+            val user = listOf(ranked("كبير", 200, score = 150.0, correction = true))
+            val merged = PersonalLearning.mergeRanked(static, user, emptySet(), 8)
+            merged.first().entry.word shouldBe "كبير"
+            merged.map { it.entry.word } shouldContain "كتير"
+        }
+
         test("user completions get the priority floor over any static non-exact score") {
             // A word the user actually typed, completing the current prefix, must beat even a
             // max-frequency static completion — «اقترح من قاموسي الذي تعلمته أولاً».
@@ -237,6 +248,125 @@ class PersonalLearningTest : FunSpec({
         }
         test("bidi format marks are transparent separators") {
             PersonalLearning.extractLastWords("مرحبا‏ كيف ", 2) shouldBe listOf("مرحبا", "كيف")
+        }
+        test("four-word contexts extract for pentagram learning") {
+            PersonalLearning.extractLastWords("السلام عليكم ورحمة الله ", 4) shouldBe
+                listOf("السلام", "عليكم", "ورحمة", "الله")
+        }
+    }
+
+    context("recency weight") {
+        val day = 24L * 60 * 60 * 1000
+        val now = 100L * day
+        test("this week outranks last month, stale habits fade") {
+            PersonalLearning.recencyWeight(now, now - day) shouldBe 1.25
+            PersonalLearning.recencyWeight(now, now - 5 * day) shouldBe 1.15
+            PersonalLearning.recencyWeight(now, now - 20 * day) shouldBe 1.0
+            PersonalLearning.recencyWeight(now, now - 90 * day) shouldBe 0.85
+        }
+        test("missing or future timestamps stay neutral") {
+            PersonalLearning.recencyWeight(now, 0L) shouldBe 1.0
+            PersonalLearning.recencyWeight(now, now + day) shouldBe 1.0
+        }
+    }
+
+    context("blended next-word merge") {
+        test("agreement across orders beats a single loud order") {
+            // «الله» is predicted by two orders at 150 each; «الخير» by one order at 160.
+            val merged = PersonalLearning.mergeNextWordsBlended(
+                orders = listOf(
+                    listOf("الله" to 150, "الخير" to 160),
+                    listOf("الله" to 150),
+                ),
+                blocked = emptySet(),
+                maxCount = 5,
+            )
+            // base 150 + 0.12*150 = 168 > 160 — the agreed-upon word wins.
+            merged.first().first shouldBe "الله"
+            merged.first().second shouldBe 168
+        }
+        test("blocked words are dropped and the cap holds") {
+            val merged = PersonalLearning.mergeNextWordsBlended(
+                orders = listOf(listOf("سيئة" to 250, "طيبة" to 100)),
+                blocked = setOf("سيئة"),
+                maxCount = 5,
+            )
+            merged.map { it.first } shouldBe listOf("طيبة")
+            val capped = PersonalLearning.mergeNextWordsBlended(
+                orders = listOf(listOf("كلمة" to 255), listOf("كلمة" to 255, "أخرى" to 255)),
+                blocked = emptySet(),
+                maxCount = 5,
+            )
+            capped.first().second shouldBe 255
+        }
+    }
+
+    context("phrase chain steps") {
+        test("a strong dominant follower extends the chain") {
+            PersonalLearning.chainStep(listOf("الله" to 200, "الناس" to 90)) shouldBe "الله"
+            PersonalLearning.chainStep(listOf("وبركاته" to 120)) shouldBe "وبركاته"
+        }
+        test("weak or contested followers end the chain") {
+            // Below CHAIN_MIN_LINK_FREQ.
+            PersonalLearning.chainStep(listOf("ربما" to 80)) shouldBe null
+            // A fork: the runner-up is too close.
+            PersonalLearning.chainStep(listOf("خير" to 150, "نور" to 140)) shouldBe null
+            PersonalLearning.chainStep(emptyList()) shouldBe null
+        }
+        test("a once-seen personal habit is not chain-strong, a twice-seen one is") {
+            // count=1 -> freq 84 < 96; count=2 -> freq 108 >= 96: the chain only trusts
+            // what the user actually repeated.
+            (PersonalLearning.userBigramFreq(1) < PersonalLearning.CHAIN_MIN_LINK_FREQ).shouldBeTrue()
+            (PersonalLearning.userBigramFreq(2) >= PersonalLearning.CHAIN_MIN_LINK_FREQ).shouldBeTrue()
+        }
+    }
+
+    context("context-endorsed completion seeding (سيناريو «إن ← ش»)") {
+        test("a predicted follower leads the bar once its first letter is typed") {
+            // بعد «إن» تنبأ المحرك بـ«شاء/شالله» — كتابة «ش» يجب ألا تغرقهما تحت شادي وشايفة.
+            val frequencyRanked = listOf(
+                ranked("شادي", 200, 180.0),
+                ranked("شايفة", 190, 170.0),
+                ranked("شز", 180, 160.0),
+            )
+            val followers = mapOf(
+                "شاء" to ("شاء" to 220),
+                "شالله" to ("شالله" to 150),
+                "يكون" to ("يكون" to 140),
+            )
+            val seeded = PersonalLearning.seedContextCompletions(frequencyRanked, followers, "ش", 5)
+            seeded[0].entry.word shouldBe "شاء"
+            seeded[1].entry.word shouldBe "شالله"
+            seeded.map { it.entry.word } shouldContain "شادي"
+            seeded.map { it.entry.word } shouldNotContain "يكون"
+        }
+        test("an exact match is never displaced by a follower") {
+            val exact = ranked("شاي", 100, 10100.0, exact = true)
+            val followers = mapOf("شايك" to ("شايك" to 255))
+            val seeded = PersonalLearning.seedContextCompletions(listOf(exact), followers, "شاي", 5)
+            seeded[0].entry.word shouldBe "شاي"
+        }
+        test("an existing candidate is lifted in place, not duplicated") {
+            val frequencyRanked = listOf(ranked("شادي", 200, 180.0), ranked("شاء", 90, 60.0))
+            val followers = mapOf("شاء" to ("شاء" to 200))
+            val seeded = PersonalLearning.seedContextCompletions(frequencyRanked, followers, "ش", 5)
+            seeded[0].entry.word shouldBe "شاء"
+            seeded.count { it.entry.word == "شاء" } shouldBe 1
+        }
+        test("no followers or empty query passes through untouched") {
+            val base = listOf(ranked("كلمة", 100, 90.0))
+            PersonalLearning.seedContextCompletions(base, emptyMap(), "ك", 5) shouldBe base
+            PersonalLearning.seedContextCompletions(
+                base, mapOf("س" to ("س" to 1)), "", 5,
+            ) shouldBe base
+        }
+    }
+
+    context("sentence-start key") {
+        test("the sentinel can never collide with normalized text") {
+            ArabicNormalizer.normalize("<s>") shouldBe PersonalLearning.SENTENCE_START_KEY
+            // No learnable word ever normalizes INTO the sentinel: '<' is not a letter.
+            PersonalLearning.isLearnableWord(PersonalLearning.SENTENCE_START_KEY).shouldBeFalse()
         }
     }
 })

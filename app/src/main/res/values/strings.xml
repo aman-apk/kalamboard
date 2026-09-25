@@ -1230,4 +1230,6 @@
     <string name="onboarding__action_next">Next</string>
     <string name="onboarding__action_skip">Skip</string>
     <string name="onboarding__action_get_started">Get started</string>
+    <string name="aman_signature" comment="Aman Labs family signature shown at the end of the settings home screen">From Aman Labs</string>
+    <string name="aman_labs" comment="Aman Labs family name shown in the onboarding footer">Aman Labs</string>
 </resources>

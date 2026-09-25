@@ -1,0 +1,12 @@
+KalamBoard (كلام بورد)
+Copyright 2026 Aman Labs
+
+KalamBoard is a modified version of FlorisBoard
+(https://github.com/florisboard/florisboard),
+Copyright 2020-2026 Patrick Goldinger and the FlorisBoard contributors,
+licensed under the Apache License, Version 2.0.
+
+Changes by Aman Labs include the Arabic-first identity and onboarding,
+on-device word prediction and dialect dictionaries (Levantine, Egyptian,
+Gulf), removal of every network code path, and an offline build guard.
+The full license text is in the LICENSE file.

@@ -52,12 +52,17 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.remember
 import dev.patrickgold.florisboard.R
 import dev.patrickgold.florisboard.app.FlorisPreferenceStore
@@ -68,8 +73,14 @@ import dev.patrickgold.jetpref.datastore.model.collectAsState
 import kotlinx.coroutines.launch
 import org.florisboard.lib.compose.stringRes
 
-/** KalamBoard's champagne-gold brand accent, used sparingly for the onboarding highlights. */
-private val KalamGold = Color(0xFFD4AF37)
+/** KalamBoard's amber-gold brand accent, used sparingly for the onboarding highlights. */
+private val KalamGold = Color(0xFFE0A32E)
+
+/**
+ * Deeper amber from the same family, used instead of [KalamGold] for accents drawn directly
+ * on light surfaces (icon tints, pager dots), where the brighter gold falls below WCAG 3:1.
+ */
+private val KalamGoldDeep = Color(0xFFA87616)
 
 /** Dark ink used for text sitting on the gold accent. */
 private val KalamInk = Color(0xFF191203)
@@ -126,6 +137,14 @@ fun OnboardingScreen() {
     val pagerState = rememberPagerState { pages.size }
     val isLastPage = pagerState.currentPage == pages.size - 1
 
+    // Gold accents sitting directly on the surface need the deeper family shade in light theme
+    // to stay >= 3:1; filled gold containers keep KalamGold with KalamInk text (8.4:1).
+    val surfaceAccent = if (MaterialTheme.colorScheme.surface.luminance() < 0.5f) {
+        KalamGold
+    } else {
+        KalamGoldDeep
+    }
+
     fun finishOnboarding() {
         scope.launch { prefs.internal.onboardingCompleted.set(true) }
         navController.navigate(Routes.Setup.Screen) {
@@ -167,7 +186,30 @@ fun OnboardingScreen() {
                             modifier = Modifier
                                 .size(132.dp)
                                 .clip(CircleShape)
-                                .background(Color.Black),
+                                // Adopted Aman family "skies" identity: the ivory glyph floats on the
+                                // golden-sky diagonal gradient with the dawn wash («صحوة الضوء»),
+                                // mirroring ic_app_icon_background.xml (108-viewport geometry scaled).
+                                .drawBehind {
+                                    drawRect(
+                                        Brush.linearGradient(
+                                            0.0f to Color(0xFFD9A93E),
+                                            0.5f to Color(0xFFAE7E23),
+                                            1.0f to Color(0xFF6F4E12),
+                                            start = Offset(size.width * (20f / 108f), 0f),
+                                            end = Offset(size.width * (88f / 108f), size.height),
+                                        )
+                                    )
+                                    drawRect(
+                                        Brush.radialGradient(
+                                            0.0f to Color(0x4DF7E8C2),
+                                            0.45f to Color(0x24F7E8C2),
+                                            0.85f to Color(0x0DF7E8C2),
+                                            1.0f to Color(0x00F7E8C2),
+                                            center = Offset(size.width * (30f / 108f), size.height * (20f / 108f)),
+                                            radius = size.width * (115f / 108f),
+                                        )
+                                    )
+                                },
                             contentAlignment = Alignment.Center,
                         ) {
                             Image(
@@ -181,14 +223,14 @@ fun OnboardingScreen() {
                             modifier = Modifier
                                 .size(112.dp)
                                 .clip(CircleShape)
-                                .background(KalamGold.copy(alpha = 0.14f)),
+                                .background(surfaceAccent.copy(alpha = 0.14f)),
                             contentAlignment = Alignment.Center,
                         ) {
                             Icon(
                                 imageVector = page.icon,
                                 contentDescription = null,
                                 modifier = Modifier.size(52.dp),
-                                tint = KalamGold,
+                                tint = surfaceAccent,
                             )
                         }
                     }
@@ -252,7 +294,7 @@ fun OnboardingScreen() {
                     val selected = pagerState.currentPage == index
                     val dotWidth by animateDpAsState(if (selected) 22.dp else 8.dp, label = "dotWidth")
                     val dotColor by animateColorAsState(
-                        if (selected) KalamGold else MaterialTheme.colorScheme.outlineVariant,
+                        if (selected) surfaceAccent else MaterialTheme.colorScheme.outlineVariant,
                         label = "dotColor",
                     )
                     Box(
@@ -277,7 +319,6 @@ fun OnboardingScreen() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 32.dp)
-                    .padding(bottom = 28.dp)
                     .height(52.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = KalamGold,
@@ -291,6 +332,26 @@ fun OnboardingScreen() {
                     ),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
+                )
+            }
+
+            // توقيع «مختبرات أمان» — خاتم العائلة في ذيل صفحة الترحيب.
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 18.dp, bottom = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.amanlabs_rosette),
+                    contentDescription = null,
+                    modifier = Modifier.size(32.dp),
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    text = stringRes(R.string.aman_labs),
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }

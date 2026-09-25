@@ -43,6 +43,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import dev.patrickgold.florisboard.R
+import dev.patrickgold.florisboard.app.aman.AmanSupportReminder
 import dev.patrickgold.florisboard.app.apptheme.FlorisAppTheme
 import dev.patrickgold.florisboard.app.ext.ExtensionImportScreenType
 import dev.patrickgold.florisboard.app.setup.NotificationPermissionState
@@ -56,6 +57,7 @@ import dev.patrickgold.florisboard.lib.util.AppVersionUtils
 import dev.patrickgold.jetpref.datastore.model.collectAsState
 import dev.patrickgold.jetpref.datastore.ui.ProvideDefaultDialogPrefStrings
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlinx.coroutines.launch
 import org.florisboard.lib.android.AndroidVersion
 import org.florisboard.lib.android.hideAppIcon
 import org.florisboard.lib.android.showAppIcon
@@ -134,6 +136,13 @@ class FlorisAppActivity : ComponentActivity() {
             }
             onNewIntent(intent)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Aman family standards §5: opening the settings app also counts as usage for the quiet
+        // monthly donation reminder (see AmanSupportReminder for the binding rules).
+        lifecycleScope.launch { AmanSupportReminder.onAppActive(this@FlorisAppActivity) }
     }
 
     override fun onPause() {

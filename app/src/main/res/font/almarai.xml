@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Almarai font family (Aman family decision 2026-08-13), mirroring Mihrab's declaration.
+     Almarai ships Regular (400) and Bold (700) only - there is no Medium/SemiBold file, so
+     never reference a weight other than these two.
+     Used by the XML view themes (app UI + crash dialog); Compose reads the two ttf files
+     directly via R.font.almarai_regular / R.font.almarai_bold in apptheme/Type.kt.
+     NOT referenced by the IME/keyboard theme, which stays on the system font by design. -->
+<font-family xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <font
+        android:font="@font/almarai_regular"
+        android:fontStyle="normal"
+        android:fontWeight="400"
+        app:font="@font/almarai_regular"
+        app:fontStyle="normal"
+        app:fontWeight="400" />
+    <font
+        android:font="@font/almarai_bold"
+        android:fontStyle="normal"
+        android:fontWeight="700"
+        app:font="@font/almarai_bold"
+        app:fontStyle="normal"
+        app:fontWeight="700" />
+</font-family>

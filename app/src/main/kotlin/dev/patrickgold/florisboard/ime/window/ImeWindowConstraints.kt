@@ -62,7 +62,9 @@ sealed class ImeWindowConstraints(rootInsets: ImeInsets.Root) {
 
     open val baselineRowCount: Float = 4f
     open val smartbarDynamicScalingFactor = 0.20f
-    open val smartbarStaticScalingFactor by calculation { 0.753f - smartbarDynamicScalingFactor }
+    // كلام بورد: 0.753 ← 0.68 (بأمر المالك 2026-08-26) — شريط التنبؤ أخفض بنحو عُشرٍ
+    // فلا يسرق من الشاشة ما لا يحتاجه؛ رقائق الاقتراح تتوسط الارتفاع الجديد بلا قصّ.
+    open val smartbarStaticScalingFactor by calculation { 0.68f - smartbarDynamicScalingFactor }
 
     open val resizeHandleTouchSize: Dp = 48.dp
     open val resizeHandleTouchOffsetFloating: Dp by calculation { resizeHandleTouchSize / 2 }

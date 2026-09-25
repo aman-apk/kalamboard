@@ -50,7 +50,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
@@ -247,9 +246,9 @@ fun TextKeyboardLayout(
                         KeyboardMode.NUMERIC_ADVANCED,
                         KeyboardMode.SYMBOLS,
                         KeyboardMode.SYMBOLS2 -> {
-                            // heightFactorSum == rowCount unless the half-height number row is
+                            // heightFactorSum == rowCount unless the short number row is
                             // active, in which case full rows keep the base height and the number
-                            // row takes its 0.5 share inside layout().
+                            // row takes its fractional share inside layout().
                             (keyboardHeight / keyboard.heightFactorSum)
                                 .coerceAtMost(keyboardRowBaseHeight.toPx() * 1.12f)
                         }
@@ -385,20 +384,13 @@ private fun TextKeyButton(
                     customLabel = "\u2039  $customLabel  \u203a"
                 }
             }
-            // Keys of the half-height number row scale their label down so the digit glyphs
-            // fit the reduced key height (theme font sizes are height-independent).
-            val isHalfHeightKey = key.touchBounds.height < desiredKey.touchBounds.height * 0.75f
+            // صف الأرقام صار بارتفاعٍ متوسّط لا نصفيّ، فلا تصغير لعنوانه: الرقم يُقرأ
+            // بحجمه كما على سائر المفاتيح (أمر المالك 2026-09-08: «ارتفاعه متوسط دون
+            // أن يؤثر على الأرقام»). حجوم الخط من السمة بوحدة sp ولا تتبع ارتفاع المفتاح.
             SnyggText(
                 modifier = Modifier
                     .wrapContentSize()
-                    .align(if (isTelPadKey) BiasAlignment(-0.5f, 0f) else Alignment.Center)
-                    .then(
-                        if (isHalfHeightKey) {
-                            Modifier.graphicsLayer(scaleX = 0.75f, scaleY = 0.75f)
-                        } else {
-                            Modifier
-                        }
-                    ),
+                    .align(if (isTelPadKey) BiasAlignment(-0.5f, 0f) else Alignment.Center),
                 text = customLabel,
             )
         }

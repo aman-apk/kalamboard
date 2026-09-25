@@ -4,13 +4,21 @@
     "id": "org.kalamboard.themes",
     "version": "1.0.0",
     "title": "KalamBoard themes",
-    "description": "The KalamBoard theme collection: pure black, graphite, navy, midnight and a warm paper-light day theme",
+    "description": "The KalamBoard theme collection: dark gray, pure black, graphite, navy, midnight and a warm paper-light day theme",
     "maintainers": [
       "KalamBoard"
     ],
     "license": "apache-2.0"
   },
   "themes": [
+    {
+      "id": "kalam_dark",
+      "label": "كلام داكن",
+      "authors": [
+        "KalamBoard"
+      ],
+      "isNight": true
+    },
     {
       "id": "kalam_black",
       "label": "Kalam Black",

@@ -19,6 +19,9 @@
         <intent>
             <action android:name="android.service.textservice.SpellCheckerService"/>
         </intent>
+        <!-- Aman family: lets the «ادعم أمان» screen detect and open the Aman Store app.
+             Package visibility only — no permission, no network. -->
+        <package android:name="org.amanlabs.store"/>
     </queries>
 
     <application
@@ -110,6 +113,11 @@
             </intent-filter>
         </activity-alias>
 
+        <!-- Aman support reminder «لاحقًا» notification action — local only -->
+        <receiver
+            android:name="dev.patrickgold.florisboard.app.aman.AmanSupportReminderReceiver"
+            android:exported="false"/>
+
         <!-- Crash Dialog Activity -->
         <activity
             android:name="dev.patrickgold.florisboard.lib.crashutility.CrashDialogActivity"
@@ -159,6 +167,12 @@
                 android:name="androidx.emoji2.text.EmojiCompatInitializer"
                 tools:node="remove"/>
         </provider>
+
+        <!-- عقد «باكأب أمان»: يسلّم المتجرَ (بعد التحقق من بصمته) قاموسَ المستخدم وتعلّمَه وتفضيلاتِه. -->
+        <provider
+            android:name=".backup.FamilyBackupProvider"
+            android:authorities="org.amanlabs.kalamboard.backup"
+            android:exported="true" />
 
     </application>
 

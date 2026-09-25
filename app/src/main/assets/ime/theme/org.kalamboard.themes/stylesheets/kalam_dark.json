@@ -1,31 +1,26 @@
 {
   "$schema": "https://schemas.florisboard.org/snygg/v2/stylesheet",
   "@defines": {
-    "--primary": "dynamic-light-color(inversePrimary)",
-    "--primary-variant": "dynamic-light-color(primary)",
-    "--secondary": "dynamic-light-color(secondaryContainer)",
-    "--secondary-variant": "dynamic-light-color(secondary)",
-    "--background": "dynamic-light-color(background)",
-    "--background-variant": "dynamic-light-color(background)",
-    "--surface": "dynamic-light-color(surfaceDim)",
-    "--surface-variant": "dynamic-light-color(surfaceVariant)",
-
-    "--popup-surface": "dynamic-light-color(surfaceContainerLow)",
-    "--focused-popup-surface": "dynamic-light-color(surfaceContainerHigh)",
-
-    "--drag-marker": "rgb(255,0,0)",
-    "--spacer-color": "dynamic-light-color(scrim)",
-
-    "--one-hand-background": "dynamic-light-color(inversePrimary)",
-    "--one-hand-foreground": "dynamic-light-color(scrim)",
-
-    "--incognito-icon-color": "#00000011",
-
-    "--on-primary": "dynamic-light-color(onPrimary)",
-    "--on-background": "dynamic-light-color(onBackground)",
-    "--on-background-disabled": "rgb(175,175,175)",
-    "--on-surface": "dynamic-light-color(onSurface)",
-    "--on-surface-variant": "#5f5f5f",
+    "--primary": "#e0a32e",
+    "--primary-variant": "#b38225",
+    "--secondary": "#f0cd7a",
+    "--secondary-variant": "#d9a93e",
+    "--background": "#1c1c1e",
+    "--background-variant": "#242426",
+    "--surface": "#2c2c2e",
+    "--surface-variant": "#3a3a3c",
+    "--popup-surface": "#48484a",
+    "--focused-popup-surface": "#5c5334",
+    "--drag-marker": "#e0a32e",
+    "--spacer-color": "rgba(255, 255, 255, 0.22)",
+    "--one-hand-background": "#242426",
+    "--one-hand-foreground": "#e0a32e",
+    "--incognito-icon-color": "#ffffff11",
+    "--on-primary": "#191203",
+    "--on-background": "#f2f0ea",
+    "--on-background-disabled": "#f2f0ea48",
+    "--on-surface": "#f2f0ea",
+    "--on-surface-variant": "#a6a49e",
 
     "--shape": "rounded-corner(8dp, 8dp, 8dp, 8dp)",
     "--shape-variant": "rounded-corner(12dp, 12dp, 12dp, 12dp)",
@@ -68,30 +63,29 @@
   },
 
   "key": {
-    "background": "transparent",
+    "background": "var(--surface)",
     "foreground": "var(--on-surface)",
     "font-size": "22sp",
     "shape": "var(--shape)",
+    "shadow-elevation": "2dp",
     "text-max-lines": "1"
   },
   "key:pressed": {
-    "background": "var(--surface)",
+    "background": "var(--surface-variant)",
     "foreground": "var(--on-surface)"
   },
   "key[code=10]": {
     "background": "var(--primary)",
-    "foreground": "var(--on-surface)",
-    "margin": "0dp 6dp"
+    "foreground": "var(--on-primary)"
   },
   "key[code=10]:pressed": {
     "background": "var(--primary-variant)",
-    "foreground": "var(--on-surface)"
+    "foreground": "var(--on-primary)"
   },
   "key[code=32]": {
     "background": "var(--surface)",
     "foreground": "var(--on-surface-variant)",
     "font-size": "12sp",
-    "margin": "0dp 6dp",
     "text-overflow": "ellipsis"
   },
   "key[code=-201,-202,-203]": {
@@ -109,8 +103,8 @@
   "key-hint": {
     "background": "transparent",
     "foreground": "var(--on-surface-variant)",
-    "font-size": "12sp",
     "font-family": "monospace",
+    "font-size": "12sp",
     "padding": "0dp 1dp 1dp 0dp",
     "text-max-lines": "1"
   },
@@ -123,7 +117,6 @@
   },
   "key-popup-element:focus": {
     "background": "var(--focused-popup-surface)",
-    "foreground": "var(--on-surface)",
     "shape": "var(--shape)"
   },
   "key-popup-element[code=-255]": {
@@ -138,8 +131,8 @@
     "font-size": "18sp"
   },
   "smartbar-shared-actions-toggle": {
-    "background": "var(--primary)",
-    "foreground": "var(--on-primary)",
+    "background": "var(--surface)",
+    "foreground": "var(--on-surface)",
     "margin": "6dp",
     "shape": "circle()",
     "shadow-elevation": "2dp"
@@ -155,13 +148,10 @@
     "foreground": "var(--on-background)",
     "shape": "var(--shape)"
   },
-  "smartbar-action-key:pressed": {
-    "background": "var(--surface)",
-    "foreground": "var(--on-surface)"
-  },
   "smartbar-action-key:disabled": {
     "foreground": "var(--on-background-disabled)"
   },
+
   "smartbar-actions-overflow": {
     "margin": "4dp"
   },
@@ -190,14 +180,15 @@
     "font-size": "24sp",
     "margin": "0dp 0dp 0dp 8dp"
   },
+
   "smartbar-actions-editor": {
     "background": "var(--background)",
     "foreground": "var(--on-background)",
     "shape": "rounded-corner(24dp, 24dp, 0dp, 0dp)"
   },
   "smartbar-actions-editor-header": {
-    "background": "var(--primary)",
-    "foreground": "var(--on-primary)",
+    "background": "var(--surface)",
+    "foreground": "var(--on-surface)",
     "font-size": "16sp",
     "text-max-lines": "1",
     "text-overflow": "ellipsis"
@@ -207,7 +198,7 @@
     "shape": "circle()"
   },
   "smartbar-actions-editor-subheader": {
-    "foreground": "var(--primary)",
+    "foreground": "var(--secondary)",
     "font-size": "16sp",
     "font-weight": "bold",
     "padding": "12dp 16dp 12dp 8dp",
@@ -230,10 +221,11 @@
   "smartbar-actions-editor-tile[code=-991]": {
     "foreground": "var(--drag-marker)"
   },
+
   "smartbar-candidate-word": {
     "background": "transparent",
     "foreground": "var(--on-background)",
-    "font-size": "14sp",
+    "font-size": "16sp",
     "margin": "4dp",
     "padding": "8dp 0dp",
     "shape": "rectangle()",
@@ -242,7 +234,7 @@
   },
   "smartbar-candidate-word:pressed": {
     "background": "var(--surface)",
-    "foreground": "var(--on-background)"
+    "foreground": "var(--on-surface)"
   },
   "smartbar-candidate-word-secondary-text": {
     "font-size": "8sp",
@@ -260,13 +252,13 @@
   },
   "smartbar-candidate-clip:pressed": {
     "background": "var(--surface)",
-    "foreground": "var(--on-background)"
+    "foreground": "var(--on-surface)"
   },
   "smartbar-candidate-clip-icon": {
     "margin": "0dp 0dp 4dp 0dp"
   },
   "smartbar-candidate-spacer": {
-    "foreground": "var(--surface)"
+    "foreground": "var(--spacer-color)"
   },
 
   "clipboard-header": {
@@ -473,6 +465,7 @@
   "one-handed-panel-button": {
     "padding": "8dp",
     "font-size": "24sp",
+    "background": "var(--surface)",
     "shape": "circle()"
   },
 

@@ -1,76 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    KalamBoard app icon foreground.
+    KalamBoard app icon foreground — approved Aman family "skies" identity.
 
-    Concept: "kalam" (speech) meets keyboard — a speech bubble drawn as a thin gold ring,
-    holding a row of three keys and a space bar. Champagne-gold vertical gradient on the
-    pure-black adaptive background; all shapes sit inside the adaptive safe zone.
+    Concept: "kalam" (speech) meets keyboard — an ivory speech bubble drawn as a thin ring,
+    holding a row of three keys and a space bar, floating on the golden-sky gradient
+    background (ic_app_icon_background.xml) with two faint stars. All shapes sit inside
+    the adaptive safe zone.
 -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Bubble ring (outer rounded rect minus inner, even-odd) -->
-    <path
-        android:fillType="evenOdd"
-        android:pathData="M34,26 L74,26 C81.73,26 88,32.27 88,40 L88,64 C88,71.73 81.73,78 74,78 L34,78 C26.27,78 20,71.73 20,64 L20,40 C20,32.27 26.27,26 34,26 Z M35,31 L73,31 C78.52,31 83,35.48 83,41 L83,63 C83,68.52 78.52,73 73,73 L35,73 C29.48,73 25,68.52 25,63 L25,41 C25,35.48 29.48,31 35,31 Z">
-        <aapt:attr name="android:fillColor">
-            <gradient
-                android:type="linear"
-                android:startX="54" android:startY="26"
-                android:endX="54" android:endY="90">
-                <item android:offset="0.0" android:color="#F2E2B0"/>
-                <item android:offset="0.55" android:color="#D4AF37"/>
-                <item android:offset="1.0" android:color="#AC8A4E"/>
-            </gradient>
-        </aapt:attr>
-    </path>
+    <group android:pivotX="54" android:pivotY="54" android:scaleX="0.98" android:scaleY="0.98">
+        <!-- Bubble ring (outer rounded rect minus inner, even-odd), ivory -->
+        <path
+            android:fillColor="#FDF3D8"
+            android:fillType="evenOdd"
+            android:pathData="M37,30h34a13,13 0 0 1 13,13v18a13,13 0 0 1 -13,13H37a13,13 0 0 1 -13,-13V43a13,13 0 0 1 13,-13z M38,35h32a9,9 0 0 1 9,9v14a9,9 0 0 1 -9,9H38a9,9 0 0 1 -9,-9V44a9,9 0 0 1 9,-9z"/>
 
-    <!-- Bubble tail -->
-    <path
-        android:pathData="M37,77 L28,88.5 L52,77 Z">
-        <aapt:attr name="android:fillColor">
-            <gradient
-                android:type="linear"
-                android:startX="54" android:startY="26"
-                android:endX="54" android:endY="90">
-                <item android:offset="0.0" android:color="#F2E2B0"/>
-                <item android:offset="0.55" android:color="#D4AF37"/>
-                <item android:offset="1.0" android:color="#AC8A4E"/>
-            </gradient>
-        </aapt:attr>
-    </path>
+        <!-- Bubble tail, ivory -->
+        <path
+            android:fillColor="#FDF3D8"
+            android:pathData="M38,73L33,81L53,73Z"/>
 
-    <!-- Three keys -->
-    <path
-        android:pathData="M35.5,40 L40.5,40 C41.88,40 43,41.12 43,42.5 L43,47.5 C43,48.88 41.88,50 40.5,50 L35.5,50 C34.12,50 33,48.88 33,47.5 L33,42.5 C33,41.12 34.12,40 35.5,40 Z M51.5,40 L56.5,40 C57.88,40 59,41.12 59,42.5 L59,47.5 C59,48.88 57.88,50 56.5,50 L51.5,50 C50.12,50 49,48.88 49,47.5 L49,42.5 C49,41.12 50.12,40 51.5,40 Z M67.5,40 L72.5,40 C73.88,40 75,41.12 75,42.5 L75,47.5 C75,48.88 73.88,50 72.5,50 L67.5,50 C66.12,50 65,48.88 65,47.5 L65,42.5 C65,41.12 66.12,40 67.5,40 Z">
-        <aapt:attr name="android:fillColor">
-            <gradient
-                android:type="linear"
-                android:startX="54" android:startY="26"
-                android:endX="54" android:endY="90">
-                <item android:offset="0.0" android:color="#F2E2B0"/>
-                <item android:offset="0.55" android:color="#D4AF37"/>
-                <item android:offset="1.0" android:color="#AC8A4E"/>
-            </gradient>
-        </aapt:attr>
-    </path>
+        <!-- Three keys — ذهب فاتح مضيء -->
+        <path
+            android:fillColor="#F6E1A8"
+            android:pathData="M36.5,41h5a2.5,2.5 0 0 1 2.5,2.5v5a2.5,2.5 0 0 1 -2.5,2.5h-5a2.5,2.5 0 0 1 -2.5,-2.5v-5a2.5,2.5 0 0 1 2.5,-2.5z M51.5,41h5a2.5,2.5 0 0 1 2.5,2.5v5a2.5,2.5 0 0 1 -2.5,2.5h-5a2.5,2.5 0 0 1 -2.5,-2.5v-5a2.5,2.5 0 0 1 2.5,-2.5z M66.5,41h5a2.5,2.5 0 0 1 2.5,2.5v5a2.5,2.5 0 0 1 -2.5,2.5h-5a2.5,2.5 0 0 1 -2.5,-2.5v-5a2.5,2.5 0 0 1 2.5,-2.5z"/>
 
-    <!-- Space bar -->
+        <!-- Space bar — أفتح من السماء بدرجتين -->
+        <path
+            android:fillColor="#F6E1A8"
+            android:pathData="M38,56h32a4,4 0 0 1 4,4a4,4 0 0 1 -4,4H38a4,4 0 0 1 -4,-4a4,4 0 0 1 4,-4z"/>
+
+        <!-- Space bar highlight -->
+        <path
+            android:fillColor="#FBF2D9"
+            android:pathData="M35.75,57h36.5a1.75,1.75 0 0 1 1.75,1.75a1.75,1.75 0 0 1 -1.75,1.75H35.75a1.75,1.75 0 0 1 -1.75,-1.75a1.75,1.75 0 0 1 1.75,-1.75z"/>
+
+        <!-- خيط الضوء — اعتماد مذهب «صحوة الضوء» 2026-08-14 -->
+        <path
+            android:strokeColor="#FFFDF2"
+            android:strokeAlpha="0.68"
+            android:strokeWidth="1.2"
+            android:fillColor="@android:color/transparent"
+            android:pathData="M39,31 L69,31"/>
+    </group>
+
+    <!-- Faint stars -->
     <path
-        android:pathData="M36,56 L72,56 C73.66,56 75,57.34 75,59 L75,61 C75,62.66 73.66,64 72,64 L36,64 C34.34,64 33,62.66 33,61 L33,59 C33,57.34 34.34,56 36,56 Z">
-        <aapt:attr name="android:fillColor">
-            <gradient
-                android:type="linear"
-                android:startX="54" android:startY="26"
-                android:endX="54" android:endY="90">
-                <item android:offset="0.0" android:color="#F2E2B0"/>
-                <item android:offset="0.55" android:color="#D4AF37"/>
-                <item android:offset="1.0" android:color="#AC8A4E"/>
-            </gradient>
-        </aapt:attr>
-    </path>
+        android:fillColor="#7AFFFFFF"
+        android:pathData="M24,24m-1.2,0a1.2,1.2 0 1 1 2.4,0a1.2,1.2 0 1 1 -2.4,0"/>
+    <path
+        android:fillColor="#69FFFFFF"
+        android:pathData="M88,82m-1,0a1,1 0 1 1 2,0a1,1 0 1 1 -2,0"/>
 </vector>
